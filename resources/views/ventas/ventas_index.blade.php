@@ -34,7 +34,9 @@
                         <th>Total</th>
                         <th>Ticket de venta</th>
                         <th>Detalles</th>
-                        <th>Eliminar</th>
+                        @if (Auth::user()->id == 1)
+                            <th>Eliminar</th>
+                        @endif
                     </tr>
                     </thead>
                     <tbody>
@@ -53,15 +55,17 @@
                                     <i class="fa fa-info"></i>
                                 </a>
                             </td>
-                            <td>
-                                <form action="{{route("ventas.destroy", [$venta])}}" method="post">
-                                    @method("delete")
-                                    @csrf
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
+                            @if (Auth::user()->id == 1)
+                                <td>
+                                    <form action="{{route("ventas.destroy", [$venta])}}" method="post">
+                                        @method("delete")
+                                        @csrf
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            @endif
                         </tr>
                     @endforeach
                     </tbody>
