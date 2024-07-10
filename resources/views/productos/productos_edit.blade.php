@@ -24,7 +24,7 @@
     <div class="row">
         <div class="col-12">
             <h1>Editar producto</h1>
-            <form method="POST" action="{{route("productos.update", [$producto])}}">
+            <form method="POST" action="{{route("productos.update", [$producto])}}" enctype="multipart/form-data">
                 @method("PUT")
                 @csrf
                 <div class="form-group">
@@ -56,6 +56,11 @@
                     <input required value="{{$producto->existencia}}" autocomplete="off" name="existencia"
                            class="form-control"
                            type="decimal(9,2)" placeholder="Existencia">
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlFile1">Imagen</label>
+                    <input type="file" class="form-control-file" id="img" name="img">
                 </div>
 
                 @include("notificacion")

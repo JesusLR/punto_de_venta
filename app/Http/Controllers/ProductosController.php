@@ -1,22 +1,22 @@
 <?php
 /*
 
-  ____          _____               _ _           _       
- |  _ \        |  __ \             (_) |         | |      
- | |_) |_   _  | |__) |_ _ _ __ _____| |__  _   _| |_ ___ 
+  ____          _____               _ _           _
+ |  _ \        |  __ \             (_) |         | |
+ | |_) |_   _  | |__) |_ _ _ __ _____| |__  _   _| |_ ___
  |  _ <| | | | |  ___/ _` | '__|_  / | '_ \| | | | __/ _ \
  | |_) | |_| | | |  | (_| | |   / /| | |_) | |_| | ||  __/
  |____/ \__, | |_|   \__,_|_|  /___|_|_.__/ \__, |\__\___|
-         __/ |                               __/ |        
-        |___/                               |___/         
-    
+         __/ |                               __/ |
+        |___/                               |___/
+
     Blog:       https://parzibyte.me/blog
     Ayuda:      https://parzibyte.me/blog/contrataciones-ayuda/
     Contacto:   https://parzibyte.me/blog/contacto/
-    
+
     Copyright (c) 2020 Luis Cabrera Benito
     Licenciado bajo la licencia MIT
-    
+
     El texto de arriba debe ser incluido en cualquier redistribucion
 */ ?>
 <?php
@@ -56,8 +56,16 @@ class ProductosController extends Controller
      */
     public function store(Request $request)
     {
-        $producto = new Producto($request->input());
-        $producto->saveOrFail();
+        $producto = new Producto();
+        $producto->codigo_barras = $request->codigo_barras;
+        $producto->descripcion = $request->descripcion;
+        $producto->precio_compra = $request->precio_compra;
+        $producto->precio_venta = $request->precio_venta;
+        $producto->existencia = $request->existencia;
+        $ext = $request->img->extension();
+        $request->img->move(public_path('img/productos'), "producto_".$request->codigo_barras.".".$ext);
+        $producto->img = "producto_".$request->codigo_barras.".".$ext;
+        $producto->save();
         return redirect()->route("productos.index")->with("mensaje", "Producto guardado");
     }
 
@@ -93,8 +101,16 @@ class ProductosController extends Controller
      */
     public function update(Request $request, Producto $producto)
     {
-        $producto->fill($request->input());
-        $producto->saveOrFail();
+        $producto = Producto::where('id', $producto->id)->first();
+        $producto->codigo_barras = $request->codigo_barras;
+        $producto->descripcion = $request->descripcion;
+        $producto->precio_compra = $request->precio_compra;
+        $producto->precio_venta = $request->precio_venta;
+        $producto->existencia = $request->existencia;
+        $ext = $request->img->extension();
+        $request->img->move(public_path('img/productos'), "producto_".$request->codigo_barras.".".$ext);
+        $producto->img = "producto_".$request->codigo_barras.".".$ext;
+        $producto->save();
         return redirect()->route("productos.index")->with("mensaje", "Producto actualizado");
     }
 

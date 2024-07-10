@@ -38,6 +38,7 @@
                         <th>Precio de venta</th>
                         <th>Utilidad</th>
                         <th>Existencia</th>
+                        <th>Imagen</th>
                         @if (Auth::user()->id == 1)
                             <th>Editar</th>
                             <th>Eliminar</th>
@@ -53,6 +54,7 @@
                             <td>{{$producto->precio_venta}}</td>
                             <td>{{$producto->precio_venta - $producto->precio_compra}}</td>
                             <td>{{$producto->existencia}}</td>
+                            <td><img src="img/productos/{{$producto->img}}" alt="{{$producto->img}}" width="100" height="100"></td>
                             @if (Auth::user()->id == 1)
                                 <td>
                                     <a class="btn btn-warning" href="{{route("productos.edit",[$producto])}}">
