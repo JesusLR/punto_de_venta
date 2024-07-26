@@ -21,6 +21,7 @@
 @extends("maestra")
 @section("titulo", "Productos")
 @section("contenido")
+<input type="text" id="userID" value={{Auth::user()->id}} hidden>
     <div class="row">
         <div class="col-12">
             <h1>Productos <i class="fa fa-box"></i></h1>

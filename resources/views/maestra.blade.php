@@ -45,7 +45,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="{{env("APP_NAME")}}">
-    {{-- <meta name="author" content="Parzibyte"> --}}
+    <meta name="author" content="Parzibyte">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield("titulo") - {{env("APP_NAME")}}</title>
     <link href="{{url("/css/bootstrap.min.css")}}" rel="stylesheet">
@@ -62,7 +62,6 @@
     </style>
 </head>
 <body>
-<input type="text" id="userID" value={{Auth::user()->id}} hidden>
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
     <a class="navbar-brand" target="_blank" href="//parzibyte.me/blog">{{env("APP_NAME")}}</a>
