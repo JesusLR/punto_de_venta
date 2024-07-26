@@ -104,7 +104,7 @@ function imagenFormatter(value, row) {
 function accionesFormatter(value, row) {
     var user = $("#userID").val()
     html = ''
-    if(user){
+    if(user == 1){
         html += '<button type="button" style="margin-right: 2px;" class="btn btn-warning" onclick="editProducto('+row.id+')"><i class="fa fa-edit"></i></button>'
         html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" onclick="confirmDeleteProducto(' + row.id + ', \'' + row.codigo_barras + '\')"><i class="fa fa-trash"></i></button>'
     }
