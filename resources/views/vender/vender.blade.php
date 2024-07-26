@@ -50,11 +50,21 @@
                     </form>
                 </div>
                 <div class="col-12 col-md-6">
-                    <form action="{{route("agregarProductoVenta")}}" method="post">
+                    <div class="form-group">
+                        <label for="id_cliente">Producto</label>
+                        <select required class="form-control" name="id_producto" id="id_producto">
+                            <option value="0"> -- Seleccione un producto -- </option>
+                            @foreach($productos as $producto)
+                                <option value="{{$producto->id}}">{{$producto->codigo_barras}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <form action="{{route("agregarProductoVenta")}}" method="post" id="formCodigo">
                         @csrf
                         <div class="form-group">
-                            <label for="codigo">Código de barras</label>
-                            <input id="codigo" autocomplete="off" required autofocus name="codigo" type="text"
+                            {{-- <label for="codigo">Código de barras</label> --}}
+                            <input hidden id="codigo" autocomplete="off" required autofocus name="codigo" type="text"
                                    class="form-control"
                                    placeholder="Código de barras">
                         </div>
@@ -103,4 +113,7 @@
             @endif
         </div>
     </div>
+
+    <script src="{{asset('js/vender.js')}}"></script>
+
 @endsection

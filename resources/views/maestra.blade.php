@@ -45,10 +45,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="{{env("APP_NAME")}}">
-    <meta name="author" content="Parzibyte">
+    {{-- <meta name="author" content="Parzibyte"> --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield("titulo") - {{env("APP_NAME")}}</title>
     <link href="{{url("/css/bootstrap.min.css")}}" rel="stylesheet">
     <link href="{{url("/css/all.min.css")}}" rel="stylesheet">
+    {{-- <link rel="stylesheet" href="{{url('//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.13.1/bootstrap-table.min.css')}}"> --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.1/dist/bootstrap-table.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         body {
             padding-top: 70px;
@@ -58,6 +62,8 @@
     </style>
 </head>
 <body>
+<input type="text" id="userID" value={{Auth::user()->id}} hidden>
+
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
     <a class="navbar-brand" target="_blank" href="//parzibyte.me/blog">{{env("APP_NAME")}}</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -138,6 +144,12 @@
         </ul>
     </div>
 </nav>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.1/dist/bootstrap-table.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script type="text/javascript">
     // Tomado de https://parzibyte.me/blog/2019/06/26/menu-responsivo-bootstrap-4-sin-dependencias/
     document.addEventListener("DOMContentLoaded", () => {
@@ -151,7 +163,8 @@
 <main class="container-fluid">
     @yield("contenido")
 </main>
-<footer class="px-2 py-2 fixed-bottom bg-dark">
+
+{{-- <footer class="px-2 py-2 fixed-bottom bg-dark">
     <span class="text-muted">Punto de venta en Laravel
         <i class="fa fa-code text-white"></i>
         con
@@ -163,6 +176,6 @@
             <i class="fab fa-github"></i>
         </a>
     </span>
-</footer>
+</footer> --}}
 </body>
 </html>

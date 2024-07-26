@@ -25,6 +25,7 @@ namespace App\Http\Controllers;
 
 use App\Producto;
 use Illuminate\Http\Request;
+use Exception;
 
 class ProductosController extends Controller
 {
@@ -35,7 +36,7 @@ class ProductosController extends Controller
      */
     public function index()
     {
-        return view("productos.productos_index", ["productos" => Producto::all()]);
+        return view("productos.productos_index");
     }
 
     /**
@@ -86,10 +87,10 @@ class ProductosController extends Controller
      * @param \App\Producto $producto
      * @return \Illuminate\Http\Response
      */
-    public function edit(Producto $producto)
+    public function editarProducto($id)
     {
-        return view("productos.productos_edit", ["producto" => $producto,
-        ]);
+        $producto = Producto::where('id', $id)->first();
+        return view("productos.productos_edit", ["producto" => $producto]);
     }
 
     /**
@@ -107,10 +108,15 @@ class ProductosController extends Controller
         $producto->precio_compra = $request->precio_compra;
         $producto->precio_venta = $request->precio_venta;
         $producto->existencia = $request->existencia;
-        $ext = $request->img->extension();
-        $request->img->move(public_path('img/productos'), "producto_".$request->codigo_barras.".".$ext);
-        $producto->img = "producto_".$request->codigo_barras.".".$ext;
+
+        if(isset($request->img)){
+            $ext = $request->img->extension();
+            $request->img->move(public_path('img/productos'), "producto_".$request->codigo_barras.".".$ext);
+            $producto->img = "producto_".$request->codigo_barras.".".$ext;
+        }
+
         $producto->save();
+
         return redirect()->route("productos.index")->with("mensaje", "Producto actualizado");
     }
 
@@ -124,5 +130,51 @@ class ProductosController extends Controller
     {
         $producto->delete();
         return redirect()->route("productos.index")->with("mensaje", "Producto eliminado");
+    }
+
+    public function gridProductos(Request $request){
+        try{
+
+            return  Producto::where('lActivo', 1)->get();
+
+        }catch(Exception $ex){
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $ex->getMessage(),
+            ]);
+        }
+    }
+
+    public function getProductos(){
+        try{
+
+            return  Producto::where('lActivo', 1)->get();
+
+        }catch(Exception $ex){
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $ex->getMessage(),
+            ]);
+        }
+    }
+
+    public function deleteProducto(Request $request){
+        try{
+
+            $producto = Producto::where('id', $request->id)->first();
+            $producto->lActivo = 0;
+            $producto->save();
+
+            return response()->json([
+                'lSuccess' => true,
+                'cMensaje' => 'Producto eliminado!',
+            ]);
+
+        }catch(Exception $ex){
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $ex->getMessage(),
+            ]);
+        }
     }
 }

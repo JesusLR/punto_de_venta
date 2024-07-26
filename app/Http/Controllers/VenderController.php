@@ -114,7 +114,7 @@ class VenderController extends Controller
     public function agregarProductoVenta(Request $request)
     {
         $codigo = $request->post("codigo");
-        $producto = Producto::where("codigo_barras", "=", $codigo)->first();
+        $producto = Producto::where("id", "=", $codigo)->first();
         if (!$producto) {
             return redirect()
                 ->route("vender.index")
@@ -178,6 +178,7 @@ class VenderController extends Controller
             [
                 "total" => $total,
                 "clientes" => Cliente::all(),
+                "productos" => Producto::where('lActivo', 1)->get(),
             ]);
     }
 }

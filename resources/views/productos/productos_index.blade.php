@@ -29,8 +29,8 @@
             @endif
             @include("notificacion")
             <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
+                <table class="table table-bordered" id="gridProductos">
+                    {{-- <thead>
                     <tr>
                         <th>Código de barras</th>
                         <th>Descripción</th>
@@ -73,9 +73,12 @@
                             @endif
                         </tr>
                     @endforeach
-                    </tbody>
+                    </tbody> --}}
                 </table>
             </div>
         </div>
     </div>
+
+    <script src="{{asset('js/productos.js')}}"></script>
+
 @endsection
