@@ -7,7 +7,6 @@ $(document).ready(function () {
 
     $("#gridProductos").bootstrapTable({
         url: "/gridProductos",
-        exportDataType: "all",
         classes: "table-striped",
         method: "post",
         contentType: "application/x-www-form-urlencoded",
@@ -17,34 +16,11 @@ $(document).ready(function () {
         // detailView: true,
         queryParams: function (p) {
             return {
-                // cTipo: $("#cTipoBusqueda").val(),
-                // dtFechaInicio: $("#dtFechaInicio").val(),
-                // dtFechaFinal: $("#dtFechaFinal").val(),
-                // iFolio: $("#txtFolio").val(),
-                // cOficio: $("#txtOficio").val(),
-                // dtFechaOficio: $("#fFechaOficio").val(),
-                // iSolicitud: $("#txtNumSolicitud").val(),
-                // iAnioFiscal: $("#txtAnioFiscalPre").val(),
-                // cEstatus: $("#txtEstatus").val(),
-                // iIDGestoriaPatente: $("#iIDGestoriaPatente").val(),
             };
         },
         icons: {
             detailOpen: "fas fa-plus",
             detailClose: "fas fa-minus",
-        },
-        exportTypes: ['excel', 'pdf', 'xlsx'],
-        exportOptions: {
-            fileName: 'Tramites de Precaptura',
-            ignoreColumn: [0, 1, 7],
-            exportHiddenCells: false,
-            text: {
-                export: 'Exportar',
-                csv: 'CSV',
-                excel: 'Excel',
-                pdf: 'PDF',
-                print: 'Imprimir',
-            },
         },
         columns: [{
             field: "id",
@@ -79,13 +55,9 @@ $(document).ready(function () {
             formatter: "accionesFormatter",
         },],
         onLoadSuccess: function (data) {
-            $("#txtFolio").val("");
-            $("#txtOficio").val("");
-            $("#txtNumSolicitud").val("");
+
         },
         onExpandRow: function (index, row, $detail) {
-            indexp = index;
-            expandTable(row, $detail.html("<table class='table table-striped table-bordered' id='subgridTramites' cellspacing='0'></table>").find("table"));
         },
     });
 });
@@ -97,7 +69,11 @@ function utilidadFormatter(value, row) {
 
 function imagenFormatter(value, row) {
     html = ''
-    html = '<img src="img/productos/'+row.img+'" alt="'+row.img+'" width="100" height="100">'
+    if(row.img == null){
+        html = 'SIN FOTO'
+    }else{
+        html = '<img src="img/productos/'+row.img+'" alt="'+row.img+'" width="100" height="100">'
+    }
     return html;
 }
 
