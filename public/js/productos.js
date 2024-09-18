@@ -54,6 +54,18 @@ $(document).ready(function () {
             title: "",
             formatter: "accionesFormatter",
         },],
+        rowStyle: function (row, index) {
+            if (row.existencia < 1) {
+                return {
+                    classes: 'table-danger'
+                };
+            }else if(row.existencia > 0 && row.existencia < 4){
+                return {
+                    classes: 'table-warning'
+                };
+            }
+            return {};
+        },
         onLoadSuccess: function (data) {
 
         },
@@ -81,8 +93,17 @@ function accionesFormatter(value, row) {
     var user = $("#userID").val()
     html = ''
     if(user == 1){
-        html += '<button type="button" style="margin-right: 2px;" class="btn btn-warning" onclick="editProducto('+row.id+')"><i class="fa fa-edit"></i></button>'
-        html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" onclick="confirmDeleteProducto(' + row.id + ', \'' + row.codigo_barras + '\')"><i class="fa fa-trash"></i></button>'
+        if(row.existencia < 1){
+            html += '<button type="button" style="margin-right: 2px;" class="btn btn-warning" onclick="editProducto('+row.id+')"><i class="fa fa-edit"></i></button>'
+            html += '<button type="button" style="margin-right: 2px;" class="btn btn-light" onclick="confirmDeleteProducto(' + row.id + ', \'' + row.codigo_barras + '\')"><i class="fa fa-trash"></i></button>'
+        }else if(row.existencia > 0 && row.existencia < 4){
+            html += '<button type="button" style="margin-right: 2px;" class="btn btn-light" onclick="editProducto('+row.id+')"><i class="fa fa-edit"></i></button>'
+            html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" onclick="confirmDeleteProducto(' + row.id + ', \'' + row.codigo_barras + '\')"><i class="fa fa-trash"></i></button>'
+        }else{
+            html += '<button type="button" style="margin-right: 2px;" class="btn btn-warning" onclick="editProducto('+row.id+')"><i class="fa fa-edit"></i></button>'
+            html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" onclick="confirmDeleteProducto(' + row.id + ', \'' + row.codigo_barras + '\')"><i class="fa fa-trash"></i></button>'
+        }
+
     }
     return html;
 }
