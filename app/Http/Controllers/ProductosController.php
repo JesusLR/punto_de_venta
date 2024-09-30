@@ -66,6 +66,7 @@ class ProductosController extends Controller
         $ext = $request->img->extension();
         $request->img->move(public_path('img/productos'), "producto_".$request->codigo_barras.".".$ext);
         $producto->img = "producto_".$request->codigo_barras.".".$ext;
+        $producto->lActivo = 1;
         $producto->save();
         return redirect()->route("productos.index")->with("mensaje", "Producto guardado");
     }
@@ -135,7 +136,22 @@ class ProductosController extends Controller
     public function gridProductos(Request $request){
         try{
 
-            return  Producto::where('lActivo', 1)->get();
+            switch($request->cTipoBusqueda){
+                case 'T':
+                    $productos = Producto::where('lActivo', 1)->get();
+                break;
+                case 'B':
+                    $productos = Producto::where('lActivo', 1)->where('existencia', '>', 4)->get();
+                break;
+                case 'R':
+                    $productos = Producto::where('lActivo', 1)->where('existencia', '<', 1)->get();
+                break;
+                case 'N':
+                    $productos = Producto::where('lActivo', 1)->where('existencia', '>', 0)->where('existencia', '<', 4)->get();
+                break;
+            }
+
+            return  $productos;
 
         }catch(Exception $ex){
             return response()->json([

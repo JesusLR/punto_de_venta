@@ -29,6 +29,17 @@
                 <a href="{{route("productos.create")}}" class="btn btn-success mb-2">Agregar</a>
             @endif
             @include("notificacion")
+
+            <div class="form-group">
+                <label for="id_cliente">Cliente</label>
+                <select required class="form-control" name="cTipoBusquedaProductos" id="cTipoBusquedaProductos">
+                        <option value="T">Todos</option>
+                        <option value="B" style="background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);">Blancos</option>
+                        <option value="R" style="background-color: red; color: white;">Rojo</option>
+                        <option value="N" style="background-color: orange; color: white;">Naranja</option>
+                </select>
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-bordered" id="gridProductos">
                     {{-- <thead>

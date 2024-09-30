@@ -16,6 +16,7 @@ $(document).ready(function () {
         // detailView: true,
         queryParams: function (p) {
             return {
+                cTipoBusqueda: $("#cTipoBusquedaProductos").val(),
             };
         },
         icons: {
@@ -182,3 +183,7 @@ function deleteProducto(id){
         },
     });
 }
+
+$( "#cTipoBusquedaProductos" ).on( "change", function() {
+    $("#gridProductos").bootstrapTable('refresh');
+  } );
