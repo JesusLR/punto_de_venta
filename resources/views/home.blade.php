@@ -51,7 +51,7 @@
             @endforeach
     @else
         @foreach([
-            ["productos", "ventas", "vender", "clientes"],
+            ["productos", "estadisticas", "ventas", "vender", "clientes"],
             ["usuarios"]
             ] as $modulos)
                 <div class="col-12 pb-2">

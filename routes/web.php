@@ -38,9 +38,13 @@ Route::middleware("auth")
         Route::delete("/productoDeVenta", "VenderController@quitarProductoDeVenta")->name("quitarProductoDeVenta");
         Route::post("/terminarOCancelarVenta", "VenderController@terminarOCancelarVenta")->name("terminarOCancelarVenta");
 
-        //productos
+        //Productos
         Route::post("/gridProductos", "ProductosController@gridProductos")->name("gridProductos");
         Route::get("/editarProducto/{id}", "ProductosController@editarProducto")->name("editarProducto");
         Route::post("/deleteProducto", "ProductosController@deleteProducto")->name("deleteProducto");
         Route::get("/getProductos", "ProductosController@getProductos")->name("getProductos");
+
+        //Estadisticas
+        Route::resource("estadisticas", "EstadisticasController");
+        Route::post("/gridEstadisticas", "EstadisticasController@gridEstadisticas")->name("gridEstadisticas");
     });

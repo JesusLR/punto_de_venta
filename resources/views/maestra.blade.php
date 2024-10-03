@@ -91,6 +91,9 @@
                     <a class="nav-link" href="{{route("productos.index")}}">Productos&nbsp;<i class="fa fa-box"></i></a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{{route("estadisticas.index")}}">Estadisticas&nbsp;<i class="fas fa-chart-pie"></i></a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{route("vender.index")}}">Vender&nbsp;<i class="fa fa-cart-plus"></i></a>
                 </li>
                 <li class="nav-item">
