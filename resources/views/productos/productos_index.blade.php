@@ -26,7 +26,12 @@
         <div class="col-12">
             <h1>Productos <i class="fa fa-box"></i></h1>
             @if (Auth::user()->id == 1)
-                <a href="{{route("productos.create")}}" class="btn btn-success mb-2">Agregar</a>
+                <a href="{{route("productos.create")}}" class="btn btn-success mb-2"  title="Agregar Producto"><i class="fas fa-plus"></i> Agregar</a>
+                <button class="btn btn-primary mb-2" id="btnCargaExcell" title="Cargar Productos"><i class="fas fa-file-excel"></i> Cargar Productos</button>
+                <a href="{{ asset('docs/plantilla_productos.xlsx') }}" class="btn btn-info mb-2" title="Descargar plantilla de excell"><i class="fas fa-file-download"></i> Descargar Plantilla</a>
+
+                {{-- <span id="btnImgISAIspan"><a target='_blank' href="{{ asset('docs/plantilla_productos.xlsx') }}" tabindex="-1" id="" data-toggle="tooltip" title="Descargar plantilla de excell"><i class="fas fa-file-download"></i></a></span> --}}
+                {{-- <a  class="btn btn-primary mb-2"> <i class="fas fa-file-excel"></i> Cargar Productos</a> --}}
             @endif
             @include("notificacion")
 
@@ -90,6 +95,8 @@
             </div>
         </div>
     </div>
+
+    @include('productos.modals.cargaExcell')
 
     <script src="{{asset('js/productos.js')}}"></script>
 

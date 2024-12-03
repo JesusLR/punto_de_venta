@@ -187,3 +187,73 @@ function deleteProducto(id){
 $( "#cTipoBusquedaProductos" ).on( "change", function() {
     $("#gridProductos").bootstrapTable('refresh');
   } );
+
+$("#btnCargaExcell").on('click', function () {
+    document.getElementById("fileExcellProductos").value = "";
+    $("#cargaExcellModal").modal('show');
+});
+
+$("#btnGuardarInfoExcell").on('click', function () {
+    if ($("#fileExcellProductos").prop("files")[0] == null) {
+        swal.fire({
+            title: "Alerta",
+            text: "Cargue un Excell.",
+            icon: "warning",
+            showConfirmButton: true,
+            confirmButtonClass: "btn btn-success btn-round",
+            confirmButtonText: "Aceptar",
+            //buttonsStyling: false,
+        });
+        return false;
+    }
+
+    var data = new FormData();
+    data.append("fileExcell", $("#fileExcellProductos").prop("files")[0]);
+
+    $.ajax({
+        url: "/cargarProductosExcell",
+        type: "post",
+        dataType: "json",
+        data: data,
+        async: true,
+        cache: false,
+        enctype: "multipart/form-data",
+        contentType: false,
+        processData: false,
+        success: function (data) {
+            if (data.lSuccess) {
+                swal.fire({
+                    title: "Carga de productos",
+                    text: data.cMensaje,
+                    icon: "success",
+                    showConfirmButton: true,
+                    confirmButtonClass: "btn btn-success btn-round",
+                    confirmButtonText: "Aceptar",
+                    //buttonsStyling: false,
+                });
+                $("#gridProductos").bootstrapTable('refresh');
+            } else {
+                swal.fire({
+                    title: "Error",
+                    text: data.cMensaje,
+                    icon: "error",
+                    showConfirmButton: true,
+                    confirmButtonClass: "btn btn-success btn-round",
+                    confirmButtonText: "Aceptar",
+                    //buttonsStyling: false,
+                });
+            }
+        },
+        error: function (data) {
+            swal.fire({
+                title: "Error",
+                text: data.cMensaje,
+                icon: "error",
+                showConfirmButton: true,
+                confirmButtonClass: "btn btn-success btn-round",
+                confirmButtonText: "Aceptar",
+                //buttonsStyling: false,
+            });
+        },
+    });
+});

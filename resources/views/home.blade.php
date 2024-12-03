@@ -50,10 +50,7 @@
                 </div>
             @endforeach
     @else
-        @foreach([
-            ["productos", "estadisticas", "ventas", "vender", "clientes"],
-            ["usuarios"]
-            ] as $modulos)
+        @foreach([["productos", "estadisticas", "ventas", "vender", "clientes"],["usuarios"]] as $modulos)
                 <div class="col-12 pb-2">
                     <div class="row">
                         @foreach($modulos as $modulo)

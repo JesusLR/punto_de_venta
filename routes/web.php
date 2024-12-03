@@ -43,6 +43,7 @@ Route::middleware("auth")
         Route::get("/editarProducto/{id}", "ProductosController@editarProducto")->name("editarProducto");
         Route::post("/deleteProducto", "ProductosController@deleteProducto")->name("deleteProducto");
         Route::get("/getProductos", "ProductosController@getProductos")->name("getProductos");
+        Route::post("/cargarProductosExcell", "ProductosController@cargarProductosExcell")->name("cargarProductosExcell");
 
         //Estadisticas
         Route::resource("estadisticas", "EstadisticasController");

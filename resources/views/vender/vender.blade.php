@@ -40,10 +40,10 @@
                         </div>
                         @if(session("productos") !== null)
                             <div class="form-group">
-                                <button name="accion" value="terminar" type="submit" class="btn btn-success">Terminar
+                                <button name="accion" value="terminar" type="submit" class="btn btn-success"><i class="fas fa-dollar-sign"></i> Terminar
                                     venta
                                 </button>
-                                <button name="accion" value="cancelar" type="submit" class="btn btn-danger">Cancelar
+                                <button name="accion" value="cancelar" type="submit" class="btn btn-danger"><i class="far fa-window-close"></i> Cancelar
                                     venta
                                 </button>
                             </div>

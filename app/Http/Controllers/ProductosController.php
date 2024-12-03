@@ -26,6 +26,8 @@ namespace App\Http\Controllers;
 use App\Producto;
 use Illuminate\Http\Request;
 use Exception;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\importProductos;
 
 class ProductosController extends Controller
 {
@@ -184,6 +186,34 @@ class ProductosController extends Controller
             return response()->json([
                 'lSuccess' => true,
                 'cMensaje' => 'Producto eliminado!',
+            ]);
+
+        }catch(Exception $ex){
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $ex->getMessage(),
+            ]);
+        }
+    }
+
+    public function cargarProductosExcell(Request $request){
+        try{
+
+            // dd($request->all());
+
+            $request->validate([
+                'fileExcell' => 'required|mimes:xlsx,xls'
+            ]);
+
+            $file = $request->file('fileExcell');
+
+            // Usar la clase de importación
+            Excel::import(new importProductos, $file);
+
+
+            return response()->json([
+                'lSuccess' => true,
+                'cMensaje' => 'Producto creados con exito',
             ]);
 
         }catch(Exception $ex){

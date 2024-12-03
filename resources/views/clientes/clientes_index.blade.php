@@ -24,7 +24,7 @@ ____          _____               _ _           _
     <div class="row">
         <div class="col-12">
             <h1>Clientes <i class="fa fa-users"></i></h1>
-            <a href="{{route("clientes.create")}}" class="btn btn-success mb-2">Agregar</a>
+            <a href="{{route("clientes.create")}}" class="btn btn-success mb-2"><i class="fas fa-plus"></i> Agregar</a>
             @include("notificacion")
             <div class="table-responsive">
                 <table class="table table-bordered">
