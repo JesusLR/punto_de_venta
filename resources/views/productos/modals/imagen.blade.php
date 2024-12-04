@@ -4,16 +4,12 @@
         justify-content: center;
         align-items: center;
         height: 100%;
-        position: relative;
-        overflow: hidden;  Oculta cualquier parte de la imagen fuera del contenedor
     }
 
     #divImagenProductoModal img {
         max-width: 100%;
         max-height: 100%;
-        object-fit: contain;
-        cursor: zoom-in;
-        transition: transform 0.25s ease;
+        object-fit: contain; /* Ajusta la imagen sin deformarla */
     }
 
 </style>

@@ -48,4 +48,5 @@ Route::middleware("auth")
         //Estadisticas
         Route::resource("estadisticas", "EstadisticasController");
         Route::post("/gridEstadisticas", "EstadisticasController@gridEstadisticas")->name("gridEstadisticas");
+        Route::post("/graficaVentas", "EstadisticasController@graficaVentas")->name("graficaVentas");
     });
