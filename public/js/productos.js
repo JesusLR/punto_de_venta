@@ -19,10 +19,6 @@ $(document).ready(function () {
                 cTipoBusqueda: $("#cTipoBusquedaProductos").val(),
             };
         },
-        icons: {
-            detailOpen: "fas fa-plus",
-            detailClose: "fas fa-minus",
-        },
         columns: [{
             field: "id",
             title: "id",
@@ -85,7 +81,7 @@ function imagenFormatter(value, row) {
     if(row.img == null){
         html = 'SIN FOTO'
     }else{
-        html = '<img src="img/productos/'+row.img+'" alt="'+row.img+'" width="100" height="100">'
+        html = `<img src="img/productos/${row.img}" alt="${row.img}" width="100" height="100" onclick="verImagen('${row.img}', '${row.codigo_barras}')">`
     }
     return html;
 }
@@ -257,3 +253,12 @@ $("#btnGuardarInfoExcell").on('click', function () {
         },
     });
 });
+
+function verImagen(img, codigo_barras){
+    html = `<img src="img/productos/${img}" alt="${img}">`
+    title = `Producto ${codigo_barras}`
+
+    $("#divImagenProductoModal").html(html)
+    $("#tituloImagenModal").html(title)
+    $("#imagenProductoModal").modal('show')
+}

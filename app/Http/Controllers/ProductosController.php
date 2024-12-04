@@ -151,6 +151,9 @@ class ProductosController extends Controller
                 case 'N':
                     $productos = Producto::where('lActivo', 1)->where('existencia', '>', 0)->where('existencia', '<', 4)->get();
                 break;
+                case 'F':
+                    $productos = Producto::where('lActivo', 1)->where('img', NULL)->get();
+                break;
             }
 
             return  $productos;

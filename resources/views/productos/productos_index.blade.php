@@ -39,6 +39,7 @@
                 <label for="id_cliente">Cliente</label>
                 <select required class="form-control" name="cTipoBusquedaProductos" id="cTipoBusquedaProductos">
                         <option value="T">Todos</option>
+                        <option value="F">Sin foto</option>
                         <option value="B" style="background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);">Blancos</option>
                         <option value="R" style="background-color: red; color: white;">Rojo</option>
                         <option value="N" style="background-color: orange; color: white;">Naranja</option>
@@ -97,6 +98,7 @@
     </div>
 
     @include('productos.modals.cargaExcell')
+    @include('productos.modals.imagen')
 
     <script src="{{asset('js/productos.js')}}"></script>
 
