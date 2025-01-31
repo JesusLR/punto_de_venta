@@ -27,6 +27,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class Producto extends Model
 {
-    protected $fillable = ["codigo_barras", "descripcion", "precio_compra", "precio_venta", "existencia",
+    protected $fillable = [
+        "codigo_barras", 
+        "descripcion", 
+        "precio_compra", 
+        "precio_venta", "existencia", 
+        "id_proveedor", 
+        "id_material", 
+        "id_categoria"
     ];
+
+    public function Proveedores() {
+        return $this->belongsTo(Proveedores::class, 'id_proveedor', 'id');
+    }
+    public function Materiales() {
+        return $this->belongsTo(Materiales::class, 'id_material', 'id');
+    }
+    public function Categorias() {
+        return $this->belongsTo(Categorias::class, 'id_categoria', 'id');
+    }
+
 }

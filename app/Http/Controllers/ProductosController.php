@@ -24,6 +24,9 @@
 namespace App\Http\Controllers;
 
 use App\Producto;
+use App\Categorias;
+use App\Materiales;
+use App\Proveedores;
 use Illuminate\Http\Request;
 use Exception;
 use Maatwebsite\Excel\Facades\Excel;
@@ -48,7 +51,15 @@ class ProductosController extends Controller
      */
     public function create()
     {
-        return view("productos.productos_create");
+        $lstCategorias = Categorias::where('lActivo', 1)->get();
+        $lstMateriales = Materiales::where('lActivo', 1)->get();
+        $lstProveedores = Proveedores::where('lActivo', 1)->get();
+
+        return view("productos.productos_create", [
+            'lstCategorias' => $lstCategorias,
+            'lstMateriales' => $lstMateriales,
+            'lstProveedores' => $lstProveedores
+        ]);
     }
 
     /**
@@ -65,10 +76,19 @@ class ProductosController extends Controller
         $producto->precio_compra = $request->precio_compra;
         $producto->precio_venta = $request->precio_venta;
         $producto->existencia = $request->existencia;
-        $ext = $request->img->extension();
-        $request->img->move(public_path('img/productos'), "producto_".$request->codigo_barras.".".$ext);
-        $producto->img = "producto_".$request->codigo_barras.".".$ext;
+        $producto->id_categoria = $request->id_categoria;
+        $producto->id_material = $request->id_material;
+        $producto->id_proveedor = $request->id_proveedor;
+        // $ext = $request->img->extension();
+        // $request->img->move(public_path('img/productos'), "producto_".$request->codigo_barras.".".$ext);
+        // $producto->img = "producto_".$request->codigo_barras.".".$ext;
         $producto->lActivo = 1;
+        if ($request->hasFile('img')) {
+            $ext = $request->img->extension();
+            $request->img->move(public_path('img/productos'), "producto_".$request->codigo_barras.".".$ext);
+            $producto->img = "producto_".$request->codigo_barras.".".$ext;
+        }
+
         $producto->save();
         return redirect()->route("productos.index")->with("mensaje", "Producto guardado");
     }
@@ -92,8 +112,17 @@ class ProductosController extends Controller
      */
     public function editarProducto($id)
     {
+        $lstCategorias = Categorias::where('lActivo', 1)->get();
+        $lstMateriales = Materiales::where('lActivo', 1)->get();
+        $lstProveedores = Proveedores::where('lActivo', 1)->get();
+
         $producto = Producto::where('id', $id)->first();
-        return view("productos.productos_edit", ["producto" => $producto]);
+        return view("productos.productos_edit", [
+            "producto" => $producto,
+            'lstCategorias' => $lstCategorias,
+            'lstMateriales' => $lstMateriales,
+            'lstProveedores' => $lstProveedores
+        ]);
     }
 
     /**
@@ -111,6 +140,9 @@ class ProductosController extends Controller
         $producto->precio_compra = $request->precio_compra;
         $producto->precio_venta = $request->precio_venta;
         $producto->existencia = $request->existencia;
+        $producto->id_categoria = $request->id_categoria;
+        $producto->id_material = $request->id_material;
+        $producto->id_proveedor = $request->id_proveedor;
 
         if(isset($request->img)){
             $ext = $request->img->extension();
@@ -137,7 +169,7 @@ class ProductosController extends Controller
 
     public function gridProductos(Request $request){
         try{
-
+            $lstProductos = array();
             switch($request->cTipoBusqueda){
                 case 'T':
                     $productos = Producto::where('lActivo', 1)->get();
@@ -156,7 +188,28 @@ class ProductosController extends Controller
                 break;
             }
 
-            return  $productos;
+            foreach($productos as $producto){
+                $lstProductos[] = array (
+                    "id" => $producto->id,
+                    "codigo_barras" => $producto->codigo_barras,
+                    "descripcion" => $producto->descripcion,
+                    "precio_compra" => $producto->precio_compra,
+                    "precio_venta" => $producto->precio_venta,
+                    "existencia" => $producto->existencia,
+                    "img" => $producto->img,
+                    "lActivo" => $producto->lActivo,
+                    "proveedor" => ($producto->id_proveedor == 0) ? "N/A" : $producto->Proveedores->cNombreProveedor,
+                    "id_proveedor" => $producto->id_proveedor,
+                    "material" => ($producto->id_material == 0) ? "N/A" : $producto->Materiales->cNombreMaterial,
+                    "id_material" => $producto->id_material,
+                    "categoria" => ($producto->id_categoria == 0) ? "N/A" : $producto->Categorias->cNombreCategoria,
+                    "id_categoria" => $producto->id_categoria,
+                    // "material" => $producto->codigo_barras,
+                    // "categoria" => $producto->codigo_barras,
+                );
+            }
+
+            return  $lstProductos;
 
         }catch(Exception $ex){
             return response()->json([

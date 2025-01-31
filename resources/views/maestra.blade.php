@@ -84,6 +84,20 @@
                 </li>
             @else
             @if (Auth::user()->id == 1)
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="categoriasDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Catalogos <i class="fas fa-book"></i>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="categoriasDropdown">
+                        <a class="dropdown-item" href="{{route("categorias.index")}}">Categorias</a>
+                        <a class="dropdown-item" href="{{route("clientes.index")}}">Clientes</a>
+                        <a class="dropdown-item" href="{{route("materiales.index")}}">Materiales</a>
+                        <a class="dropdown-item" href="{{route("proveedores.index")}}">Proveedores</a>
+                        <a class="dropdown-item" href="{{route("usuarios.index")}}">Usuarios</a>
+                        {{-- <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Something else here</a> --}}
+                    </div>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{route("home")}}">Inicio&nbsp;<i class="fa fa-home"></i></a>
                 </li>
@@ -99,12 +113,18 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{route("ventas.index")}}">Ventas&nbsp;<i class="fa fa-list"></i></a>
                 </li>
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link" href="{{route("usuarios.index")}}">Usuarios&nbsp;<i class="fa fa-users"></i></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{route("clientes.index")}}">Clientes&nbsp;<i class="fa fa-users"></i></a>
+                </li> --}}
+                {{-- <li class="nav-item">
+                    <a class="nav-link" href="{{route("proveedores.index")}}">Proveedores&nbsp;<i class="fas fa-people-carry"></i></a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{route("categorias.index")}}">Categorias&nbsp;<i class="fas fa-people-carry"></i></a>
+                </li> --}}
             @else
                 <li class="nav-item">
                     <a class="nav-link" href="{{route("home")}}">Inicio&nbsp;<i class="fa fa-home"></i></a>

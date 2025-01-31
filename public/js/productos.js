@@ -43,6 +43,18 @@ $(document).ready(function () {
             field: "existencia",
             title: "Existencia",
         }, {
+            field: "proveedor",
+            title: "Proveedor",
+            // formatter: "proveedorFormatter",
+        }, {
+            field: "material",
+            title: "Material",
+            // formatter: "materialFormatter",
+        }, {
+            field: "categoria",
+            title: "Categoria",
+            // formatter: "categoriaFormatter",
+        }, {
             field: "img",
             title: "Imagen",
             formatter: "imagenFormatter",
@@ -85,6 +97,16 @@ function imagenFormatter(value, row) {
     }
     return html;
 }
+
+// function proveedorFormatter(value, row) {
+//     html = ''
+//     if(row.id_proveedor == 0){
+//         html = 'N/A'
+//     }else{
+//         html = row.Proveedor
+//     }
+//     return html;
+// }
 
 function accionesFormatter(value, row) {
     var user = $("#userID").val()

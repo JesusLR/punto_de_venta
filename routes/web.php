@@ -49,4 +49,25 @@ Route::middleware("auth")
         Route::resource("estadisticas", "EstadisticasController");
         Route::post("/gridEstadisticas", "EstadisticasController@gridEstadisticas")->name("gridEstadisticas");
         Route::post("/graficaVentas", "EstadisticasController@graficaVentas")->name("graficaVentas");
+
+        //Proveedores
+        Route::resource("proveedores", "ProveedoresController");
+        Route::post("/gridProveedores", "ProveedoresController@gridProveedores")->name("gridProveedores");
+        Route::post("/saveProveedores", "ProveedoresController@saveProveedores")->name("saveProveedores");
+        Route::post("/deleteProveedor", "ProveedoresController@deleteProveedor")->name("deleteProveedor");
+        Route::get("/getProveedor/{id}", "ProveedoresController@getProveedor")->name("getProveedor");
+
+        //Categorias
+        Route::resource("categorias", "CategoriasController");
+        Route::post("/gridCategorias", "CategoriasController@gridCategorias")->name("gridCategorias");
+        Route::post("/saveCategorias", "CategoriasController@saveCategorias")->name("saveCategorias");
+        Route::post("/deleteCategoria", "CategoriasController@deleteCategoria")->name("deleteCategoria");
+        Route::get("/getCategoria/{id}", "CategoriasController@getCategoria")->name("getCategoria");
+
+        //Materiales
+        Route::resource("materiales", "MaterialesController");
+        Route::post("/gridMateriales", "MaterialesController@gridMateriales")->name("gridMateriales");
+        Route::post("/saveMateriales", "MaterialesController@saveMateriales")->name("saveMateriales");
+        Route::post("/deleteMaterial", "MaterialesController@deleteMaterial")->name("deleteMaterial");
+        Route::get("/getMaterial/{id}", "MaterialesController@getMaterial")->name("getMaterial");
     });

@@ -57,6 +57,34 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="label">Proveedor</label>
+                    <select name="id_proveedor" id="id_proveedor" class="form-control">
+                        <option value="0">Seleccione un proveedor</option>
+                        @foreach($lstProveedores as $proveedor)
+                            <option value="{{ $proveedor->id }}">{{ $proveedor->cNombreProveedor }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="label">Categoria</label>
+                    <select name="id_categoria" id="id_categoria" class="form-control">
+                        <option value="0">Seleccione una categoria</option>
+                        @foreach($lstCategorias as $categoria)
+                            <option value="{{ $categoria->id }}">{{ $categoria->cNombreCategoria }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="label">Material</label>
+                    <select name="id_material" id="id_material" class="form-control">
+                        <option value="0">Seleccione un material</option>
+                        @foreach($lstMateriales as $material)
+                            <option value="{{ $material->id }}">{{ $material->cNombreMaterial }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="exampleFormControlFile1">Imagen</label>
                     <input type="file" class="form-control-file" id="img" name="img">
                 </div>
