@@ -41,7 +41,15 @@ class ProductosController extends Controller
      */
     public function index()
     {
-        return view("productos.productos_index");
+        $lstCategorias = Categorias::where('lActivo', 1)->get();
+        $lstMateriales = Materiales::where('lActivo', 1)->get();
+        $lstProveedores = Proveedores::where('lActivo', 1)->get();
+        
+        return view("productos.productos_index", [
+            'lstCategorias' => $lstCategorias,
+            'lstMateriales' => $lstMateriales,
+            'lstProveedores' => $lstProveedores
+        ]);
     }
 
     /**
@@ -170,23 +178,64 @@ class ProductosController extends Controller
     public function gridProductos(Request $request){
         try{
             $lstProductos = array();
+
+            $productos = Producto::query();
+
             switch($request->cTipoBusqueda){
                 case 'T':
-                    $productos = Producto::where('lActivo', 1)->get();
+                    $productos->where('lActivo', 1);
                 break;
                 case 'B':
-                    $productos = Producto::where('lActivo', 1)->where('existencia', '>', 4)->get();
+                    $productos->where('lActivo', 1)->where('existencia', '>', 4);
                 break;
                 case 'R':
-                    $productos = Producto::where('lActivo', 1)->where('existencia', '<', 1)->get();
+                    $productos->where('lActivo', 1)->where('existencia', '<', 1);
                 break;
                 case 'N':
-                    $productos = Producto::where('lActivo', 1)->where('existencia', '>', 0)->where('existencia', '<', 4)->get();
+                    $productos->where('lActivo', 1)->where('existencia', '>', 0)->where('existencia', '<', 4);
                 break;
                 case 'F':
-                    $productos = Producto::where('lActivo', 1)->where('img', NULL)->get();
+                    $productos->where('lActivo', 1)->where('img', NULL);
                 break;
             }
+
+            switch($request->cTipoBusquedaProveedor){
+                case 'T':
+                    $productos->where('lActivo', '>', 0);
+                break;
+                case 0:
+                    $productos->where('id_proveedor', 0);
+                break;
+                default:
+                    $productos->where('id_proveedor', $request->cTipoBusquedaProveedor);
+                break;
+            }
+
+            switch($request->cTipoBusquedaMaterial){
+                case 'T':
+                    $productos->where('id_material', '>', 0);
+                break;
+                case 0:
+                    $productos->where('id_material', 0);
+                break;
+                default:
+                    $productos->where('id_material', $request->cTipoBusquedaMaterial);
+                break;
+            }
+
+            switch($request->cTipoBusquedaCategoria){
+                case 'T':
+                    $productos->where('id_categoria', '>', 0);
+                break;
+                case 0:
+                    $productos->where('id_categoria', 0);
+                break;
+                default:
+                    $productos->where('id_categoria', $request->cTipoBusquedaCategoria);
+                break;
+            }
+
+            $productos = $productos->get(); 
 
             foreach($productos as $producto){
                 $lstProductos[] = array (
@@ -254,8 +303,6 @@ class ProductosController extends Controller
 
     public function cargarProductosExcell(Request $request){
         try{
-
-            // dd($request->all());
 
             $request->validate([
                 'fileExcell' => 'required|mimes:xlsx,xls'

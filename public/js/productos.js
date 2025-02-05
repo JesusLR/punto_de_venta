@@ -17,6 +17,9 @@ $(document).ready(function () {
         queryParams: function (p) {
             return {
                 cTipoBusqueda: $("#cTipoBusquedaProductos").val(),
+                cTipoBusquedaProveedor: $("#cTipoBusquedaProveedor").val(),
+                cTipoBusquedaMaterial: $("#cTipoBusquedaMaterial").val(),
+                cTipoBusquedaCategoria: $("#cTipoBusquedaCategoria").val(),
             };
         },
         columns: [{
@@ -206,6 +209,18 @@ $( "#cTipoBusquedaProductos" ).on( "change", function() {
     $("#gridProductos").bootstrapTable('refresh');
   } );
 
+$( "#cTipoBusquedaProveedor" ).on( "change", function() {
+    $("#gridProductos").bootstrapTable('refresh');
+  } );
+
+$( "#cTipoBusquedaMaterial" ).on( "change", function() {
+    $("#gridProductos").bootstrapTable('refresh');
+  } );
+
+$( "#cTipoBusquedaCategoria" ).on( "change", function() {
+    $("#gridProductos").bootstrapTable('refresh');
+  } );
+
 $("#btnCargaExcell").on('click', function () {
     document.getElementById("fileExcellProductos").value = "";
     $("#cargaExcellModal").modal('show');
@@ -240,6 +255,7 @@ $("#btnGuardarInfoExcell").on('click', function () {
         processData: false,
         success: function (data) {
             if (data.lSuccess) {
+                $("#cargaExcellModal").modal('hide');
                 swal.fire({
                     title: "Carga de productos",
                     text: data.cMensaje,

@@ -38,7 +38,7 @@
 
             {{-- <div class="form-group">
                 <label for="id_cliente">Cliente</label>
-                <select required class="form-control" name="cTipoBusquedaProductos" id="cTipoBusquedaProductos">
+                <select required class="form-control" name="" id="">
                         <option value="T">Todos</option>
                         <option value="F">Sin foto</option>
                         <option value="B" style="background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);">Blancos</option>
