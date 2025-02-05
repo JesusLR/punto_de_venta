@@ -17,6 +17,9 @@ $(document).ready(function () {
         queryParams: function (p) {
             return {
                 cTipoBusqueda: $("#cTipoBusquedaProductos").val(),
+                cTipoBusquedaProveedor: $("#cTipoBusquedaProveedor").val(),
+                cTipoBusquedaMaterial: $("#cTipoBusquedaMaterial").val(),
+                cTipoBusquedaCategoria: $("#cTipoBusquedaCategoria").val(),
             };
         },
         columns: [{
@@ -42,6 +45,18 @@ $(document).ready(function () {
         }, {
             field: "existencia",
             title: "Existencia",
+        }, {
+            field: "proveedor",
+            title: "Proveedor",
+            // formatter: "proveedorFormatter",
+        }, {
+            field: "material",
+            title: "Material",
+            // formatter: "materialFormatter",
+        }, {
+            field: "categoria",
+            title: "Categoria",
+            // formatter: "categoriaFormatter",
         }, {
             field: "img",
             title: "Imagen",
@@ -85,6 +100,16 @@ function imagenFormatter(value, row) {
     }
     return html;
 }
+
+// function proveedorFormatter(value, row) {
+//     html = ''
+//     if(row.id_proveedor == 0){
+//         html = 'N/A'
+//     }else{
+//         html = row.Proveedor
+//     }
+//     return html;
+// }
 
 function accionesFormatter(value, row) {
     var user = $("#userID").val()
@@ -184,6 +209,18 @@ $( "#cTipoBusquedaProductos" ).on( "change", function() {
     $("#gridProductos").bootstrapTable('refresh');
   } );
 
+$( "#cTipoBusquedaProveedor" ).on( "change", function() {
+    $("#gridProductos").bootstrapTable('refresh');
+  } );
+
+$( "#cTipoBusquedaMaterial" ).on( "change", function() {
+    $("#gridProductos").bootstrapTable('refresh');
+  } );
+
+$( "#cTipoBusquedaCategoria" ).on( "change", function() {
+    $("#gridProductos").bootstrapTable('refresh');
+  } );
+
 $("#btnCargaExcell").on('click', function () {
     document.getElementById("fileExcellProductos").value = "";
     $("#cargaExcellModal").modal('show');
@@ -218,6 +255,7 @@ $("#btnGuardarInfoExcell").on('click', function () {
         processData: false,
         success: function (data) {
             if (data.lSuccess) {
+                $("#cargaExcellModal").modal('hide');
                 swal.fire({
                     title: "Carga de productos",
                     text: data.cMensaje,

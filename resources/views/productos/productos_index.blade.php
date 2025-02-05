@@ -35,15 +35,50 @@
             @endif
             @include("notificacion")
 
-            <div class="form-group">
-                <label for="id_cliente">Cliente</label>
-                <select required class="form-control" name="cTipoBusquedaProductos" id="cTipoBusquedaProductos">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="cTipoBusquedaProductos">Dsiponibilidad</label>
+                    <select required class="form-control" name="cTipoBusquedaProductos" id="cTipoBusquedaProductos">
                         <option value="T">Todos</option>
                         <option value="F">Sin foto</option>
                         <option value="B" style="background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);">Blancos</option>
                         <option value="R" style="background-color: red; color: white;">Rojo</option>
                         <option value="N" style="background-color: orange; color: white;">Naranja</option>
-                </select>
+                    </select>
+                </div>
+            
+                <div class="col-md-6 mb-3">
+                    <label for="cTipoBusquedaProveedor">Proveedor</label>
+                    <select required class="form-control" name="cTipoBusquedaProveedor" id="cTipoBusquedaProveedor">
+                        <option value="T">Todos</option>
+                        <option value="0">N/A</option>
+                        @foreach ($lstProveedores as $proveedor)
+                            <option value="{{$proveedor->id}}">{{$proveedor->cNombreProveedor}}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="cTipoBusquedaMaterial">Material</label>
+                    <select required class="form-control" name="cTipoBusquedaMaterial" id="cTipoBusquedaMaterial">
+                        <option value="T">Todos</option>
+                        <option value="0">N/A</option>
+                        @foreach ($lstMateriales as $material)
+                            <option value="{{$material->id}}">{{$material->cNombreMaterial}}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="cTipoBusquedaCategoria">Categoria</label>
+                    <select required class="form-control" name="cTipoBusquedaCategoria" id="cTipoBusquedaCategoria">
+                        <option value="T">Todos</option>
+                        <option value="0">N/A</option>
+                        @foreach ($lstCategorias as $categoria)
+                            <option value="{{$categoria->id}}">{{$categoria->cNombreCategoria}}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
             <div class="table-responsive">
