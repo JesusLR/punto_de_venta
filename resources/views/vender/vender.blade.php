@@ -21,7 +21,6 @@
 @extends("maestra")
 @section("titulo", "Realizar venta")
 @section("contenido")
-<input type="text" id="userID" value={{Auth::user()->id}} hidden>
     <div class="row">
         <div class="col-12">
             <h1>Nueva venta <i class="fa fa-cart-plus"></i></h1>
@@ -31,6 +30,7 @@
                     <form action="{{route("terminarOCancelarVenta")}}" method="post">
                         @csrf
                         <div class="form-group">
+                            <input type="text" id="userID" name="userID" value={{Auth::user()->id}} hidden>
                             <label for="id_cliente">Cliente</label>
                             <select required class="form-control" name="id_cliente" id="id_cliente">
                                 @foreach($clientes as $cliente)

@@ -201,7 +201,7 @@ class ProductosController extends Controller
 
             switch($request->cTipoBusquedaProveedor){
                 case 'T':
-                    $productos->where('lActivo', '>', 0);
+                    $productos->where('lActivo', '>=', 0);
                 break;
                 case 0:
                     $productos->where('id_proveedor', 0);
@@ -213,7 +213,7 @@ class ProductosController extends Controller
 
             switch($request->cTipoBusquedaMaterial){
                 case 'T':
-                    $productos->where('id_material', '>', 0);
+                    $productos->where('id_material', '>=', 0);
                 break;
                 case 0:
                     $productos->where('id_material', 0);
@@ -225,7 +225,7 @@ class ProductosController extends Controller
 
             switch($request->cTipoBusquedaCategoria){
                 case 'T':
-                    $productos->where('id_categoria', '>', 0);
+                    $productos->where('id_categoria', '>=', 0);
                 break;
                 case 0:
                     $productos->where('id_categoria', 0);

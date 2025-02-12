@@ -43,9 +43,11 @@ class VenderController extends Controller
 
     public function terminarVenta(Request $request)
     {
-        // Crear una venta
+        // $request->all();
         $venta = new Venta();
+        $venta->cNombreVenta = NULL;
         $venta->id_cliente = $request->input("id_cliente");
+        $venta->id_usuario = $request->input("userID");
         $venta->saveOrFail();
         $idVenta = $venta->id;
         $productos = $this->obtenerProductos();

@@ -23,7 +23,11 @@
 @section("contenido")
     <div class="row">
         <div class="col-12">
-            <h1>Detalle de venta #{{$venta->id}}</h1>
+            @if (strlen($venta->cNombreVenta) == 0)
+                <h1>Detalle de venta #{{$venta->id}}</h1>
+            @else
+                <h1>{{$venta->cNombreVenta}}</h1>
+            @endif
             <h1>Cliente: <small>{{$venta->cliente->nombre}}</small></h1>
             @include("notificacion")
             <a class="btn btn-info" href="{{route("ventas.index")}}">

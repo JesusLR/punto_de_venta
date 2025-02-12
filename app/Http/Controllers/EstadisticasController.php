@@ -32,7 +32,7 @@ class EstadisticasController extends Controller
             ->get();
 
             if(count($resultado) == 0){
-                throw new Exception("No se encontraron registrso de venta");
+                throw new Exception("No se encontraron registros de venta");
             }
 
             // Preparar los datos para el gráfico

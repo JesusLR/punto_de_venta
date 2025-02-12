@@ -24,17 +24,18 @@
 namespace App\Http\Controllers;
 
 use App\Venta;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
+use Exception;
 
 class VentasController extends Controller
 {
 
-    public function ticket(Request $request)
-    {
-        $venta = Venta::findOrFail($request->get("id"));
+    public function ticket($id){
+        $venta = Venta::findOrFail($id);
         $nombreImpresora = env("NOMBRE_IMPRESORA");
         $connector = new WindowsPrintConnector($nombreImpresora);
         $impresora = new Printer($connector);
@@ -75,13 +76,27 @@ class VentasController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        $ventasConTotales = Venta::join("productos_vendidos", "productos_vendidos.id_venta", "=", "ventas.id")
-            ->select("ventas.*", DB::raw("sum(productos_vendidos.cantidad * productos_vendidos.precio) as total"))
-            ->groupBy("ventas.id", "ventas.created_at", "ventas.updated_at", "ventas.id_cliente")
-            ->get();
-        return view("ventas.ventas_index", ["ventas" => $ventasConTotales,]);
+    public function index(){
+        return view("ventas.ventas_index", [
+            'users' => User::select('*')->get() 
+        ]);
+    }
+
+    public function gridVentas(Request $request){
+        $ventasConTotales = Venta::query();
+        $ventasConTotales->join("productos_vendidos", "productos_vendidos.id_venta", "=", "ventas.id")
+        ->join("clientes", "clientes.id", "=", "ventas.id_cliente")
+        ->join("users", "users.id", "=", "ventas.id_usuario")
+        ->select("ventas.*", DB::raw("sum(productos_vendidos.cantidad * productos_vendidos.precio) as total"), "clientes.nombre", "users.name")
+        ->groupBy("ventas.id", "ventas.created_at", "ventas.updated_at", "ventas.id_cliente", "clientes.nombre", "users.name");
+
+        if($request->cTipoBusqueda != "T"){
+            $ventasConTotales->where("id_usuario", $request->cTipoBusqueda);
+        }
+
+        $ventasConTotales = $ventasConTotales->get(); 
+
+        return $ventasConTotales;
     }
 
     /**
@@ -157,5 +172,35 @@ class VentasController extends Controller
         $venta->delete();
         return redirect()->route("ventas.index")
             ->with("mensaje", "Venta eliminada");
+    }
+
+    public function saveNombreVenta(Request $request){
+        try{
+
+            if(strlen($request->cNombreVenta) == 0){
+                throw  new Exception('Ingrese un nombre para la venta.');
+            }
+
+            $existeVenta = Venta::where('cNombreVenta', trim($request->cNombreVenta))->where('id', '!=', $request->id)->count();
+
+            if($existeVenta > 0){
+                throw  new Exception('Esta venta ya se encuentra registrada.');
+            }
+
+            $venta = Venta::where("id", $request->id)->first();
+            $venta->cNombreVenta = strtoupper($request->cNombreVenta);
+            $venta->save();
+
+            return response()->json([
+                'lSuccess' => true,
+                'cMensaje' => "Nombre editado con exito!",
+            ]);
+
+        }catch(Exception $ex){
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $ex->getMessage(),
+            ]);
+        }
     }
 }

@@ -21,13 +21,28 @@
 @extends("maestra")
 @section("titulo", "Ventas")
 @section("contenido")
+<input type="text" id="userID" value={{Auth::user()->id}} hidden>
+<input type="text" id="iIDVenta" hidden>
     <div class="row">
         <div class="col-12">
             <h1>Ventas <i class="fa fa-list"></i></h1>
             @include("notificacion")
+
+            <div class="row" @if (Auth::user()->id != 1) style="display: none;"  @endif>
+                <div class="col-md-6 mb-3">
+                    <label for="cTipoBusquedaProductos">Usuario</label>
+                    <select required class="form-control" name="cTipoBusquedaVenta" id="cTipoBusquedaVenta">
+                        <option value="T">Todos</option>
+                        @foreach ($users as $user)
+                        <option @if ($user->id != 1 && Auth::user()->id == $user->id) selected @endif value="{{$user->id}}">{{$user->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
             <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
+                <table class="table table-bordered" id="gridVentas">
+                    {{-- <thead>
                     <tr>
                         <th>Fecha</th>
                         <th>Cliente</th>
@@ -68,9 +83,14 @@
                             @endif
                         </tr>
                     @endforeach
-                    </tbody>
+                    </tbody> --}}
                 </table>
             </div>
         </div>
     </div>
+
+    @include('ventas.modals.editNombreVentaModal')
+
+    <script src="{{asset('js/ventas.js')}}"></script>
+
 @endsection

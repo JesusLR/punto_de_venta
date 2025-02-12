@@ -31,7 +31,7 @@ Route::middleware("auth")
         Route::resource("clientes", "ClientesController");
         Route::resource("usuarios", "UserController")->parameters(["usuarios" => "user"]);
         Route::resource("productos", "ProductosController");
-        Route::get("/ventas/ticket", "VentasController@ticket")->name("ventas.ticket");
+        Route::get("/ventas/ticket/{id}", "VentasController@ticket")->name("ventas.ticket");
         Route::resource("ventas", "VentasController");
         Route::get("/vender", "VenderController@index")->name("vender.index");
         Route::post("/productoDeVenta", "VenderController@agregarProductoVenta")->name("agregarProductoVenta");
@@ -44,6 +44,11 @@ Route::middleware("auth")
         Route::post("/deleteProducto", "ProductosController@deleteProducto")->name("deleteProducto");
         Route::get("/getProductos", "ProductosController@getProductos")->name("getProductos");
         Route::post("/cargarProductosExcell", "ProductosController@cargarProductosExcell")->name("cargarProductosExcell");
+
+        //Ventas
+        Route::post("/gridVentas", "VentasController@gridVentas")->name("gridVentas");
+        Route::post("/saveNombreVenta", "VentasController@saveNombreVenta")->name("saveNombreVenta");
+        
 
         //Estadisticas
         Route::resource("estadisticas", "EstadisticasController");
