@@ -101,6 +101,7 @@ function imagenFormatter(value, row) {
     html = ''
     if(row.img == null){
         html = 'SIN FOTO'
+        // html = html = `<img src="img/logo.jpg" alt="Sin imagen" width="100" height="100">`
     }else{
         html = `<img src="img/productos/${row.img}" alt="${row.img}" width="100" height="100" onclick="verImagen('${row.img}', '${row.codigo_barras}')">`
     }
