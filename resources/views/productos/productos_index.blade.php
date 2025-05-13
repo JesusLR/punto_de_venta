@@ -21,6 +21,9 @@
 @extends("maestra")
 @section("titulo", "Productos")
 @section("contenido")
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.0/dist/bootstrap-table.min.css">
+
 <input type="text" id="userID" value={{Auth::user()->id}} hidden>
     <div class="row">
         <div class="col-12">
@@ -29,7 +32,7 @@
                 <a href="{{route("productos.create")}}" class="btn btn-success mb-2"  title="Agregar Producto"><i class="fas fa-plus"></i> Agregar</a>
                 <button class="btn btn-primary mb-2" id="btnCargaExcell" title="Cargar Productos"><i class="fas fa-file-excel"></i> Cargar Productos</button>
                 <a href="{{ asset('docs/plantilla_productos.xlsx') }}" class="btn btn-info mb-2" title="Descargar plantilla de excell"><i class="fas fa-file-download"></i> Descargar Plantilla</a>
-
+                {{-- <button class="btn btn-success mb-2" id="btnExportarExcell" title="Exportar Productos de la tabla"><i class="fas fa-file-excel"></i> Exportar excell</button> --}}
                 {{-- <span id="btnImgISAIspan"><a target='_blank' href="{{ asset('docs/plantilla_productos.xlsx') }}" tabindex="-1" id="" data-toggle="tooltip" title="Descargar plantilla de excell"><i class="fas fa-file-download"></i></a></span> --}}
                 {{-- <a  class="btn btn-primary mb-2"> <i class="fas fa-file-excel"></i> Cargar Productos</a> --}}
             @endif
@@ -82,7 +85,10 @@
             </div>
 
             <div class="table-responsive">
-                <table class="table table-bordered" id="gridProductos">
+                <table class="table table-bordered" id="gridProductos"
+                data-show-export="true"
+                data-show-footer="true"
+                data-url="https://examples.wenzhixin.net.cn/examples/bootstrap_table/data">
                     {{-- <thead>
                     <tr>
                         <th>Código de barras</th>
@@ -134,6 +140,12 @@
 
     @include('productos.modals.cargaExcell')
     @include('productos.modals.imagen')
+
+    {{-- Export --}}
+    <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.29.0/tableExport.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.29.0/libs/jsPDF/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.0/dist/bootstrap-table.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.0/dist/extensions/export/bootstrap-table-export.min.js"></script>
 
     <script src="{{asset('js/productos.js')}}"></script>
 

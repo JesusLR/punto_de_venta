@@ -13,7 +13,13 @@ $(document).ready(function () {
         pagination: true,
         pageSize: 10,
         search: true,
-        // detailView: true,
+        exportDataType: 'all',
+        exportTypes: ['excel', 'pdf'],
+        exportOptions: {
+            fileName: function () {
+              return 'Productos'
+            }
+          },
         queryParams: function (p) {
             return {
                 cTipoBusqueda: $("#cTipoBusquedaProductos").val(),
@@ -95,6 +101,7 @@ function imagenFormatter(value, row) {
     html = ''
     if(row.img == null){
         html = 'SIN FOTO'
+        // html = html = `<img src="img/logo.jpg" alt="Sin imagen" width="100" height="100">`
     }else{
         html = `<img src="img/productos/${row.img}" alt="${row.img}" width="100" height="100" onclick="verImagen('${row.img}', '${row.codigo_barras}')">`
     }
@@ -299,4 +306,23 @@ function verImagen(img, codigo_barras){
     $("#divImagenProductoModal").html(html)
     $("#tituloImagenModal").html(title)
     $("#imagenProductoModal").modal('show')
+}
+
+var $table = $('#table')
+
+function idFormatter() {
+  return 'Total'
+}
+
+function nameFormatter(data) {
+  return data.length
+}
+
+function priceFormatter(data) {
+  var field = this.field
+  return '$' + data.map(function (row) {
+    return +row[field].substring(1)
+  }).reduce(function (sum, i) {
+    return sum + i
+  }, 0)
 }

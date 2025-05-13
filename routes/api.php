@@ -106,3 +106,7 @@ Route::group(['prefix' => 'auth'], function () {
 
     });
 });
+
+//Catalogo de productos
+Route::resource("catalogoProductos", "CatalogoController");
+Route::get("/verCategoria/{id_categoria}/{id_material}", "CatalogoController@verCategoria")->name("verCategoria");
