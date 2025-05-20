@@ -64,7 +64,7 @@
 <body>
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" target="_blank" href="//parzibyte.me/blog">{{env("APP_NAME")}}</a>
+    <a class="navbar-brand" target="" href="{{route("home")}}">{{env("APP_NAME")}}</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse"
             id="botonMenu" aria-label="Mostrar u ocultar menú">
         <span class="navbar-toggler-icon"></span>
@@ -73,17 +73,20 @@
     <div class="collapse navbar-collapse" id="menu">
         <ul class="navbar-nav mr-auto">
             @guest
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link" href="{{ route('login') }}">Login</a>
-                </li>
+                </li> --}}
 
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link" href="{{ route('register') }}">
                         Registro
                     </a>
-                </li>
+                </li> --}}
             @else
             @if (Auth::user()->id == 1)
+                <li class="nav-item">
+                    <a class="nav-link" href="{{route("home")}}">Inicio&nbsp;<i class="fa fa-home"></i></a>
+                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="categoriasDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Catalogos <i class="fas fa-book"></i>
@@ -97,9 +100,6 @@
                         {{-- <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#">Something else here</a> --}}
                     </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{route("home")}}">Inicio&nbsp;<i class="fa fa-home"></i></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{route("productos.index")}}">Productos&nbsp;<i class="fa fa-box"></i></a>
@@ -149,13 +149,19 @@
             @endguest
         </ul>
         <ul class="navbar-nav ml-auto">
-            @auth
+            @guest
                 <li class="nav-item">
-                    <a href="{{route("logout")}}" class="nav-link">
-                        Salir ({{ Auth::user()->name }})
-                    </a>
+                    <a class="nav-link" href="{{ route('login') }}">Login</a>
                 </li>
-            @endauth
+            @else
+                @auth
+                    <li class="nav-item">
+                        <a href="{{route("logout")}}" class="nav-link">
+                            Salir ({{ Auth::user()->name }})
+                        </a>
+                    </li>
+                @endauth
+            @endguest
             {{-- <li class="nav-item">
                 <a class="nav-link" href="{{route("soporte.index")}}">Soporte&nbsp;<i
                         class="fa fa-hands-helping"></i></a>

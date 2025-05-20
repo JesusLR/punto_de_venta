@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <title>Joyeria Colibri Progreso</title>
+    <title>{{env("APP_NAME")}}</title>
 
     {{-- <link href="{{url("/css/bootstrap.min.css")}}" rel="stylesheet"> --}}
     {{-- <link href="{{url("/css/all.min.css")}}" rel="stylesheet"> --}}
@@ -223,7 +223,7 @@
 
     <!-- Barra de navegación -->
     <nav class="navbar navbar-expand-lg navbar-light">
-        <a class="navbar-brand" href="#">Joyeria Colibri Progreso</a>
+        <a class="navbar-brand" href="#">{{env("APP_NAME")}}</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -301,10 +301,10 @@
     <footer>
         <div class="container">
             <div class="footer-text">
-                <p><strong>Joyeria Colibri Progreso</strong></p>
+                <p><strong>{{env("APP_NAME")}}</strong></p>
                 {{-- <p><i class="fas fa-map-marker-alt"></i> Dirección: Calle Ficticia 123, Ciudad, País</p> --}}
                 {{-- <p><i class="fas fa-phone-alt"></i> Teléfono: +1 234 567 890</p> --}}
-                {{-- <p>© 2025 Joyeria Colibri Progreso. Todos los derechos reservados.</p> --}}
+                {{-- <p>© 2025 {{env("APP_NAME")}}. Todos los derechos reservados.</p> --}}
             </div>
         </div>
     </footer>
