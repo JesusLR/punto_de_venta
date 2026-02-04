@@ -181,32 +181,35 @@
 
     .chart-container {
         background: white;
-        padding: 2rem;
+        padding: 1rem; /* reducido */
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        margin-bottom: 2rem;
+        margin-bottom: 1.25rem;
     }
 
     .chart-title {
-        font-size: 1.2rem;
+        font-size: 1rem; /* más pequeño */
         font-weight: 700;
         color: #2a2a2a;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         display: flex;
         align-items: center;
         gap: 0.5rem;
-    }
-
-    .chart-title i {
-        color: #D4AF37;
-        font-size: 1.3rem;
+        justify-content: space-between;
     }
 
     #myChart {
         display: block;
         margin: 0 auto;
+        width: 100% !important;
+        height: 300px; /* reducir altura */
+        max-height: 360px;
+    }
+
+    @media (min-width: 1200px) {
+        #myChart { height: 320px; }
     }
 
     @media (max-width: 768px) {
@@ -275,9 +278,14 @@
         <div class="col-12">
             <div class="estadisticas-header">
                 <div>
-                    <h1>Estadísticas <i class="fas fa-chart-pie"></i></h1>
+                    <h1>
+                        <i class="fas fa-chart-pie"></i>
+                            Estadísticas
+                    </h1>
                 </div>
             </div>
+
+            
 
             @include("notificacion")
 
@@ -326,7 +334,7 @@
                 <div class="chart-title">
                     <i class="fas fa-bar-chart"></i> Gráfico de Ventas
                 </div>
-                <canvas id="myChart" width="300" height="150"></canvas>
+                <canvas id="myChart" style="width:100%;height:420px;"></canvas>
             </div>
         </div>
     </div>
