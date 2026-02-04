@@ -18,6 +18,7 @@ class CatalogoController extends Controller
                 $producto = Producto::where('id_categoria', $categoria->id)
                                     ->where('id_material', $material->id)
                                     ->where('lActivo', 1)
+                                    ->where('existencia', '>', 0)
                                     ->orderBy('id', 'desc')
                                     ->first();
                 if(!is_null($producto)){
@@ -46,6 +47,7 @@ class CatalogoController extends Controller
             $lstProducto = Producto::where('id_categoria', $id_categoria)
             ->where('id_material', $id_material)
             ->where('lActivo', 1)
+            ->where('existencia', '>', 0)
             ->orderBy('id', 'desc')
             ->select('productos.*')
             ->get();

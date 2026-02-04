@@ -1,37 +1,20 @@
-<style>
-    #divImagenProductoModal {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-    }
-
-    #divImagenProductoModal img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain; /* Ajusta la imagen sin deformarla */
-    }
-
-</style>
-
+{{-- moved modal styles to public/css/productos-styles.css --}}
 <div class="modal fade bd-example-modal-lg" id="imagenProductoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="tituloImagenModal"></h5>
+          <h5 class="modal-title" id="tituloImagenModal"><i class="fas fa-image" style="margin-right: 0.8rem; color: #D4AF37;"></i></h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
             <div id="divImagenProductoModal">
-
+                {{-- imagen inyectada dinámicamente --}}
             </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-dismiss="modal">cerrar</button>
-          {{-- <button type="button" class="btn btn-primary" id="btnGuardarInfoExcell">Guardar</button> --}}
-        </div>
+          {{-- botón opcional --}}
       </div>
     </div>
   </div>

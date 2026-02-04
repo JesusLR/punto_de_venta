@@ -43,7 +43,7 @@ class VenderController extends Controller
 
     public function terminarVenta(Request $request)
     {
-        // $request->all();
+        $request->all();
         $venta = new Venta();
         $venta->cNombreVenta = NULL;
         $venta->id_cliente = $request->input("id_cliente");
