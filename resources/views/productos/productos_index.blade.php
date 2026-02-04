@@ -42,7 +42,6 @@
                 Filtros de Búsqueda
             </div>
             <div class="row">
-                @if(Auth::user()->id == 1)
                 <div class="col-md-3">
                     <div class="form-group-modern">
                         <label><i class="fas fa-search"></i>Buscar por:</label>
@@ -55,19 +54,20 @@
                             </select>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="form-group-modern">
-                        <label><i class="fas fa-truck"></i>Proveedor:</label>
-                        <select class="form-control-modern" id="cTipoBusquedaProveedor">
-                            <option value="T">Todos</option>
-                            <option value="0">N/A</option>
-                            @foreach($lstProveedores as $proveedor)
-                                <option value="{{ $proveedor->id }}">{{ $proveedor->cNombreProveedor }}</option>
-                            @endforeach
-                        </select>
+                {{-- @if(Auth::user()->id == 1) --}}
+                    <div class="col-md-3" @if(Auth::user()->id != 1) style="display:none;" @endif>
+                        <div class="form-group-modern">
+                            <label><i class="fas fa-truck"></i>Proveedor:</label>
+                            <select class="form-control-modern" id="cTipoBusquedaProveedor">
+                                <option value="T">Todos</option>
+                                <option value="0">N/A</option>
+                                @foreach($lstProveedores as $proveedor)
+                                    <option value="{{ $proveedor->id }}">{{ $proveedor->cNombreProveedor }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-                </div>
-                @endif
+                {{-- @endif --}}
                 <div class="col-md-3">
                     <div class="form-group-modern">
                         <label><i class="fas fa-gem"></i>Material:</label>

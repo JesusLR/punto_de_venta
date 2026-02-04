@@ -13,22 +13,29 @@ class CatalogoController extends Controller
         $lstProducto = array();
         $lstCategorias = Categorias::where('lActivo', 1)->get();
         $lstMateriales = Materiales::where('lActivo', 1)->get();
-        foreach($lstCategorias as $categoria){
-            foreach($lstMateriales as $material){
-                $producto = Producto::where('id_categoria', $categoria->id)
-                                    ->where('id_material', $material->id)
-                                    ->where('lActivo', 1)
-                                    ->where('existencia', '>', 0)
-                                    ->orderBy('id', 'desc')
-                                    ->first();
-                if(!is_null($producto)){
-                    $lstProducto[] = array(
-                        'id' => $producto->id,
-                        'id_categoria' => $producto->id_categoria,
-                        'id_material' => $producto->id_material,
-                        'img' => $producto->img,
-                    );
-                }
+        $productos = Producto::leftJoin('materiales', 'productos.id_material', '=', 'materiales.id')
+                    ->leftJoin('categorias', 'productos.id_categoria', '=', 'categorias.id')
+                    // ->where('productos.id_categoria', $categoria->id)
+                    // ->where('productos.id_material', $material->id)
+                    ->where('productos.lActivo', 1)
+                    ->where('productos.existencia', '>', 0)
+                    ->select('productos.*', 'materiales.cNombreMaterial', 'categorias.cNombreCategoria')
+                    ->orderBy('id', 'desc')
+                    ->get();
+
+        if(!is_null($productos)){
+            foreach($productos as $producto){
+                $lstProducto[] = array(
+                    'id' => $producto->id,
+                    'id_categoria' => $producto->id_categoria,
+                    'id_material' => $producto->id_material,
+                    'img' => $producto->img,
+                    'descripcion' => $producto->descripcion,
+                    'precio_venta' => $producto->precio_venta,
+                    'cNombreMaterial' => $producto->cNombreMaterial,
+                    'cNombreCategoria' => $producto->cNombreCategoria,
+                    'codigo_barras' => $producto->codigo_barras,
+                );
             }
         }
         // dd($lstProducto);
