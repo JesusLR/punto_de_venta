@@ -31,7 +31,7 @@ class CatalogoController extends Controller
                     'id_material' => $producto->id_material,
                     'img' => $producto->img,
                     'descripcion' => $producto->descripcion,
-                    'precio_venta' => $producto->precio_venta,
+                    'precio_venta' => ($producto->cNombreMaterial == 'ORO') ? '0.00' : $producto->precio_venta,
                     'cNombreMaterial' => $producto->cNombreMaterial,
                     'cNombreCategoria' => $producto->cNombreCategoria,
                     'codigo_barras' => $producto->codigo_barras,

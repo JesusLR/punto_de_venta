@@ -567,7 +567,7 @@
     <!-- Grid de productos -->
     <div class="products-grid" id="productsGrid">
         @foreach($lstProducto as $producto)
-            <div class="jewel-card" data-categoria="{{ $producto->id_categoria }}" data-material="{{ $producto->material->cNombreMaterial ?? '' }}">
+            <div class="jewel-card" data-categoria="{{ $producto->id_categoria }}" data-material="{{ $producto->cNombreMaterial ?? '' }}">
                 <div class="jewel-media">
                     @if($producto->img)
                         <img src="{{ asset('img/productos/'.$producto->img) }}" alt="{{ $producto->descripcion }}">
