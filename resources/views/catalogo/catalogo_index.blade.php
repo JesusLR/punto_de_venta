@@ -597,7 +597,7 @@
                                 data-price="{{ number_format($producto->precio_venta, 2) }}">
                             <i class="fas fa-eye"></i> Ver
                         </button>
-                        <button class="btn-whatsapp" data-phone="" data-title="{{ $producto->descripcion }} - {{ $producto->material->cNombreMaterial ?? '' }}">
+                        <button class="btn-whatsapp" data-phone="" data-title="{{ $producto->descripcion }} - {{ $producto->cNombreMaterial ?? '' }}">
                             <i class="fab fa-whatsapp"></i> WhatsApp
                         </button>
                     </div>
@@ -684,7 +684,8 @@
         $('.btn-whatsapp, #modalWhatsapp').on('click', function(){
             var title = $(this).data('title') || $('#modalTitle').text();
             var material = $('#modalMaterial span').text() || '';
-            var phone = $(this).data('phone') || '';
+            // var phone = $(this).data('phone') || '';
+            var phone = "9991629742"; // Número fijo para contacto';
             var text = 'Hola, estoy interesado en: ' + title + (material ? ' (' + material + ')' : '');
             var url = phone ? 'https://wa.me/' + phone.replace(/\D/g,'') + '?text=' + encodeURIComponent(text)
                             : 'https://web.whatsapp.com/send?text=' + encodeURIComponent(text);

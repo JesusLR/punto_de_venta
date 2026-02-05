@@ -2,11 +2,14 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\AboutController;
 
 Route::get('/', function () {
-    return redirect()->route("home");
+    return redirect()->route("inicio");
 });
+// Route::get('/', function () {
+//     return redirect()->route("home");
+// });
 Route::get("/acerca-de", function () {
     return view("misc.acerca_de");
 })->name("acerca_de.index");
@@ -19,6 +22,7 @@ Auth::routes([
 ]);
 
 Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/inicio', 'HomeController@inicio')->name('inicio');
 // Permitir logout con petición get
 Route::get("/logout", function () {
     Auth::logout();
@@ -75,4 +79,6 @@ Route::middleware("auth")
         Route::post("/saveMateriales", "MaterialesController@saveMateriales")->name("saveMateriales");
         Route::post("/deleteMaterial", "MaterialesController@deleteMaterial")->name("deleteMaterial");
         Route::get("/getMaterial/{id}", "MaterialesController@getMaterial")->name("getMaterial");
+
+        Route::post('/about/upload-image', [AboutController::class, 'uploadImage'])->name('about.upload.image');
     });
