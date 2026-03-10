@@ -194,6 +194,143 @@
         </p>
     </div>
 
+    {{-- Card: Precio del oro (hoy) - Mejorado --}}
+    <div class="module-card gold-price-card" style="margin-bottom:2rem;padding:0;overflow:hidden;">
+        <!-- Header del card -->
+        <div style="background:linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);padding:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+            <div style="display:flex;align-items:center;gap:1rem;">
+                <div style="font-size:2.8rem;color:#1a1a1a;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div>
+                    <h3 style="margin:0;color:#1a1a1a;font-size:1.4rem;font-weight:800;letter-spacing:0.5px;">
+                        PRECIO DEL ORO
+                    </h3>
+                    <p style="margin:0;color:#2d2d2d;font-size:0.95rem;font-weight:600;opacity:0.9;">
+                        <i class="far fa-calendar-alt"></i> {{ \Carbon\Carbon::now()->format('d/m/Y') }}
+                    </p>
+                </div>
+            </div>
+            
+            <select id="goldFilterSelect" class="form-control" style="max-width:180px;border:2px solid #1a1a1a;border-radius:8px;font-weight:700;padding:0.6rem;background:white;">
+                <option value="all">Ver todos</option>
+                @if(!empty($precios_oro_gramo) && count($precios_oro_gramo) > 0)
+                    @foreach($precios_oro_gramo as $p)
+                        <option value="{{ $p['k'] }}">{{ $p['k'] }}</option>
+                    @endforeach
+                @endif
+            </select>
+        </div>
+
+        <!-- Body del card con precios -->
+        <div style="padding:1.8rem;background:white;">
+            <div id="goldPricesGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;">
+                @if(!empty($precios_oro_gramo) && count($precios_oro_gramo) > 0)
+                    @foreach($precios_oro_gramo as $p)
+                        <div class="gold-price-item" data-quilate="{{ $p['k'] }}" 
+                             style="background:linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+                                    border-radius:12px;
+                                    padding:1.2rem;
+                                    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+                                    text-align:center;
+                                    transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                                    border:2px solid transparent;
+                                    cursor:pointer;">
+                            <div style="font-size:0.9rem;color:#666;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">
+                                <i class="fas fa-gem" style="color:#D4AF37;margin-right:0.3rem;"></i>
+                                {{ $p['k'] }}
+                            </div>
+                            <div style="font-size:1.3rem;color:#D4AF37;font-weight:800;letter-spacing:-0.5px;">
+                                ${{ number_format((float) $p['v'], 2) }}
+                            </div>
+                            <div style="font-size:0.75rem;color:#999;font-weight:600;margin-top:0.3rem;">
+                                MXN / GRAMO
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div style="grid-column:1/-1;text-align:center;padding:2rem;color:#999;">
+                        <i class="fas fa-exclamation-circle" style="font-size:2rem;margin-bottom:0.5rem;"></i>
+                        <p style="margin:0;font-weight:600;">No hay registros disponibles</p>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Vista destacada cuando se selecciona uno -->
+            <div id="goldSelectedView" style="margin-top:1.5rem;padding:1.5rem;background:linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);border-radius:12px;display:none;align-items:center;justify-content:space-between;">
+                <div>
+                    <div style="color:#D4AF37;font-weight:800;font-size:0.9rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">
+                        Precio seleccionado
+                    </div>
+                    <div style="display:flex;align-items:baseline;gap:1rem;">
+                        <span id="goldSelectedLabel" style="font-weight:800;color:white;font-size:1.8rem;"></span>
+                        <span id="goldSelectedValue" style="font-weight:900;color:#D4AF37;font-size:2.2rem;"></span>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('goldFilterSelect').value='all';document.getElementById('goldFilterSelect').dispatchEvent(new Event('change'));" 
+                        class="btn-module-access" style="background:white;color:#1a1a1a;padding:0.7rem 1.2rem;">
+                    <i class="fas fa-times"></i> Limpiar
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const select = document.getElementById('goldFilterSelect');
+    const items = document.querySelectorAll('.gold-price-item');
+    const selectedView = document.getElementById('goldSelectedView');
+    const selLabel = document.getElementById('goldSelectedLabel');
+    const selValue = document.getElementById('goldSelectedValue');
+
+    function resetItems() {
+        items.forEach(i => {
+            i.classList.remove('selected');
+            i.style.display = 'block';
+        });
+        selectedView.style.display = 'none';
+    }
+
+    function highlightItem(quilate) {
+        resetItems();
+        let found = false;
+        items.forEach(i => {
+            if (i.dataset.quilate === quilate) {
+                i.classList.add('selected');
+                const priceText = i.querySelector('div:nth-child(2)').textContent.trim();
+                selLabel.textContent = quilate;
+                selValue.textContent = priceText;
+                found = true;
+            } else {
+                i.style.display = 'none';
+            }
+        });
+        if (found) {
+            selectedView.style.display = 'flex';
+        }
+    }
+
+    select && select.addEventListener('change', function(){
+        const v = this.value;
+        if (v === 'all') {
+            resetItems();
+        } else {
+            highlightItem(v);
+        }
+    });
+
+    // Click en item para seleccionarlo
+    items.forEach(item => {
+        item.addEventListener('click', function(){
+            const quilate = this.dataset.quilate;
+            select.value = quilate;
+            select.dispatchEvent(new Event('change'));
+        });
+    });
+});
+</script>
+
     @php
         $modulos = Auth::user()->id == 1
             ? [

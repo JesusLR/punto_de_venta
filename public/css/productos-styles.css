@@ -719,3 +719,31 @@
         font-size: 1.1rem;
     }
 }
+
+/* CARD DE PRECIO DE ORO DE HOME */
+.gold-price-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.25) !important;
+    border-color: #D4AF37 !important;
+}
+
+.gold-price-item.selected {
+    border-color: #D4AF37 !important;
+    background: linear-gradient(135deg, #fffbf0 0%, #fff9e6 100%) !important;
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3) !important;
+}
+
+@media (max-width: 768px) {
+    #goldPricesGrid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+    }
+    
+    .gold-price-card > div:first-child {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    #goldFilterSelect {
+        max-width: 100% !important;
+    }
+}

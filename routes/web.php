@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\HomeController;
 
 Route::get('/', function () {
     return redirect()->route("inicio");
@@ -81,4 +82,5 @@ Route::middleware("auth")
         Route::get("/getMaterial/{id}", "MaterialesController@getMaterial")->name("getMaterial");
 
         Route::post('/about/upload-image', [AboutController::class, 'uploadImage'])->name('about.upload.image');
+        Route::get('/gold-price', [HomeController::class, 'goldPrice'])->name('gold.price');
     });
