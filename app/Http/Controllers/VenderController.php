@@ -23,11 +23,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Apartado;
+use App\ApartadoAbono;
+use App\ApartadoProducto;
 use App\Cliente;
 use App\Producto;
 use App\ProductoVendido;
 use App\Venta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class VenderController extends Controller
 {
@@ -36,9 +40,76 @@ class VenderController extends Controller
     {
         if ($request->input("accion") == "terminar") {
             return $this->terminarVenta($request);
+        } elseif ($request->input("accion") == "apartar") {
+            return $this->apartarVenta($request);
         } else {
             return $this->cancelarVenta();
         }
+    }
+
+    public function apartarVenta(Request $request)
+    {
+        $productos = $this->obtenerProductos();
+        if (count($productos) <= 0) {
+            return redirect()->route("vender.index")->with([
+                "mensaje" => "No hay productos para apartar",
+                "tipo" => "danger",
+            ]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $apartado = new Apartado();
+            $apartado->id_cliente = $request->input("id_cliente");
+            $apartado->id_usuario = $request->input("userID");
+            $apartado->total = $this->calcularTotalCarrito($productos);
+            $apartado->total_abonado = 0;
+            $apartado->saldo = $apartado->total;
+            $apartado->estado = 'ABIERTO';
+            $apartado->saveOrFail();
+
+            foreach ($productos as $producto) {
+                $productoActualizado = Producto::find($producto->id);
+                if (!$productoActualizado || $productoActualizado->existencia < $producto->cantidad) {
+                    throw new \Exception('No hay existencia suficiente para apartar el producto ' . $producto->descripcion);
+                }
+
+                $apartadoProducto = new ApartadoProducto();
+                $apartadoProducto->fill([
+                    "id_apartado" => $apartado->id,
+                    "id_producto" => $producto->id,
+                    "descripcion" => $producto->descripcion,
+                    "codigo_barras" => $producto->codigo_barras,
+                    "precio" => $producto->precio_venta,
+                    "cantidad" => $producto->cantidad,
+                ]);
+                $apartadoProducto->saveOrFail();
+
+                $productoActualizado->existencia -= $producto->cantidad;
+                $productoActualizado->saveOrFail();
+            }
+
+            DB::commit();
+            $this->vaciarProductos();
+
+            return redirect()->route("vender.index")->with("mensaje", "Productos apartados correctamente");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route("vender.index")->with([
+                "mensaje" => $e->getMessage(),
+                "tipo" => "danger",
+            ]);
+        }
+    }
+
+    public function abonarApartado(Request $request)
+    {
+        return redirect()->route('apartados.index');
+    }
+
+    public function ejecutarApartadoVenta(Request $request)
+    {
+        return redirect()->route('apartados.index');
     }
 
     public function terminarVenta(Request $request)
@@ -73,6 +144,15 @@ class VenderController extends Controller
         return redirect()
             ->route("vender.index")
             ->with("mensaje", "Venta terminada");
+    }
+
+    private function calcularTotalCarrito(array $productos)
+    {
+        $total = 0;
+        foreach ($productos as $producto) {
+            $total += $producto->cantidad * $producto->precio_venta;
+        }
+        return $total;
     }
 
     private function obtenerProductos()
@@ -172,10 +252,9 @@ class VenderController extends Controller
      */
     public function index()
     {
-        $total = 0;
-        foreach ($this->obtenerProductos() as $producto) {
-            $total += $producto->cantidad * $producto->precio_venta;
-        }
+        $productosCarrito = $this->obtenerProductos();
+        $total = $this->calcularTotalCarrito($productosCarrito);
+
         return view("vender.vender",
             [
                 "total" => $total,

@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
 use Exception;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class VentasController extends Controller
 {
@@ -136,6 +137,23 @@ class VentasController extends Controller
             "venta" => $venta,
             "total" => $total,
         ]);
+    }
+
+    public function pdf($id)
+    {
+        $venta = Venta::with(['cliente', 'user', 'productos'])->findOrFail($id);
+
+        $total = 0;
+        foreach ($venta->productos as $producto) {
+            $total += $producto->cantidad * $producto->precio;
+        }
+
+        $pdf = Pdf::loadView('ventas.pdf', [
+            'venta' => $venta,
+            'total' => $total,
+        ])->setPaper('letter', 'portrait');
+
+        return $pdf->stream('venta_' . $venta->id . '.pdf');
     }
 
     /**

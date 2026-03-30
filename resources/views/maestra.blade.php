@@ -265,6 +265,9 @@
                     <a class="nav-link" href="{{route("vender.index")}}"><i class="fa fa-cart-plus mr-1"></i>Vender</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{{route("apartados.index")}}"><i class="fas fa-clipboard-list mr-1"></i>Apartados</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{route("ventas.index")}}"><i class="fa fa-list mr-1"></i>Ventas</a>
                 </li>
             @else
@@ -276,6 +279,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{route("vender.index")}}"><i class="fa fa-cart-plus mr-1"></i>Vender</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{route("apartados.index")}}"><i class="fas fa-clipboard-list mr-1"></i>Apartados</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{route("ventas.index")}}"><i class="fa fa-list mr-1"></i>Ventas</a>
