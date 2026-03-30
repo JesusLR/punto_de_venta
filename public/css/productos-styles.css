@@ -1,0 +1,749 @@
+/* =====================================================
+   ESTILOS COMPARTIDOS PARA MÓDULO DE PRODUCTOS
+   ===================================================== */
+
+/* Header Principal */
+.productos-header {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    border-left: 4px solid #D4AF37;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.productos-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.productos-header h1 i {
+    color: #D4AF37;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* Contenedor de Filtros */
+.filters-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 2rem;
+}
+
+.filters-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2a2a2a;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid #D4AF37;
+}
+
+.filters-title i {
+    color: #D4AF37;
+}
+
+/* Tabla Container */
+.table-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    animation: fadeIn 0.5s ease;
+}
+
+/* Form Container */
+.form-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+    animation: fadeIn 0.5s ease;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2a2a2a;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid #D4AF37;
+}
+
+.section-title i {
+    color: #D4AF37;
+    font-size: 1.3rem;
+}
+
+/* Botones Modernos */
+.btn-modern {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    color: #D4AF37;
+    border: 1px solid #D4AF37;
+    padding: 0.7rem 1.5rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-modern:hover {
+    background: #D4AF37;
+    color: #1a1a1a;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+.btn-modern i {
+    font-size: 1.1rem;
+}
+
+.btn-success-modern {
+    background: linear-gradient(135deg, #28a745 0%, #20923d 100%);
+    color: white;
+    border: 1px solid #28a745;
+}
+
+.btn-success-modern:hover {
+    background: linear-gradient(135deg, #20923d 0%, #1e7e34 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-excel {
+    background: linear-gradient(135deg, #217346 0%, #1a5c37 100%);
+    color: white;
+    border: 1px solid #217346;
+}
+
+.btn-excel:hover {
+    background: linear-gradient(135deg, #1a5c37 0%, #145029 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(33, 115, 70, 0.3);
+}
+
+.btn-pdf {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    border: 1px solid #dc3545;
+}
+
+.btn-pdf:hover {
+    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-action {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    color: #D4AF37;
+    border: 1px solid #D4AF37;
+    padding: 0.8rem 2rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 0.8rem;
+}
+
+.btn-action:hover {
+    background: #D4AF37;
+    color: #1a1a1a;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+.btn-action i {
+    font-size: 1.1rem;
+}
+
+.btn-action.btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+    border-color: #6c757d;
+}
+
+.btn-action.btn-secondary:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    color: white;
+}
+
+/* Select y Form Controls Modernos */
+.form-control-modern {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    background-color: white;
+    color: #2a2a2a;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-control-modern:focus {
+    outline: none;
+    border-color: #D4AF37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.form-group-modern {
+    margin-bottom: 1rem;
+}
+
+.form-group-modern label {
+    display: block;
+    font-weight: 600;
+    color: #2a2a2a;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.form-group-modern label i {
+    color: #D4AF37;
+    margin-right: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #2a2a2a;
+    margin-bottom: 0.6rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.form-group label i {
+    color: #D4AF37;
+    margin-right: 0.5rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    background-color: white;
+    color: #2a2a2a;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: auto;
+    min-height: 42px;
+    line-height: 1.5;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #D4AF37;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.form-control-file {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 0.8rem 1rem;
+    background-color: white;
+    width: 100%;
+}
+
+.form-control-file:focus {
+    outline: none;
+    border-color: #D4AF37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.text-danger {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.form-text {
+    font-size: 0.85rem;
+    color: #95a5a6;
+    margin-top: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.form-text i {
+    font-size: 0.75rem;
+}
+
+/* Tabla Mejorada */
+.table-striped tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table-striped tbody tr:hover {
+    background-color: #f8f9fa !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: scale(1.01);
+}
+
+/* Imagen Producto */
+.img-wrapper {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #e0e0e0;
+}
+
+.img-wrapper:hover {
+    transform: scale(1.1);
+    border-color: #D4AF37;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.img-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(212, 175, 55, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.img-wrapper:hover .img-overlay {
+    opacity: 1;
+}
+
+.img-overlay i {
+    color: white;
+    font-size: 1.5rem;
+}
+
+.img-placeholder {
+    width: 60px;
+    height: 60px;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #95a5a6;
+    font-size: 0.7rem;
+}
+
+.img-placeholder i {
+    font-size: 1.5rem;
+    margin-bottom: 0.2rem;
+}
+
+/* Preview Container */
+.preview-container {
+    border: 2px dashed #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.preview-container:hover {
+    border-color: #D4AF37;
+    background: linear-gradient(135deg, #fafafa 0%, #f9f9f9 100%);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
+}
+
+.preview-image {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.preview-image:hover {
+    transform: scale(1.05);
+}
+
+.preview-placeholder {
+    color: #95a5a6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.preview-placeholder i {
+    font-size: 3.5rem;
+    opacity: 0.4;
+}
+
+.preview-placeholder p {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Profit Indicator */
+.profit-indicator {
+    padding: 1.2rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    animation: slideIn 0.3s ease;
+}
+
+.profit-positive {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.1);
+}
+
+.profit-negative {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1);
+}
+
+.profit-indicator i {
+    font-size: 1.3rem;
+}
+
+/* Botones de Tabla */
+.btn-table-action {
+    padding: 0.4rem 0.7rem;
+    border-radius: 6px;
+    margin: 0 0.2rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-table-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-table-action i {
+    font-size: 0.9rem;
+}
+
+/* Filas con Estado */
+.table-danger {
+    background-color: #ffebee !important;
+    border-left: 4px solid #e74c3c !important;
+}
+
+.table-warning {
+    background-color: #fff9c4 !important;
+    border-left: 4px solid #f39c12 !important;
+}
+
+/* Modal Mejorado */
+.modal-header {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: white;
+    border-bottom: 3px solid #D4AF37;
+}
+
+.modal-title {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modal-footer {
+    border-top: 2px solid #e0e0e0;
+}
+
+/* Toolbar Bootstrap Table */
+.fixed-table-toolbar .search input {
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    padding: 0.5rem 1rem;
+}
+
+.fixed-table-toolbar .search input:focus {
+    border-color: #D4AF37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+/* Botones de exportación */
+.fixed-table-toolbar .columns,
+.fixed-table-toolbar .export {
+    margin-left: 10px;
+}
+
+.fixed-table-toolbar .export .dropdown-menu {
+    min-width: 150px;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .productos-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .header-actions {
+        flex-direction: column;
+    }
+
+    .btn-modern {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .filters-container .row > div {
+        margin-bottom: 1rem;
+    }
+
+    .form-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .btn-action {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 0.8rem;
+        margin-right: 0;
+    }
+
+    .preview-container {
+        min-height: 200px;
+    }
+}
+
+/* Modal específico para vista de imagen */
+.modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    background: white;
+    overflow: hidden;
+}
+
+.modal-dialog {
+    max-width: 90vw;
+    width: auto;
+    margin: 1.75rem auto;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: white;
+    border: none;
+    border-radius: 12px 12px 0 0;
+    padding: 1.5rem;
+}
+
+.modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #D4AF37;
+}
+
+.modal-header .close {
+    color: #D4AF37;
+    opacity: 0.8;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-header .close:hover {
+    opacity: 1;
+    color: white;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    background: white;
+    max-height: calc(100vh - 200px);
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#divImagenProductoModal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Asegurar que la imagen NO se salga del modal */
+#divImagenProductoModal img {
+    max-width: 100%;
+    max-height: calc(100vh - 240px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+    display: block;
+    margin: 0 auto;
+}
+
+.modal-footer {
+    background: #f9f9f9;
+    border: none;
+    border-radius: 0 0 12px 12px;
+    padding: 1.5rem;
+}
+
+.modal-footer .btn-danger {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
+}
+
+.modal-footer .btn-danger:hover {
+    background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+@media (max-width: 768px) {
+    .modal-dialog {
+        max-width: 95vw;
+        margin: 1rem auto;
+    }
+
+    .modal-body {
+        padding: 1rem;
+        max-height: calc(100vh - 180px);
+    }
+
+    #divImagenProductoModal img {
+        max-height: calc(100vh - 200px);
+    }
+
+    .modal-title {
+        font-size: 1.1rem;
+    }
+}
+
+/* CARD DE PRECIO DE ORO DE HOME */
+.gold-price-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.25) !important;
+    border-color: #D4AF37 !important;
+}
+
+.gold-price-item.selected {
+    border-color: #D4AF37 !important;
+    background: linear-gradient(135deg, #fffbf0 0%, #fff9e6 100%) !important;
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3) !important;
+}
+
+@media (max-width: 768px) {
+    #goldPricesGrid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+    }
+    
+    .gold-price-card > div:first-child {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    #goldFilterSelect {
+        max-width: 100% !important;
+    }
+}

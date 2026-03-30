@@ -23,12 +23,17 @@ class EstadisticasController extends Controller
 
             $fechaInicio = Carbon::parse($request->dtFechaInicio); // fecha de inicio
             $fechaFin = Carbon::parse($request->dtFechaFinal); // fecha de fin
+            $limite = $request->has('limite') ? intval($request->limite) : 10; // Parámetro de límite, por defecto 10
+            
+            // Validar que el límite esté entre 5 y 100
+            $limite = max(5, min($limite, 100));
+            
             // dd($fechaInicioA, $fechaInicio);
             $resultado = ProductoVendido::whereBetween('created_at', [$fechaInicio, $fechaFin])
             ->groupBy('codigo_barras')  // Agrupar por el código de barras
             ->selectRaw('codigo_barras, sum(cantidad) as total_cantidad, count(*) as veces_vendido')  // Sumar las cantidades y contar las veces
             ->orderByDesc('total_cantidad')  // Ordenar por la suma total de la cantidad de manera descendente
-            ->take(10)  // Limitar los resultados a los primeros 10
+            ->take($limite)  // Limitar los resultados según el parámetro
             ->get();
 
             if(count($resultado) == 0){

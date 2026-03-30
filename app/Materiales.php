@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class Materiales extends Model
 {
     protected $table = "materiales";
-    protected $fillable = ["cNombreMaterial", "cNotasMaterial". "lActivo"];
+    protected $fillable = ["cNombreMaterial", "cNotasMaterial". "lActivo", "cSimbolo", "lActivoConsulta"];
 }

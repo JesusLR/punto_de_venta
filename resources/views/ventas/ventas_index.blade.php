@@ -21,17 +21,25 @@
 @extends("maestra")
 @section("titulo", "Ventas")
 @section("contenido")
-<input type="text" id="userID" value={{Auth::user()->id}} hidden>
-<input type="text" id="iIDVenta" hidden>
-    <div class="row">
-        <div class="col-12">
-            <h1>Ventas <i class="fa fa-list"></i></h1>
-            @include("notificacion")
 
+<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
+
+<input type="text" id="userID" value="{{Auth::user()->id}}" hidden>
+<input type="text" id="iIDVenta" hidden>
+
+<div class="row">
+    <div class="col-12">
+        <div class="productos-header">
+            <h1><i class="fa fa-list"></i> Ventas</h1>
+        </div>
+
+        @include("notificacion")
+
+        <div class="filters-container">
             <div class="row" @if (Auth::user()->id != 1) style="display: none;"  @endif>
                 <div class="col-md-6 mb-3">
                     <label for="cTipoBusquedaProductos">Usuario</label>
-                    <select required class="form-control" name="cTipoBusquedaVenta" id="cTipoBusquedaVenta">
+                    <select required class="form-control-modern" name="cTipoBusquedaVenta" id="cTipoBusquedaVenta">
                         <option value="T">Todos</option>
                         @foreach ($users as $user)
                         <option @if ($user->id != 1 && Auth::user()->id == $user->id) selected @endif value="{{$user->id}}">{{$user->name}}</option>
@@ -39,58 +47,24 @@
                     </select>
                 </div>
             </div>
+        </div>
 
-            <div class="table-responsive">
-                <table class="table table-bordered" id="gridVentas">
-                    {{-- <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Cliente</th>
-                        <th>Total</th>
-                        <th>Ticket de venta</th>
-                        <th>Detalles</th>
-                        @if (Auth::user()->id == 1)
-                            <th>Eliminar</th>
-                        @endif
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($ventas as $venta)
-                        <tr>
-                            <td>{{$venta->created_at}}</td>
-                            <td>{{$venta->cliente->nombre}}</td>
-                            <td>${{number_format($venta->total, 2)}}</td>
-                            <td>
-                                <a class="btn btn-info" href="{{route("ventas.ticket", ["id"=>$venta->id])}}">
-                                    <i class="fa fa-print"></i>
-                                </a>
-                            </td>
-                            <td>
-                                <a class="btn btn-success" href="{{route("ventas.show", $venta)}}">
-                                    <i class="fa fa-info"></i>
-                                </a>
-                            </td>
-                            @if (Auth::user()->id == 1)
-                                <td>
-                                    <form action="{{route("ventas.destroy", [$venta])}}" method="post">
-                                        @method("delete")
-                                        @csrf
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            @endif
-                        </tr>
-                    @endforeach
-                    </tbody> --}}
-                </table>
+        <div class="table-container">
+            <div class="table-wrapper">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="gridVentas"></table>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    @include('ventas.modals.editNombreVentaModal')
+@include('ventas.modals.editNombreVentaModal')
 
-    <script src="{{asset('js/ventas.js')}}"></script>
+{{-- libs para generación de PDF en cliente (html2canvas + jsPDF UMD) --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script src="{{asset('js/ventas.js')}}"></script>
 
 @endsection

@@ -218,7 +218,8 @@
 <body>
 
 <nav class="navbar navbar-expand-md fixed-top">
-    <a class="navbar-brand" target="" href="{{route("home")}}">
+    {{-- <a class="navbar-brand" target="" href="{{route("home")}}"> --}}
+    <a class="navbar-brand" target="" href="#">
         <i class="fa fa-shopping-cart mr-2"></i>{{env("APP_NAME")}}
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -284,7 +285,7 @@
 
             @endguest
         </ul>
-        <ul class="navbar-nav ml-auto">
+        {{-- <ul class="navbar-nav ml-auto">
             @guest
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('login') }}"><i class="fa fa-sign-in-alt mr-1"></i>Login</a>
@@ -298,7 +299,7 @@
                     </li>
                 @endauth
             @endguest
-        </ul>
+        </ul> --}}
     </div>
 </nav>
 

@@ -21,100 +21,134 @@
 @extends("maestra")
 @section("titulo", "Realizar venta")
 @section("contenido")
-    <div class="row">
-        <div class="col-12">
-            <h1>Nueva venta <i class="fa fa-cart-plus"></i></h1>
-            @include("notificacion")
-            <div class="row">
-                <div class="col-12 col-md-6">
-                    <form action="{{route("terminarOCancelarVenta")}}" method="post">
-                        @csrf
-                        <div class="form-group">
-                            <input type="text" id="userID" name="userID" value={{Auth::user()->id}} hidden>
-                            <label for="id_cliente">Cliente</label>
-                            <select required class="form-control" name="id_cliente" id="id_cliente">
-                                @foreach($clientes as $cliente)
-                                    <option value="{{$cliente->id}}">{{$cliente->nombre}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        @if(session("productos") !== null)
-                            <div class="form-group">
-                                <button name="accion" value="terminar" type="submit" class="btn btn-success"><i class="fas fa-dollar-sign"></i> Terminar
-                                    venta
-                                </button>
-                                <button name="accion" value="cancelar" type="submit" class="btn btn-danger"><i class="far fa-window-close"></i> Cancelar
-                                    venta
-                                </button>
-                            </div>
-                        @endif
-                    </form>
-                </div>
-                <div class="col-12 col-md-6">
+
+<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
+
+<div class="row">
+    <div class="col-12">
+        <div class="productos-header">
+            <h1><i class="fa fa-cart-plus"></i> Nueva venta</h1>
+        </div>
+
+        @include("notificacion")
+
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <form action="{{route('terminarOCancelarVenta')}}" method="post" class="form-container">
+                    @csrf
+                    <input type="hidden" id="userID" name="userID" value="{{ Auth::user()->id }}">
+
                     <div class="form-group">
-                        <label for="id_cliente">Producto</label>
-                        <select required class="form-control" name="id_producto" id="id_producto">
-                            <option value="0"> -- Seleccione un producto -- </option>
-                            @foreach($productos as $producto)
-                                <option value="{{$producto->id}}">{{$producto->codigo_barras}}</option>
+                        <label><i class="fas fa-user"></i> Cliente</label>
+                        <select required class="form-control-modern" name="id_cliente" id="id_cliente">
+                            @foreach($clientes as $cliente)
+                                <option value="{{$cliente->id}}">{{$cliente->nombre}}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <form action="{{route("agregarProductoVenta")}}" method="post" id="formCodigo">
+                    @if(session('productos') !== null)
+                        <div class="form-group" style="margin-top:1rem;">
+                            <button name="accion" value="terminar" type="submit" class="btn-action btn-success-modern">
+                                <i class="fas fa-dollar-sign"></i> Terminar venta
+                            </button>
+                            <button name="accion" value="cancelar" type="submit" class="btn-action btn-secondary">
+                                <i class="far fa-window-close"></i> Cancelar venta
+                            </button>
+                        </div>
+                    @endif
+                </form>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="form-container">
+                    <div class="form-group">
+                        <label><i class="fas fa-box"></i> Producto</label>
+                        <select required class="form-control-modern" name="id_producto" id="id_producto">
+                            <option value="0"> -- Seleccione un producto -- </option>
+                            @foreach($productos as $producto)
+                                <option value="{{$producto->id}}">{{$producto->codigo_barras}} - {{$producto->descripcion}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <form action="{{route('agregarProductoVenta')}}" method="post" id="formCodigo" style="margin-top:1rem;">
                         @csrf
                         <div class="form-group">
-                            {{-- <label for="codigo">Código de barras</label> --}}
-                            <input hidden id="codigo" autocomplete="off" required autofocus name="codigo" type="text"
-                                   class="form-control"
-                                   placeholder="Código de barras">
+                            <input hidden id="codigo" autocomplete="off" name="codigo" type="text" class="form-control-modern" placeholder="Código de barras" autofocus>
                         </div>
                     </form>
                 </div>
             </div>
-            @if(session("productos") !== null)
-                <h2>Total: ${{number_format($total, 2)}}</h2>
+        </div>
+
+        <div class="form-container" style="margin-top:1rem;">
+            @if(session('productos') !== null)
+                <h3 style="margin-bottom:1rem;">Total: ${{ number_format($total, 2) }}</h3>
+
+                <div style="margin-bottom:1rem;">
+                    <button type="button" id="btnPrintTicket" class="btn-action btn-success-modern">
+                        <i class="fas fa-print"></i> Imprimir ticket
+                    </button>
+                </div>
+
                 <div class="table-responsive">
-                    <table class="table table-bordered">
+                    <table class="table table-bordered table-striped">
                         <thead>
-                        <tr>
-                            <th>Código de barras</th>
-                            <th>Descripción</th>
-                            <th>Precio</th>
-                            <th>Cantidad</th>
-                            <th>Quitar</th>
-                        </tr>
+                            <tr>
+                                <th>Código de barras</th>
+                                <th>Descripción</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Quitar</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        @foreach(session("productos") as $producto)
-                            <tr>
-                                <td>{{$producto->codigo_barras}}</td>
-                                <td>{{$producto->descripcion}}</td>
-                                <td>${{number_format($producto->precio_venta, 2)}}</td>
-                                <td>{{$producto->cantidad}}</td>
-                                <td>
-                                    <form action="{{route("quitarProductoDeVenta")}}" method="post">
-                                        @method("delete")
-                                        @csrf
-                                        <input type="hidden" name="indice" value="{{$loop->index}}">
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @endforeach
+                            @foreach(session('productos') as $producto)
+                                <tr>
+                                    <td>{{ $producto->codigo_barras }}</td>
+                                    <td>{{ $producto->descripcion }}</td>
+                                    <td>${{ number_format($producto->precio_venta, 2) }}</td>
+                                    <td>{{ $producto->cantidad }}</td>
+                                    <td>
+                                        <form action="{{route('quitarProductoDeVenta')}}" method="post">
+                                            @method('delete')
+                                            @csrf
+                                            <input type="hidden" name="indice" value="{{ $loop->index }}">
+                                            <button type="submit" class="btn-table-action btn btn-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
             @else
-                <h2>Aquí aparecerán los productos de la venta
-                    <br>
-                    Escanea el código de barras o escribe y presiona Enter</h2>
+                <div class="text-center" style="padding:2rem;">
+                    <h4>Aquí aparecerán los productos de la venta</h4>
+                    <p>Escanea el código de barras o escribe y presiona Enter</p>
+                </div>
             @endif
         </div>
     </div>
+</div>
 
-    <script src="{{asset('js/vender.js')}}"></script>
+{{-- pasar datos de la venta a JS --}}
+@if(session('productos') !== null)
+<script>
+    window.ventaData = @json(session('productos'));
+    window.ventaTotal = {{ $total }};
+    window.ventaFecha = "{{ now()->format('d/m/Y H:i') }}";
+    window.ventaUsuario = "{{ Auth::user()->name }}";
+</script>
+@endif
+
+{{-- libs para generación de PDF en cliente (html2canvas + jsPDF UMD) --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script src="{{ asset('js/vender.js') }}"></script>
 
 @endsection
