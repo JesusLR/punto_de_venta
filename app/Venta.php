@@ -27,6 +27,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Venta extends Model
 {
+
+    protected $fillable = ["id_cliente", "id_usuario", "cNombreVenta"];
     public function productos()
     {
         return $this->hasMany("App\ProductoVendido", "id_venta");
@@ -35,5 +37,15 @@ class Venta extends Model
     public function cliente()
     {
         return $this->belongsTo("App\Cliente", "id_cliente");
+    }
+
+    public function user()
+    {
+        return $this->belongsTo("App\User", "id_usuario");
+    }
+
+    public function usuario()
+    {
+        return $this->user();
     }
 }

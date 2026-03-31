@@ -134,13 +134,8 @@
 <script src="{{ asset('js/ventas.js') }}"></script>
 
 <script>
-    // llamar a la función que ya existe en ventas.js para mostrar PDF
     document.getElementById('btnPrintTicketVenta').addEventListener('click', function () {
-        if (typeof printTicketVenta === 'function') {
-            printTicketVenta(window.saleData, window.saleTotal, window.saleFecha, window.saleUsuario);
-        } else {
-            alert('Función de impresión no disponible.');
-        }
+        window.open("{{ route('ventas.pdf', ['id' => $venta->id]) }}", '_blank');
     });
 </script>
 

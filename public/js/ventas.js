@@ -97,6 +97,11 @@ function accionesFormatter(value, row) {
     //    html += ' <button type="button" style="margin-right: 2px;" class="btn btn-info" title="Imprimir ticket" onclick="imprimirTicket('+row.id+')"><i class="fa fa-print"></i></button>'
        html += ' <button type="button" style="margin-right: 2px;" class="btn btn-light" title="Editar nombre de venta" onclick="editNombreVenta('+row.id+', \''+row.cNombreVenta+'\')"><i class="fa fa-edit"></i></button>';
     }
+    // console.log(row.apartado_id_venta > 0)
+    if(row.apartado_id_venta > 0){
+        html += '<button type="button" style="margin-right: 2px;" class="btn btn-secondary" title="Ver historial de abonos" onclick="verHistorialAbonos(' + row.apartado_id + ')"><i class="fas fa-history"></i></button>';
+         html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" title="Descargar PDF Historial de abonos" onclick="descargarPdfApartado(' + row.apartado_id + ')"><i class="fas fa-file-pdf"></i></button>';
+    }
     return html;
 }
 
@@ -448,3 +453,26 @@ function printTicketVenta(items, total, fecha, usuario) {
 // Exponer en window si es necesario
 window.printTicketVenta = printTicketVenta;
 
+function verHistorialAbonos(id) {
+    $.ajax({
+        url: "/apartados/ver-abonos/" + id,
+        type: "get",
+        success: function (html) {
+            $("#historialAbonosBody").html(html);
+            $("#modalHistorialAbonos").modal("show");
+        },
+        error: function () {
+            swal.fire({
+                title: "Error",
+                text: "No se pudo cargar el historial de abonos.",
+                icon: "error",
+                showConfirmButton: true,
+                confirmButtonText: "Aceptar",
+            });
+        }
+    });
+}
+
+function descargarPdfApartado(id) {
+    window.open('/apartados/pdf/' + id, '_blank');
+}

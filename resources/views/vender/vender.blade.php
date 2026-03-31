@@ -52,7 +52,10 @@
                             <button name="accion" value="terminar" type="submit" class="btn-action btn-success-modern">
                                 <i class="fas fa-dollar-sign"></i> Terminar venta
                             </button>
-                            <button name="accion" value="cancelar" type="submit" class="btn-action btn-secondary">
+                            <button name="accion" value="apartar" type="submit" class="btn-action btn-secondary">
+                                <i class="fas fa-hand-holding-usd"></i> Apartar
+                            </button>
+                            <button name="accion" value="cancelar" type="submit" class="btn-action" style="background:#FF6B6B; color:#fff;">
                                 <i class="far fa-window-close"></i> Cancelar venta
                             </button>
                         </div>

@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
 use Exception;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class VentasController extends Controller
 {
@@ -85,10 +86,27 @@ class VentasController extends Controller
     public function gridVentas(Request $request){
         $ventasConTotales = Venta::query();
         $ventasConTotales->join("productos_vendidos", "productos_vendidos.id_venta", "=", "ventas.id")
-        ->join("clientes", "clientes.id", "=", "ventas.id_cliente")
-        ->join("users", "users.id", "=", "ventas.id_usuario")
-        ->select("ventas.*", DB::raw("sum(productos_vendidos.cantidad * productos_vendidos.precio) as total"), "clientes.nombre", "users.name")
-        ->groupBy("ventas.id", "ventas.created_at", "ventas.updated_at", "ventas.id_cliente", "clientes.nombre", "users.name");
+            ->join("clientes", "clientes.id", "=", "ventas.id_cliente")
+            ->join("users", "users.id", "=", "ventas.id_usuario")
+            ->leftJoin("apartados", "apartados.id_venta", "=", "ventas.id")
+            ->select(
+                "ventas.*",
+                DB::raw("SUM(productos_vendidos.cantidad * productos_vendidos.precio) as total"),
+                "clientes.nombre",
+                "users.name",
+                "apartados.id as apartado_id",
+                "apartados.id_venta as apartado_id_venta"
+            )
+            ->groupBy(
+                "ventas.id",
+                "ventas.created_at",
+                "ventas.updated_at",
+                "ventas.id_cliente",
+                "clientes.nombre",
+                "users.name",
+                "apartados.id",
+                "apartados.id_venta"
+            );
 
         if($request->cTipoBusqueda != "T"){
             $ventasConTotales->where("id_usuario", $request->cTipoBusqueda);
@@ -136,6 +154,23 @@ class VentasController extends Controller
             "venta" => $venta,
             "total" => $total,
         ]);
+    }
+
+    public function pdf($id)
+    {
+        $venta = Venta::with(['cliente', 'user', 'productos'])->findOrFail($id);
+
+        $total = 0;
+        foreach ($venta->productos as $producto) {
+            $total += $producto->cantidad * $producto->precio;
+        }
+
+        $pdf = Pdf::loadView('ventas.pdf', [
+            'venta' => $venta,
+            'total' => $total,
+        ])->setPaper('letter', 'portrait');
+
+        return $pdf->stream('venta_' . $venta->id . '.pdf');
     }
 
     /**

@@ -60,6 +60,7 @@
 </div>
 
 @include('ventas.modals.editNombreVentaModal')
+@include('ventas.modals.modalHistorialAbonos')
 
 {{-- libs para generación de PDF en cliente (html2canvas + jsPDF UMD) --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>

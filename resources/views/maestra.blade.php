@@ -261,11 +261,16 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{route("estadisticas.index")}}"><i class="fas fa-chart-pie mr-1"></i>Estadísticas</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{route("vender.index")}}"><i class="fa fa-cart-plus mr-1"></i>Vender</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{route("ventas.index")}}"><i class="fa fa-list mr-1"></i>Ventas</a>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="ventasDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-book mr-1"></i>Tienda
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="ventasDropdown">
+                        <a class="dropdown-item" href="{{route("vender.index")}}"><i class="fa fa-cart-plus mr-2" style="color: #95E1D3;"></i>Vender</a>
+                        <a class="dropdown-item" href="{{route("apartados.index")}}"><i class="fas fa-clipboard-list mr-2" style="color: #FF6B6B;"></i>Apartados</a>
+                        <a class="dropdown-item" href="{{route("ventas.index")}}"><i class="fa fa-list mr-2" style="color: #45B7D1;"></i>Ventas</a>
+                    </div>
                 </li>
             @else
                 <li class="nav-item">
@@ -276,6 +281,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{route("vender.index")}}"><i class="fa fa-cart-plus mr-1"></i>Vender</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{route("apartados.index")}}"><i class="fas fa-clipboard-list mr-1"></i>Apartados</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{route("ventas.index")}}"><i class="fa fa-list mr-1"></i>Ventas</a>
