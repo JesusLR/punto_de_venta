@@ -115,7 +115,7 @@ function accionesApartadoFormatter(value, row) {
 
     html += '<button type="button" style="margin-right: 2px;" class="btn btn-info" title="Ver productos" onclick="verProductosApartado(' + row.id + ')"><i class="fas fa-box"></i></button>';
     html += '<button type="button" style="margin-right: 2px;" class="btn btn-secondary" title="Ver historial de abonos" onclick="verHistorialAbonos(' + row.id + ')"><i class="fas fa-history"></i></button>';
-    html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" title="Descargar PDF" onclick="descargarPdfApartado(' + row.id + ')"><i class="fas fa-file-pdf"></i></button>';
+    html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" title="Descargar PDF Historial de abonos" onclick="descargarPdfApartado(' + row.id + ')"><i class="fas fa-file-pdf"></i></button>';
 
     if (row.estado === 'LIQUIDADO') {
         html += '<button type="button" style="margin-right: 2px;" class="btn btn-success" title="Ejecutar venta" onclick="ejecutarApartado(' + row.id + ')"><i class="fas fa-check"></i></button>';
