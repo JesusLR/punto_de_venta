@@ -54,10 +54,22 @@ class VenderController extends Controller
         }
 
         try {
+
+
+            $clienteExistente = Cliente::where('nombre', $request->input('nombre'))
+                                ->first();
+                                
+            if ($clienteExistente) {
+                return response()->json([
+                    'lSuccess' => false,
+                    'cMensaje' => 'Ya existe un cliente con ese nombre.',
+                ]);
+            }
+
             $cliente = Cliente::create([
-                'nombre' => $request->input('nombre'),
+                'nombre' => strtoupper($request->input('nombre')),
                 'telefono' => $request->input('telefono'),
-                'observaciones' => $request->input('observaciones'),
+                'observaciones' => strtoupper($request->input('observaciones')),
             ]);
 
             return response()->json([

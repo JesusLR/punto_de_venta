@@ -278,7 +278,7 @@ class ApartadosController extends Controller
 
         $apartado = Apartado::findOrFail($request->id_apartado);
         $apartado->update([
-            'nombre_apartado' => $request->nombre_apartado,
+            'nombre_apartado' => strtoupper($request->nombre_apartado),
         ]);
 
         return response()->json([

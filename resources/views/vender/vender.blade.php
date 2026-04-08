@@ -160,7 +160,7 @@
                     {{-- </div> --}}
                     {{-- <diav class="form-group mb-0"> --}}
                         <label for="nuevo_cliente_telefono"><i class="fas fa-phone"></i> Teléfono</label>
-                        <input type="text" id="nuevo_cliente_telefono" name="telefono" class="form-control" maxlength="255" placeholder="Ej. 5551234567" required>
+                        <input type="text" id="nuevo_cliente_telefono" name="telefono" class="form-control" maxlength="10" placeholder="Ej. 9991234567" required>
                     {{-- </div> --}}
                     {{-- <div class="form-group mb-0 mt-2"> --}}
                         <label for="nuevo_cliente_observaciones"><i class="fas fa-sticky-note"></i> Observaciones</label>

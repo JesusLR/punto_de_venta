@@ -6,6 +6,7 @@ $(document).ready(function () {
     });
 
     $('#id_producto').select2();
+    $('#id_cliente').select2();
 
     $('#btnNuevoClienteVenta').on('click', function () {
         $('#nuevo_cliente_nombre').val('');
