@@ -155,7 +155,7 @@
     <div class="doc-header">
         <div class="brand">Joyería Colibrí</div>
         <div class="doc-title">Comprobante de venta folio #{{ $venta->id }}</div>
-        <div class="meta-date">Generado: {{ now()->format('d/m/Y H:i:s') }}</div>
+        <div class="meta-date">Generado: {{ now()->format('d/m/Y ') }}</div>
     </div>
 
     <div class="info-box">
@@ -168,7 +168,7 @@
                 </tr>
                 <tr>
                     <td class="info-label">Fecha:</td>
-                    <td>{{ $venta->created_at ? $venta->created_at->format('d/m/Y H:i:s') : '-' }}</td>
+                    <td>{{ $venta->created_at ? $venta->created_at->format('d/m/Y') : '-' }}</td>
                 </tr>
                 <tr>
                     <td class="info-label">Cliente:</td>

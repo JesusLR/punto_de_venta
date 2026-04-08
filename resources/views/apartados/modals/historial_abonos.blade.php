@@ -1,5 +1,6 @@
 @if($abonos && count($abonos) > 0)
-    <table class="table table-sm table-bordered">
+    <div class="table-responsive apartado-table-wrapper">
+    <table class="table table-sm table-bordered apartado-table">
         <thead>
             <tr>
                 <th>Fecha</th>
@@ -22,11 +23,11 @@
                     <td>{{ $abono->observaciones ?: '-' }}</td>
                     @if (Auth::user()->id == 1)
                         <td>
-                                <button type="button" class="btn btn-sm btn-primary" title="Editar fecha"
+                                <button type="button" class="btn btn-sm btn-primary apartado-action-btn" title="Editar fecha"
                                         onclick="editarFechaAbono({{ $abono->id }}, {{ $apartado->id }}, '{{ optional($abono->fecha_registro)->format('Y-m-d') }}')">
                                     <i class="fas fa-calendar-alt"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-danger" onclick="eliminarAbono({{ $abono->id }}, {{ $apartado->id }})">
+                                <button type="button" class="btn btn-sm btn-danger apartado-action-btn" onclick="eliminarAbono({{ $abono->id }}, {{ $apartado->id }})">
                                     <i class="fas fa-trash"></i>
                                 </button>
                         </td>
@@ -35,6 +36,10 @@
             @endforeach
         </tbody>
     </table>
+    </div>
 @else
-    <p class="text-muted">No hay abonos registrados en este apartado.</p>
+    <div class="apartado-modal-empty">
+        <i class="fas fa-receipt"></i>
+        <span>No hay abonos registrados en este apartado.</span>
+    </div>
 @endif

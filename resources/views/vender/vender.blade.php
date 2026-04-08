@@ -141,35 +141,53 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalNuevoClienteVenta" tabindex="-1" role="dialog" aria-labelledby="modalNuevoClienteVentaLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade apartado-modal" id="modalNuevoClienteVenta" tabindex="-1" role="dialog" aria-labelledby="modalNuevoClienteVentaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalNuevoClienteVentaLabel"><i class="fas fa-user-plus"></i> Nuevo cliente</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                <div>
+                    <span class="apartado-modal-badge">
+                        <i class="fas fa-user-friends"></i> Clientes
+                    </span>
+                    <h5 class="modal-title" id="modalNuevoClienteVentaLabel"><i class="fas fa-user-plus"></i> Nuevo cliente</h5>
+                    <p class="apartado-modal-subtitle mb-0">Registra un cliente rápido y selecciónalo automáticamente para la venta.</p>
+                </div>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <form id="formNuevoClienteVenta" method="post">
                 @csrf
                 <div class="modal-body">
-                    {{-- <p style="margin-bottom: 1rem; color: #6c757d;">Registra un cliente rápido y quedará seleccionado automáticamente.</p> --}}
-                    <div class="form-group">
-                        <label for="nuevo_cliente_nombre"><i class="fas fa-user"></i> Nombre</label>
-                        <input type="text" id="nuevo_cliente_nombre" name="nombre" class="form-control" maxlength="255" placeholder="Nombre completo" required>
-                    {{-- </div> --}}
-                    {{-- <diav class="form-group mb-0"> --}}
-                        <label for="nuevo_cliente_telefono"><i class="fas fa-phone"></i> Teléfono</label>
-                        <input type="text" id="nuevo_cliente_telefono" name="telefono" class="form-control" maxlength="10" placeholder="Ej. 9991234567" required>
-                    {{-- </div> --}}
-                    {{-- <div class="form-group mb-0 mt-2"> --}}
-                        <label for="nuevo_cliente_observaciones"><i class="fas fa-sticky-note"></i> Observaciones</label>
-                        <textarea id="nuevo_cliente_observaciones" name="observaciones" class="form-control" rows="2" maxlength="1000" placeholder="Opcional"></textarea>
+                    <div class="apartado-modal-helper">
+                        <i class="fas fa-bolt"></i>
+                        <span>Captura solo la información necesaria para continuar con la venta sin salir de esta pantalla.</span>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label for="nuevo_cliente_nombre"><i class="fas fa-user"></i>Nombre</label>
+                        <input type="text" id="nuevo_cliente_nombre" name="nombre" class="form-control form-control-modern apartado-modal-input" maxlength="255" placeholder="Nombre completo" required>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label for="nuevo_cliente_telefono"><i class="fas fa-phone"></i>Teléfono</label>
+                        <input type="text" id="nuevo_cliente_telefono" name="telefono" class="form-control form-control-modern apartado-modal-input" maxlength="10" placeholder="Ej. 9991234567" required>
+                    </div>
+
+                    <div class="form-group-modern mb-0">
+                        <label for="nuevo_cliente_observaciones"><i class="fas fa-sticky-note"></i>Observaciones</label>
+                        <textarea id="nuevo_cliente_observaciones" name="observaciones" class="form-control form-control-modern" rows="2" maxlength="1000" placeholder="Opcional"></textarea>
+                        <small class="form-text">
+                            <i class="fas fa-info-circle"></i>
+                            Puedes agregar una nota breve para identificar mejor al cliente.
+                        </small>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success">
+                    <button type="button" class="btn apartado-modal-btn-cancel" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-modern btn-success-modern">
                         <i class="fas fa-save"></i> Guardar cliente
                     </button>
                 </div>

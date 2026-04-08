@@ -505,6 +505,218 @@
     border-left: 4px solid #f39c12 !important;
 }
 
+/* Modal de edición de apartado */
+.apartado-modal .modal-dialog,
+#modalNombreApartado .modal-dialog {
+    max-width: 540px;
+    width: 92%;
+    margin: 1.75rem auto;
+}
+
+.apartado-modal .modal-content,
+#modalNombreApartado .modal-content {
+    border: none;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+}
+
+.apartado-modal .modal-header,
+#modalNombreApartado .modal-header {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: white;
+    border-bottom: 3px solid #D4AF37;
+    padding: 1.4rem 1.5rem 1.2rem;
+    align-items: flex-start;
+}
+
+.apartado-modal .modal-title,
+#modalNombreApartado .modal-title {
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin: 0.6rem 0 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.apartado-modal .modal-title i,
+#modalNombreApartado .modal-title i {
+    color: #D4AF37;
+}
+
+.apartado-modal .modal-header .close,
+#modalNombreApartado .modal-header .close {
+    opacity: 0.9;
+    text-shadow: none;
+}
+
+.apartado-modal .modal-header .close:hover,
+#modalNombreApartado .modal-header .close:hover {
+    color: #D4AF37;
+    opacity: 1;
+}
+
+.apartado-modal .modal-body,
+#modalNombreApartado .modal-body {
+    padding: 1.5rem;
+    background: linear-gradient(180deg, #fffdf7 0%, #ffffff 100%);
+}
+
+.apartado-modal .modal-footer,
+#modalNombreApartado .modal-footer {
+    border-top: 1px solid #f0f0f0;
+    background: #fafafa;
+    padding: 1rem 1.5rem 1.4rem;
+    gap: 0.75rem;
+}
+
+.apartado-modal .modal-dialog.modal-sm {
+    max-width: 500px;
+}
+
+.apartado-modal .modal-dialog.modal-lg {
+    max-width: 860px;
+}
+
+.apartado-modal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(212, 175, 55, 0.16);
+    color: #f7d777;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.apartado-modal-subtitle {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
+.apartado-modal-helper {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.95rem 1rem;
+    margin-bottom: 1.25rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0.06) 100%);
+    color: #7a6120;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    font-size: 0.9rem;
+}
+
+.apartado-modal-helper i {
+    margin-top: 0.1rem;
+    color: #D4AF37;
+}
+
+.apartado-modal-body-soft {
+    background: linear-gradient(180deg, #fffdf7 0%, #ffffff 100%);
+}
+
+.apartado-modal-input {
+    border-radius: 10px;
+    min-height: 46px;
+}
+
+.apartado-modal-btn-cancel {
+    background: white;
+    color: #495057;
+    border: 1px solid #d9dee3;
+    border-radius: 10px;
+    padding: 0.7rem 1.25rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.apartado-modal-btn-cancel:hover {
+    background: #f3f4f6;
+    border-color: #c8ced6;
+    color: #212529;
+}
+
+.apartado-inline-card {
+    background: linear-gradient(180deg, #ffffff 0%, #fffdf8 100%);
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+}
+
+.apartado-inline-card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2a2a2a;
+}
+
+.apartado-inline-card-title i {
+    color: #D4AF37;
+}
+
+.apartado-table-wrapper {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #ececec;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+}
+
+.apartado-table {
+    margin-bottom: 0;
+}
+
+.apartado-table thead th {
+    background: #1f1f1f;
+    color: #f7d777;
+    border-color: #333;
+    font-size: 0.83rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    vertical-align: middle;
+}
+
+.apartado-table tbody td {
+    vertical-align: middle;
+    border-color: #f0f0f0;
+}
+
+.apartado-table tbody tr:hover {
+    background: #fffdf5;
+}
+
+.apartado-modal-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.2rem;
+    border-radius: 14px;
+    background: #fffdf8;
+    border: 1px dashed rgba(212, 175, 55, 0.45);
+    color: #7a6120;
+    font-weight: 600;
+}
+
+.apartado-modal-empty i {
+    color: #D4AF37;
+}
+
+.apartado-action-btn {
+    min-width: 34px;
+    border-radius: 8px;
+    box-shadow: none !important;
+}
+
 /* Modal Mejorado (solo imagen de producto) */
 #imagenProductoModal .modal-header {
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
@@ -716,6 +928,37 @@
 }
 
 @media (max-width: 768px) {
+    .apartado-modal .modal-dialog,
+    #modalNombreApartado .modal-dialog {
+        max-width: 95vw;
+        margin: 1rem auto;
+    }
+
+    .apartado-modal .modal-header,
+    .apartado-modal .modal-body,
+    .apartado-modal .modal-footer,
+    #modalNombreApartado .modal-header,
+    #modalNombreApartado .modal-body,
+    #modalNombreApartado .modal-footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .apartado-modal .modal-footer,
+    #modalNombreApartado .modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .apartado-modal .modal-footer .btn,
+    #modalNombreApartado .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .apartado-inline-card {
+        padding: 1rem;
+    }
+
     #imagenProductoModal .modal-dialog {
         max-width: 95vw;
         margin: 1rem auto;
