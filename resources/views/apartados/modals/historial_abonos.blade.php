@@ -22,6 +22,10 @@
                     <td>{{ $abono->observaciones ?: '-' }}</td>
                     @if (Auth::user()->id == 1)
                         <td>
+                                <button type="button" class="btn btn-sm btn-primary" title="Editar fecha"
+                                        onclick="editarFechaAbono({{ $abono->id }}, {{ $apartado->id }}, '{{ optional($abono->fecha_registro)->format('Y-m-d') }}')">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </button>
                                 <button type="button" class="btn btn-sm btn-danger" onclick="eliminarAbono({{ $abono->id }}, {{ $apartado->id }})">
                                     <i class="fas fa-trash"></i>
                                 </button>

@@ -251,6 +251,7 @@ function eliminarAbono(idAbono, idApartado) {
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Sí, eliminar",
+        confirmButtonColor: "#a72828",
         cancelButtonText: "Cancelar",
     }).then((result) => {
         if (!result.isConfirmed) return;
@@ -287,6 +288,73 @@ function eliminarAbono(idAbono, idApartado) {
                 swal.fire({
                     title: "Error",
                     text: "Ocurrió un error al eliminar el abono.",
+                    icon: "error",
+                    showConfirmButton: true,
+                    confirmButtonText: "Aceptar",
+                });
+            },
+        });
+    });
+}
+
+function editarFechaAbono(idAbono, idApartado, fechaActual) {
+    swal.fire({
+        title: "Editar fecha de abono",
+        input: "date",
+        inputValue: fechaActual || obtenerFechaActual(),
+        showCancelButton: true,
+        confirmButtonText: "Guardar",
+        confirmButtonColor: "#28a745",
+        cancelButtonText: "Cancelar",
+        inputAttributes: {
+            max: obtenerFechaActual(),
+        },
+        inputValidator: (value) => {
+            if (!value) {
+                return "Debes seleccionar una fecha";
+            }
+        }
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+
+        $.ajax({
+            url: "/apartados/editar-fecha-abono",
+            type: "post",
+            dataType: "json",
+            data: {
+                id_abono: idAbono,
+                fecha_abono: result.value,
+            },
+            success: function (data) {
+                if (data.lSuccess) {
+                    swal.fire({
+                        title: "Apartados",
+                        text: data.cMensaje,
+                        icon: "success",
+                        showConfirmButton: true,
+                        confirmButtonText: "Aceptar",
+                    });
+                    verHistorialAbonos(idApartado);
+                    if ($("#gridApartados").length) {
+                        $("#gridApartados").bootstrapTable("refresh");
+                    }
+                    if ($("#gridVentas").length) {
+                        $("#gridVentas").bootstrapTable("refresh");
+                    }
+                } else {
+                    swal.fire({
+                        title: "Error",
+                        text: data.cMensaje,
+                        icon: "error",
+                        showConfirmButton: true,
+                        confirmButtonText: "Aceptar",
+                    });
+                }
+            },
+            error: function () {
+                swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al editar la fecha del abono.",
                     icon: "error",
                     showConfirmButton: true,
                     confirmButtonText: "Aceptar",

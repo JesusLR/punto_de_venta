@@ -297,6 +297,48 @@ class ApartadosController extends Controller
         }
     }
 
+    public function editarFechaAbono(Request $request)
+    {
+        if (Auth::id() != 1) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'No tienes permiso para editar la fecha del abono.',
+            ]);
+        }
+
+        try {
+            $request->validate([
+                'id_abono' => 'required|exists:apartado_abonos,id',
+                'fecha_abono' => 'required|date_format:Y-m-d',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $e->validator->errors()->first() ?: 'Datos inválidos para editar la fecha del abono.',
+                'errors' => $e->validator->errors(),
+            ]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $abono = ApartadoAbono::findOrFail($request->id_abono);
+            $abono->fecha_abono = Carbon::createFromFormat('Y-m-d', $request->fecha_abono)->startOfDay();
+            $abono->save();
+
+            DB::commit();
+            return response()->json([
+                'lSuccess' => true,
+                'cMensaje' => 'Fecha de abono actualizada exitosamente.',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'Error al editar la fecha del abono: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
     public function detalle($id)
     {
         $apartado = Apartado::with(['cliente', 'abonos.usuario'])->findOrFail($id);
