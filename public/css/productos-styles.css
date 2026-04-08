@@ -505,20 +505,20 @@
     border-left: 4px solid #f39c12 !important;
 }
 
-/* Modal Mejorado */
-.modal-header {
+/* Modal Mejorado (solo imagen de producto) */
+#imagenProductoModal .modal-header {
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
     color: white;
     border-bottom: 3px solid #D4AF37;
 }
 
-.modal-title {
+#imagenProductoModal .modal-title {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-.modal-footer {
+#imagenProductoModal .modal-footer {
     border-top: 2px solid #e0e0e0;
 }
 
@@ -603,7 +603,7 @@
 }
 
 /* Modal específico para vista de imagen */
-.modal-content {
+#imagenProductoModal .modal-content {
     border: none;
     border-radius: 12px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
@@ -611,25 +611,25 @@
     overflow: hidden;
 }
 
-.modal-dialog {
+#imagenProductoModal .modal-dialog {
     max-width: 500px;
     width: 90%;
     margin: 1.75rem auto;
 }
 
-.modal-dialog.modal-sm {
+#imagenProductoModal .modal-dialog.modal-sm {
     max-width: 380px;
 }
 
-.modal-dialog.modal-md {
+#imagenProductoModal .modal-dialog.modal-md {
     max-width: 550px;
 }
 
-.modal-dialog.modal-lg {
+#imagenProductoModal .modal-dialog.modal-lg {
     max-width: 700px;
 }
 
-.modal-header {
+#imagenProductoModal .modal-header {
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
     color: white;
     border: none;
@@ -637,7 +637,7 @@
     padding: 1rem;
 }
 
-.modal-title {
+#imagenProductoModal .modal-title {
     font-size: 1rem;
     font-weight: 700;
     letter-spacing: 0.5px;
@@ -645,18 +645,18 @@
     color: #D4AF37;
 }
 
-.modal-header .close {
+#imagenProductoModal .modal-header .close {
     color: #D4AF37;
     opacity: 0.8;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.modal-header .close:hover {
+#imagenProductoModal .modal-header .close:hover {
     opacity: 1;
     color: white;
 }
 
-.modal-body {
+#imagenProductoModal .modal-body {
     padding: 1rem;
     background: white;
     max-height: 70vh;
@@ -687,7 +687,7 @@
     margin: 0 auto;
 }
 
-.modal-footer {
+#imagenProductoModal .modal-footer {
     background: #f9f9f9;
     border: none;
     border-radius: 0 0 12px 12px;
@@ -697,7 +697,7 @@
     gap: 0.5rem;
 }
 
-.modal-footer .btn-danger {
+#imagenProductoModal .modal-footer .btn-danger {
     background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
     color: white;
     border: none;
@@ -710,30 +710,30 @@
     letter-spacing: 0.3px;
 }
 
-.modal-footer .btn-danger:hover {
+#imagenProductoModal .modal-footer .btn-danger:hover {
     background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
     box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
 }
 
 @media (max-width: 768px) {
-    .modal-dialog {
+    #imagenProductoModal .modal-dialog {
         max-width: 95vw;
         margin: 1rem auto;
     }
 
-    .modal-dialog.modal-sm {
+    #imagenProductoModal .modal-dialog.modal-sm {
         max-width: 320px;
     }
 
-    .modal-dialog.modal-md {
+    #imagenProductoModal .modal-dialog.modal-md {
         max-width: 400px;
     }
 
-    .modal-dialog.modal-lg {
+    #imagenProductoModal .modal-dialog.modal-lg {
         max-width: 90vw;
     }
 
-    .modal-body {
+    #imagenProductoModal .modal-body {
         padding: 0.8rem;
         max-height: calc(100vh - 180px);
     }
@@ -742,7 +742,7 @@
         max-height: calc(100vh - 200px);
     }
 
-    .modal-title {
+    #imagenProductoModal .modal-title {
         font-size: 0.95rem;
     }
 }

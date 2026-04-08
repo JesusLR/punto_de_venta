@@ -73,7 +73,7 @@
                         <select required class="form-control-modern" name="id_producto" id="id_producto">
                             <option value="0"> -- Seleccione un producto -- </option>
                             @foreach($productos as $producto)
-                                <option value="{{$producto->id}}">{{$producto->codigo_barras}} - {{$producto->descripcion}}</option>
+                                <option value="{{$producto->id}}">{{$producto->codigo_barras}} - {{$producto->descripcion}} (Existencia: {{$producto->existencia}})</option>
                             @endforeach
                         </select>
                     </div>

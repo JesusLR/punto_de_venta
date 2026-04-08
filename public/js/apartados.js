@@ -5,8 +5,8 @@ $(document).ready(function () {
         },
     });
 
-     $('#cTipoBusquedaApartado').select2();
-     $('#cEstadoApartado').select2();
+    $('#cTipoBusquedaApartado').select2();
+    $('#cEstadoApartado').select2();
 
     $("#gridApartados").bootstrapTable({
         url: "/gridApartados/gridApartados",
@@ -63,7 +63,7 @@ $(document).ready(function () {
         }],
     });
 
-    configurarRangoSemanaFechas();
+    // configurarRangoSemanaFechas();
 
 });
 
@@ -302,6 +302,7 @@ function verProductosApartado(id) {
         type: "get",
         success: function (html) {
             $("#productosBody").html(html);
+            // $('#id_producto_apartado').select2();
             $("#modalProductos").modal("show");
         },
         error: function () {
@@ -313,6 +314,64 @@ function verProductosApartado(id) {
                 confirmButtonText: "Aceptar",
             });
         }
+    });
+}
+
+function agregarProductoAApartado() {
+    var idApartado = $("#id_apartado_producto").val();
+    var idProducto = $("#id_producto_apartado").val();
+    var cantidad = $("#cantidad_producto_apartado").val();
+
+    if (!idProducto) {
+        swal.fire({
+            title: "Apartados",
+            text: "Selecciona un producto para agregar.",
+            icon: "warning",
+            showConfirmButton: true,
+            confirmButtonText: "Aceptar",
+        });
+        return;
+    }
+
+    $.ajax({
+        url: "/apartados/agregar-producto",
+        type: "post",
+        dataType: "json",
+        data: {
+            id_apartado: idApartado,
+            id_producto: idProducto,
+            cantidad: cantidad,
+        },
+        success: function (data) {
+            if (data.lSuccess) {
+                swal.fire({
+                    title: "Apartados",
+                    text: data.cMensaje,
+                    icon: "success",
+                    showConfirmButton: true,
+                    confirmButtonText: "Aceptar",
+                });
+                verProductosApartado(idApartado);
+                $("#gridApartados").bootstrapTable("refresh");
+            } else {
+                swal.fire({
+                    title: "Error",
+                    text: data.cMensaje,
+                    icon: "error",
+                    showConfirmButton: true,
+                    confirmButtonText: "Aceptar",
+                });
+            }
+        },
+        error: function () {
+            swal.fire({
+                title: "Error",
+                text: "Ocurrió un error al agregar el producto al apartado.",
+                icon: "error",
+                showConfirmButton: true,
+                confirmButtonText: "Aceptar",
+            });
+        },
     });
 }
 

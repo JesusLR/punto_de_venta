@@ -16,7 +16,7 @@
                     <!-- Formulario compacto -->
                     <div class="form-group ">
                         <label for="monto_abono">Monto</label>
-                        <input type="number" id="monto_abono" class="form-control form-control-sm" name="monto_abono" min="0.01" step="0.01" placeholder="0.00" required >
+                        <input type="number" id="monto_abono" class="form-control form-control-sm" name="monto_abono" min="1" step="1" placeholder="0.00" required >
                         {{-- <small class="form-text text-muted" id="max-abono" style="font-size: 0.7em;"></small> --}}
                     {{-- </div> --}}
 

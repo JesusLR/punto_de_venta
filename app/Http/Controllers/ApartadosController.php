@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Apartado;
 use App\ApartadoAbono;
+use App\ApartadoProducto;
+use App\Producto;
 use App\Venta;
 use App\ProductoVendido;
 use App\User;
@@ -164,7 +166,91 @@ class ApartadosController extends Controller
     public function verProductos($id_apartado)
     {
         $apartado = Apartado::with('productos')->findOrFail($id_apartado);
-        return view('apartados.modals.productos', compact('apartado'));
+        $productosDisponibles = Producto::where('lActivo', 1)
+            ->where('existencia', '>', 0)
+            ->orderBy('descripcion')
+            ->get();
+
+        return view('apartados.modals.productos', compact('apartado', 'productosDisponibles'));
+    }
+
+    public function agregarProducto(Request $request)
+    {
+        try {
+            $request->validate([
+                'id_apartado' => 'required|exists:apartados,id',
+                'id_producto' => 'required|exists:productos,id',
+                'cantidad' => 'required|numeric|min:0.01',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $e->validator->errors()->first() ?: 'Datos inválidos para agregar el producto.',
+                'errors' => $e->validator->errors(),
+            ]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $apartado = Apartado::findOrFail($request->id_apartado);
+            $producto = Producto::findOrFail($request->id_producto);
+            $cantidad = (float) $request->cantidad;
+
+            if ((float) $producto->existencia < $cantidad) {
+                DB::rollBack();
+                return response()->json([
+                    'lSuccess' => false,
+                    'cMensaje' => 'No hay existencia suficiente para agregar este producto al apartado.',
+                ]);
+            }
+
+            $apartadoProducto = ApartadoProducto::where('id_apartado', $apartado->id)
+                ->where('id_producto', $producto->id)
+                ->first();
+
+            if ($apartadoProducto) {
+                $apartadoProducto->cantidad = (float) $apartadoProducto->cantidad + $cantidad;
+                $apartadoProducto->save();
+            } else {
+                ApartadoProducto::create([
+                    'id_apartado' => $apartado->id,
+                    'id_producto' => $producto->id,
+                    'descripcion' => $producto->descripcion,
+                    'codigo_barras' => $producto->codigo_barras,
+                    'precio' => $producto->precio_venta,
+                    'cantidad' => $cantidad,
+                ]);
+            }
+
+            $producto->existencia = (float) $producto->existencia - $cantidad;
+            $producto->save();
+
+            $totalProductos = (float) ApartadoProducto::where('id_apartado', $apartado->id)
+                ->selectRaw('COALESCE(SUM(precio * cantidad), 0) as total')
+                ->value('total');
+
+            $abonado = (float) ApartadoAbono::where('id_apartado', $apartado->id)->sum('monto');
+            $saldo = $totalProductos - $abonado;
+            $estado = $saldo <= 0 ? 'LIQUIDADO' : 'ABIERTO';
+
+            $apartado->update([
+                'total' => $totalProductos,
+                'saldo' => $saldo,
+                'estado' => $estado,
+            ]);
+
+            DB::commit();
+            return response()->json([
+                'lSuccess' => true,
+                'cMensaje' => 'Producto agregado al apartado exitosamente.',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'Error al agregar producto al apartado: ' . $e->getMessage(),
+            ]);
+        }
     }
 
     public function verAbonos($id_apartado)
