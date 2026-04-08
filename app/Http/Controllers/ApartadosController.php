@@ -175,7 +175,40 @@ class ApartadosController extends Controller
             ->orderByRaw('COALESCE(fecha_abono, created_at) desc')
             ->get();
 
-        return view('apartados.modals.historial_abonos', compact('abonos'));
+        return view('apartados.modals.historial_abonos', compact('abonos', 'apartado'));
+    }
+
+    public function eliminarAbono(Request $request)
+    {
+        try {
+            $request->validate([
+                'id_abono' => 'required|exists:apartado_abonos,id',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $e->validator->errors()->first() ?: 'Datos inválidos para eliminar el abono.',
+                'errors' => $e->validator->errors(),
+            ]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $abono = ApartadoAbono::findOrFail($request->id_abono);
+            $abono->delete();
+
+            DB::commit();
+            return response()->json([
+                'lSuccess' => true,
+                'cMensaje' => 'Abono eliminado exitosamente.',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'Error al eliminar el abono: ' . $e->getMessage(),
+            ]);
+        }
     }
 
     public function detalle($id)
@@ -230,13 +263,13 @@ class ApartadosController extends Controller
             $apartados->where('apartados.estado', $request->cEstadoApartado);
         }
 
-        if ($request->cFechaInicioApartado) {
-            $apartados->whereDate('apartados.created_at', '>=', $request->cFechaInicioApartado);
-        }
+        // if ($request->cFechaInicioApartado) {
+        //     $apartados->whereDate('apartados.created_at', '>=', $request->cFechaInicioApartado);
+        // }
 
-        if ($request->cFechaFinApartado) {
-            $apartados->whereDate('apartados.created_at', '<=', $request->cFechaFinApartado);
-        }
+        // if ($request->cFechaFinApartado) {
+        //     $apartados->whereDate('apartados.created_at', '<=', $request->cFechaFinApartado);
+        // }
 
         $apartados = $apartados->orderBy('apartados.id', 'desc')
             ->get()
@@ -247,6 +280,7 @@ class ApartadosController extends Controller
 
                 return [
                     'id' => $apartado->id,
+                    'id_cliente' => $apartado->id_cliente,
                     'cliente' => $apartado->cliente ? $apartado->cliente : 'N/A',
                     'name' => $apartado->vendedor,
                     'total' => (float) $apartado->total,
@@ -267,6 +301,7 @@ class ApartadosController extends Controller
             $request->validate([
                 'id_apartado' => 'required|exists:apartados,id',
                 'nombre_apartado' => 'nullable|string|max:255',
+                'id_cliente' => 'required|exists:clientes,id',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -279,6 +314,7 @@ class ApartadosController extends Controller
         $apartado = Apartado::findOrFail($request->id_apartado);
         $apartado->update([
             'nombre_apartado' => strtoupper($request->nombre_apartado),
+            'id_cliente' => $request->id_cliente,
         ]);
 
         return response()->json([

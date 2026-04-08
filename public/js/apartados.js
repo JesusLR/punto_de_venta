@@ -5,6 +5,9 @@ $(document).ready(function () {
         },
     });
 
+     $('#cTipoBusquedaApartado').select2();
+     $('#cEstadoApartado').select2();
+
     $("#gridApartados").bootstrapTable({
         url: "/gridApartados/gridApartados",
         classes: "table-striped",
@@ -17,8 +20,8 @@ $(document).ready(function () {
             return {
                 cTipoBusqueda: $("#cTipoBusquedaApartado").val(),
                 cEstadoApartado: $("#cEstadoApartado").val(),
-                cFechaInicioApartado: $("#cFechaInicioApartado").val(),
-                cFechaFinApartado: $("#cFechaFinApartado").val(),
+                // cFechaInicioApartado: $("#cFechaInicioApartado").val(),
+                // cFechaFinApartado: $("#cFechaFinApartado").val(),
             };
         },
         columns: [{
@@ -68,45 +71,49 @@ $("#cTipoBusquedaApartado").on("change", function () {
     $("#gridApartados").bootstrapTable("refresh");
 });
 
-$("#cEstadoApartado, #cFechaInicioApartado, #cFechaFinApartado").on("change", function () {
+// $("#cEstadoApartado, #cFechaInicioApartado, #cFechaFinApartado").on("change", function () {
+//     limitarRangoSemana();
+//     $("#gridApartados").bootstrapTable("refresh");
+// });
+$("#cEstadoApartado").on("change", function () {
     limitarRangoSemana();
     $("#gridApartados").bootstrapTable("refresh");
 });
 
-function configurarRangoSemanaFechas() {
-    var hoy = obtenerFechaISO(new Date());
-    var haceSieteDias = new Date();
-    haceSieteDias.setDate(haceSieteDias.getDate() - 6);
+// function configurarRangoSemanaFechas() {
+//     var hoy = obtenerFechaISO(new Date());
+//     var haceSieteDias = new Date();
+//     haceSieteDias.setDate(haceSieteDias.getDate() - 6);
 
-    $("#cFechaFinApartado").val(hoy);
-    $("#cFechaInicioApartado").val(obtenerFechaISO(haceSieteDias));
-}
+//     $("#cFechaFinApartado").val(hoy);
+//     $("#cFechaInicioApartado").val(obtenerFechaISO(haceSieteDias));
+// }
 
-function limitarRangoSemana() {
-    var fechaInicio = $("#cFechaInicioApartado").val();
-    var fechaFin = $("#cFechaFinApartado").val();
+// function limitarRangoSemana() {
+//     var fechaInicio = $("#cFechaInicioApartado").val();
+//     var fechaFin = $("#cFechaFinApartado").val();
 
-    if (!fechaInicio || !fechaFin) {
-        return;
-    }
+//     if (!fechaInicio || !fechaFin) {
+//         return;
+//     }
 
-    var inicio = new Date(fechaInicio + "T00:00:00");
-    var fin = new Date(fechaFin + "T00:00:00");
+//     var inicio = new Date(fechaInicio + "T00:00:00");
+//     var fin = new Date(fechaFin + "T00:00:00");
 
-    if (inicio > fin) {
-        $("#cFechaFinApartado").val(fechaInicio);
-        return;
-    }
+//     if (inicio > fin) {
+//         $("#cFechaFinApartado").val(fechaInicio);
+//         return;
+//     }
 
-    var milisegundosPorDia = 1000 * 60 * 60 * 24;
-    var diferenciaDias = Math.floor((fin - inicio) / milisegundosPorDia) + 1;
+//     var milisegundosPorDia = 1000 * 60 * 60 * 24;
+//     var diferenciaDias = Math.floor((fin - inicio) / milisegundosPorDia) + 1;
 
-    if (diferenciaDias > 7) {
-        var nuevoInicio = new Date(fin);
-        nuevoInicio.setDate(fin.getDate() - 6);
-        $("#cFechaInicioApartado").val(obtenerFechaISO(nuevoInicio));
-    }
-}
+//     if (diferenciaDias > 7) {
+//         var nuevoInicio = new Date(fin);
+//         nuevoInicio.setDate(fin.getDate() - 6);
+//         $("#cFechaInicioApartado").val(obtenerFechaISO(nuevoInicio));
+//     }
+// }
 
 function obtenerFechaISO(fecha) {
     var anio = fecha.getFullYear();
@@ -166,7 +173,7 @@ function estadoApartadoFormatter(value, row) {
 function accionesApartadoFormatter(value, row) {
     let html = '';
 
-    html += '<button type="button" style="margin-right: 2px;" class="btn btn-light" title="Cambiar nombre de apartado" onclick="abrirModalNombreApartado(' + row.id + ', \'' + escaparTexto(row.nombre_apartado) + '\')"><i class="fas fa-pen"></i></button>';
+    html += '<button type="button" style="margin-right: 2px;" class="btn btn-light" title="Cambiar nombre de apartado" onclick="abrirModalNombreApartado(' + row.id + ', \'' + escaparTexto(row.nombre_apartado) + '\', ' + row.id_cliente + ')"><i class="fas fa-pen"></i></button>';
 
     if (row.estado !== 'LIQUIDADO') {
         html += '<button type="button" style="margin-right: 2px;" class="btn btn-primary" title="Abonar" onclick="abrirModalAbono(' + row.id + ', \'' + escaparTexto(row.cliente) + '\', ' + row.total + ', ' + row.abonado + ', ' + row.saldo + ')"><i class="fas fa-money-bill"></i></button>';
@@ -202,9 +209,10 @@ function abrirModalAbono(id, cliente, total, abonado, saldo) {
 
     $("#modalAbono").modal("show");
 }
-function abrirModalNombreApartado(id, nombre) {
+function abrirModalNombreApartado(id, nombre, idCliente) {
     $("#id_apartado_nombre").val(id);
     $("#nombre-apartado").val(nombre);
+    $("#cliente-apartado").val(idCliente);
     $("#modalNombreApartado").modal("show");
 }
 
@@ -233,6 +241,58 @@ function verHistorialAbonos(id) {
                 confirmButtonText: "Aceptar",
             });
         }
+    });
+}
+
+function eliminarAbono(idAbono, idApartado) {
+    swal.fire({
+        title: "¿Eliminar abono?",
+        text: "Esta acción no se puede deshacer.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+
+        $.ajax({
+            url: "/apartados/eliminar-abono",
+            type: "post",
+            dataType: "json",
+            data: {
+                id_abono: idAbono,
+            },
+            success: function (data) {
+                if (data.lSuccess) {
+                    swal.fire({
+                        title: "Apartados",
+                        text: data.cMensaje,
+                        icon: "success",
+                        showConfirmButton: true,
+                        confirmButtonText: "Aceptar",
+                    });
+                    verHistorialAbonos(idApartado);
+                    $("#gridApartados").bootstrapTable("refresh");
+                } else {
+                    swal.fire({
+                        title: "Error",
+                        text: data.cMensaje,
+                        icon: "error",
+                        showConfirmButton: true,
+                        confirmButtonText: "Aceptar",
+                    });
+                }
+            },
+            error: function () {
+                swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al eliminar el abono.",
+                    icon: "error",
+                    showConfirmButton: true,
+                    confirmButtonText: "Aceptar",
+                });
+            },
+        });
     });
 }
 
@@ -366,6 +426,7 @@ $("#btnSaveNombreApartado").on("click", function (e) {
         data: {
             id_apartado: $("#id_apartado_nombre").val(),
             nombre_apartado: $("#nombre-apartado").val(),
+            id_cliente: $("#cliente-apartado").val(),
         },  
         success: function (data) {
             if (data.lSuccess) {
