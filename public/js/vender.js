@@ -7,6 +7,61 @@ $(document).ready(function () {
 
     $('#id_producto').select2();
 
+    $('#btnNuevoClienteVenta').on('click', function () {
+        $('#nuevo_cliente_nombre').val('');
+        $('#nuevo_cliente_telefono').val('');
+        $('#nuevo_cliente_observaciones').val('');
+        $('#modalNuevoClienteVenta').modal('show');
+    });
+
+    $('#formNuevoClienteVenta').on('submit', function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: '/vender/cliente-rapido',
+            type: 'post',
+            dataType: 'json',
+            data: {
+                nombre: $('#nuevo_cliente_nombre').val(),
+                telefono: $('#nuevo_cliente_telefono').val(),
+                observaciones: $('#nuevo_cliente_observaciones').val(),
+            },
+            success: function (data) {
+                if (!data.lSuccess || !data.cliente) {
+                    swal.fire({
+                        title: 'Error',
+                        text: data.cMensaje || 'No se pudo guardar el cliente.',
+                        icon: 'error',
+                        showConfirmButton: true,
+                        confirmButtonText: 'Aceptar',
+                    });
+                    return;
+                }
+
+                var option = new Option(data.cliente.nombre, data.cliente.id, true, true);
+                $('#id_cliente').append(option).val(data.cliente.id).trigger('change');
+                $('#modalNuevoClienteVenta').modal('hide');
+
+                swal.fire({
+                    title: 'Clientes',
+                    text: data.cMensaje,
+                    icon: 'success',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Aceptar',
+                });
+            },
+            error: function () {
+                swal.fire({
+                    title: 'Error',
+                    text: 'Ocurrió un error al guardar el cliente.',
+                    icon: 'error',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Aceptar',
+                });
+            },
+        });
+    });
+
 });
 
 

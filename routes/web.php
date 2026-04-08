@@ -40,6 +40,7 @@ Auth::routes([
                 Route::get("/ventas/pdf/{id}", "VentasController@pdf")->name("ventas.pdf");
                 Route::resource("ventas", "VentasController");
                 Route::get("/vender", "VenderController@index")->name("vender.index");
+                Route::post("/vender/cliente-rapido", "VenderController@crearClienteRapido")->name("vender.crearClienteRapido");
                 Route::post("/productoDeVenta", "VenderController@agregarProductoVenta")->name("agregarProductoVenta");
                 Route::delete("/productoDeVenta", "VenderController@quitarProductoDeVenta")->name("quitarProductoDeVenta");
                 Route::post("/terminarOCancelarVenta", "VenderController@terminarOCancelarVenta")->name("terminarOCancelarVenta");
@@ -52,7 +53,8 @@ Auth::routes([
                 Route::get("/apartados/ver-productos/{id}", "ApartadosController@verProductos")->name("apartados.verProductos");
                 Route::get("/apartados/ver-abonos/{id}", "ApartadosController@verAbonos")->name("apartados.verAbonos");
                 Route::get("/apartados/detalle/{id}", "ApartadosController@detalle")->name("apartados.detalle");
-                Route::post("/gridApartados", "ApartadosController@gridApartados")->name("gridApartados");
+                Route::post("/gridApartados/gridApartados", "ApartadosController@gridApartados")->name("gridApartados");
+                Route::post("/apartados/cambiarNombre", "ApartadosController@cambiarNombre")->name("apartados.cambiarNombre");
 
                 //Productos
                 Route::post("/gridProductos", "ProductosController@gridProductos")->name("gridProductos");

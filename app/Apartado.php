@@ -16,6 +16,7 @@ class Apartado extends Model
         'saldo',
         'estado',
         'id_venta',
+        'nombre_apartado'
     ];
 
     public function cliente()

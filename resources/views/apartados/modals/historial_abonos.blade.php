@@ -12,7 +12,7 @@
         <tbody>
             @foreach($abonos as $abono)
                 <tr>
-                    <td>{{ $abono->created_at->format('d/m/Y H:i:s') }}</td>
+                    <td>{{ $abono->fecha_registro ? $abono->fecha_registro->format('d/m/Y') : '-' }}</td>
                     <td>{{ $abono->usuario->name ?? 'N/A' }}</td>
                     <td>${{ number_format($abono->monto, 2) }}</td>
                     <td>{{ $abono->tipo_pago === 'MERCADO_PAGO' ? 'MERCADO PAGO' : 'EFECTIVO' }}</td>

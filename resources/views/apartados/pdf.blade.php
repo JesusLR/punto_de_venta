@@ -154,8 +154,13 @@
 <body>
     <div class="doc-header">
         <div class="brand">Joyería Colibrí</div>
-        <div class="doc-title">Comprobante de apartado #{{ $apartado->id }}</div>
-        <div class="meta-date">Generado: {{ now()->format('d/m/Y H:i:s') }}</div>
+        @if ($apartado->nombre_apartado == null)
+            <div class="doc-title">Comprobante de apartado #{{ $apartado->id }}</div>
+        @else
+            <div class="doc-title">{{ $apartado->nombre_apartado }}</div>
+        @endif
+        
+        <div class="meta-date">Generado: {{ now()->format('d/m/Y') }}</div>
     </div>
 
     <div class="info-box">
@@ -168,7 +173,7 @@
                 </tr>
                 <tr>
                     <td class="info-label">Fecha:</td>
-                    <td>{{ $apartado->created_at ? $apartado->created_at->format('d/m/Y H:i:s') : '-' }}</td>
+                    <td>{{ $apartado->created_at ? $apartado->created_at->format('d/m/Y') : '-' }}</td>
                 </tr>
                 <tr>
                     <td class="info-label">Cliente:</td>
@@ -219,19 +224,19 @@
                 <thead>
                     <tr>
                         <th>Fecha</th>
-                        <th>Usuario</th>
-                        <th class="text-right">Monto</th>
+                        {{-- <th>Usuario</th> --}}
                         <th>Tipo de pago</th>
+                        <th class="text-right">Monto</th>
                         {{-- <th>Observaciones</th> --}}
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($apartado->abonos->sortByDesc('created_at') as $abono)
+                    @foreach($apartado->abonos->sortByDesc(function ($abono) { return $abono->fecha_registro; }) as $abono)
                         <tr>
-                            <td>{{ $abono->created_at ? $abono->created_at->format('d/m/Y H:i:s') : '-' }}</td>
-                            <td>{{ $abono->usuario->name ?? 'N/A' }}</td>
-                            <td class="text-right">${{ number_format($abono->monto, 2) }}</td>
+                            <td>{{ $abono->fecha_registro ? $abono->fecha_registro->format('d/m/Y') : '-' }}</td>
+                            {{-- <td>{{ $abono->usuario->name ?? 'N/A' }}</td> --}}
                             <td>{{ $abono->tipo_pago === 'MERCADO_PAGO' ? 'MÉTODO ELECTRÓNICO' : 'EFECTIVO' }}</td>
+                            <td class="text-right">${{ number_format($abono->monto, 2) }}</td>
                             {{-- <td>{{ $abono->observaciones ?: '-' }}</td> --}}
                         </tr>
                     @endforeach

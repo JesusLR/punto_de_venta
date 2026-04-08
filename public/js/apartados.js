@@ -6,7 +6,7 @@ $(document).ready(function () {
     });
 
     $("#gridApartados").bootstrapTable({
-        url: "/gridApartados",
+        url: "/gridApartados/gridApartados",
         classes: "table-striped",
         method: "post",
         contentType: "application/x-www-form-urlencoded",
@@ -16,6 +16,9 @@ $(document).ready(function () {
         queryParams: function (p) {
             return {
                 cTipoBusqueda: $("#cTipoBusquedaApartado").val(),
+                cEstadoApartado: $("#cEstadoApartado").val(),
+                cFechaInicioApartado: $("#cFechaInicioApartado").val(),
+                cFechaFinApartado: $("#cFechaFinApartado").val(),
             };
         },
         columns: [{
@@ -57,11 +60,60 @@ $(document).ready(function () {
         }],
     });
 
+    configurarRangoSemanaFechas();
+
 });
 
 $("#cTipoBusquedaApartado").on("change", function () {
     $("#gridApartados").bootstrapTable("refresh");
 });
+
+$("#cEstadoApartado, #cFechaInicioApartado, #cFechaFinApartado").on("change", function () {
+    limitarRangoSemana();
+    $("#gridApartados").bootstrapTable("refresh");
+});
+
+function configurarRangoSemanaFechas() {
+    var hoy = obtenerFechaISO(new Date());
+    var haceSieteDias = new Date();
+    haceSieteDias.setDate(haceSieteDias.getDate() - 6);
+
+    $("#cFechaFinApartado").val(hoy);
+    $("#cFechaInicioApartado").val(obtenerFechaISO(haceSieteDias));
+}
+
+function limitarRangoSemana() {
+    var fechaInicio = $("#cFechaInicioApartado").val();
+    var fechaFin = $("#cFechaFinApartado").val();
+
+    if (!fechaInicio || !fechaFin) {
+        return;
+    }
+
+    var inicio = new Date(fechaInicio + "T00:00:00");
+    var fin = new Date(fechaFin + "T00:00:00");
+
+    if (inicio > fin) {
+        $("#cFechaFinApartado").val(fechaInicio);
+        return;
+    }
+
+    var milisegundosPorDia = 1000 * 60 * 60 * 24;
+    var diferenciaDias = Math.floor((fin - inicio) / milisegundosPorDia) + 1;
+
+    if (diferenciaDias > 7) {
+        var nuevoInicio = new Date(fin);
+        nuevoInicio.setDate(fin.getDate() - 6);
+        $("#cFechaInicioApartado").val(obtenerFechaISO(nuevoInicio));
+    }
+}
+
+function obtenerFechaISO(fecha) {
+    var anio = fecha.getFullYear();
+    var mes = String(fecha.getMonth() + 1).padStart(2, "0");
+    var dia = String(fecha.getDate()).padStart(2, "0");
+    return anio + "-" + mes + "-" + dia;
+}
 
 function fechaApartadoFormatter(value, row) {
     var user = $("#userID").val()
@@ -82,7 +134,12 @@ function fechaApartadoFormatter(value, row) {
 }
 
 function folioApartadoFormatter(value, row) {
-    return "Detalle de venta Apartado#" + row.id;
+    if(row.nombre_apartado == null){
+         return "Detalle de venta Apartado #" + row.id;
+    }else{
+        return row.nombre_apartado;
+    }
+   
 }
 
 function montoTotalApartadoFormatter(value, row) {
@@ -108,6 +165,8 @@ function estadoApartadoFormatter(value, row) {
 
 function accionesApartadoFormatter(value, row) {
     let html = '';
+
+    html += '<button type="button" style="margin-right: 2px;" class="btn btn-light" title="Cambiar nombre de apartado" onclick="abrirModalNombreApartado(' + row.id + ', \'' + escaparTexto(row.nombre_apartado) + '\')"><i class="fas fa-pen"></i></button>';
 
     if (row.estado !== 'LIQUIDADO') {
         html += '<button type="button" style="margin-right: 2px;" class="btn btn-primary" title="Abonar" onclick="abrirModalAbono(' + row.id + ', \'' + escaparTexto(row.cliente) + '\', ' + row.total + ', ' + row.abonado + ', ' + row.saldo + ')"><i class="fas fa-money-bill"></i></button>';
@@ -137,10 +196,24 @@ function abrirModalAbono(id, cliente, total, abonado, saldo) {
     $("#saldo-abono").html('$' + parseFloat(saldo).toFixed(2));
     $("#monto_abono").attr("max", saldo).val("");
     $("#max-abono").text("Máximo: $" + parseFloat(saldo).toFixed(2));
+    $("#fecha_abono").val(obtenerFechaActual());
     $("#tipo_pago_abono").val("EFECTIVO");
     $("#observaciones_abono").val("");
 
     $("#modalAbono").modal("show");
+}
+function abrirModalNombreApartado(id, nombre) {
+    $("#id_apartado_nombre").val(id);
+    $("#nombre-apartado").val(nombre);
+    $("#modalNombreApartado").modal("show");
+}
+
+function obtenerFechaActual() {
+    var ahora = new Date();
+    var offset = ahora.getTimezoneOffset();
+    var fechaLocal = new Date(ahora.getTime() - (offset * 60000));
+
+    return fechaLocal.toISOString().slice(0, 10);
 }
 
 function verHistorialAbonos(id) {
@@ -247,6 +320,7 @@ $("#formAbono").on("submit", function (e) {
         data: {
             id_apartado: $("#id_apartado_abono").val(),
             monto_abono: $("#monto_abono").val(),
+            fecha_abono: $("#fecha_abono").val(),
             tipo_pago: $("#tipo_pago_abono").val(),
             observaciones: $("#observaciones_abono").val(),
         },
@@ -275,6 +349,49 @@ $("#formAbono").on("submit", function (e) {
             swal.fire({
                 title: "Error",
                 text: "Ocurrió un error al registrar el abono.",
+                icon: "error",
+                showConfirmButton: true,
+                confirmButtonText: "Aceptar",
+            });
+        },
+    });
+});
+
+$("#btnSaveNombreApartado").on("click", function (e) {
+    e.preventDefault();
+    $.ajax({
+        url: "/apartados/cambiarNombre",  
+        type: "post",
+        dataType: "json",
+        data: {
+            id_apartado: $("#id_apartado_nombre").val(),
+            nombre_apartado: $("#nombre-apartado").val(),
+        },  
+        success: function (data) {
+            if (data.lSuccess) {
+                $("#modalNombreApartado").modal("hide");
+                swal.fire({
+                    title: "Apartados",
+                    text: data.cMensaje,
+                    icon: "success",
+                    showConfirmButton: true,
+                    confirmButtonText: "Aceptar",
+                });
+                $("#gridApartados").bootstrapTable("refresh");
+            } else {
+                swal.fire({
+                    title: "Error",
+                    text: data.cMensaje,
+                    icon: "error",
+                    showConfirmButton: true,
+                    confirmButtonText: "Aceptar",
+                });
+            }
+        },
+        error: function () {
+            swal.fire({
+                title: "Error",
+                text: "Ocurrió un error al cambiar el nombre del apartado.",
                 icon: "error",
                 showConfirmButton: true,
                 confirmButtonText: "Aceptar",

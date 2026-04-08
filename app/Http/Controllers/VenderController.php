@@ -32,9 +32,51 @@ use App\ProductoVendido;
 use App\Venta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class VenderController extends Controller
 {
+
+    public function crearClienteRapido(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nombre' => 'required|string|max:255',
+            'telefono' => 'required|string|max:255',
+            'observaciones' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $validator->errors()->first(),
+                'errors' => $validator->errors(),
+            ]);
+        }
+
+        try {
+            $cliente = Cliente::create([
+                'nombre' => $request->input('nombre'),
+                'telefono' => $request->input('telefono'),
+                'observaciones' => $request->input('observaciones'),
+            ]);
+
+            return response()->json([
+                'lSuccess' => true,
+                'cMensaje' => 'Cliente agregado correctamente.',
+                'cliente' => [
+                    'id' => $cliente->id,
+                    'nombre' => $cliente->nombre,
+                    'telefono' => $cliente->telefono,
+                    'observaciones' => $cliente->observaciones,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'No se pudo guardar el cliente.',
+            ]);
+        }
+    }
 
     public function terminarOCancelarVenta(Request $request)
     {
@@ -259,7 +301,7 @@ class VenderController extends Controller
             [
                 "total" => $total,
                 "clientes" => Cliente::all(),
-                "productos" => Producto::where('lActivo', 1)->get(),
+                "productos" => Producto::where('lActivo', 1)->where('existencia', '>', 0)->get(),
             ]);
     }
 }
