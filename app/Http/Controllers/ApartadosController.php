@@ -50,6 +50,13 @@ class ApartadosController extends Controller
 
         $apartado = Apartado::findOrFail($request->id_apartado);
 
+        if ($apartado->estado === 'CANCELADO') {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'No se pueden registrar abonos en un apartado cancelado.',
+            ]);
+        }
+
         $total_abonado = $apartado->abonos()->sum('monto');
         $saldo = $apartado->total - $total_abonado;
 
@@ -99,6 +106,13 @@ class ApartadosController extends Controller
         }
 
         $apartado = Apartado::findOrFail($request->id_apartado);
+
+        if ($apartado->estado === 'CANCELADO') {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'No se puede ejecutar un apartado cancelado.',
+            ]);
+        }
 
         $total_abonado = $apartado->abonos()->sum('monto');
         $saldo = $apartado->total - $total_abonado;
@@ -192,7 +206,16 @@ class ApartadosController extends Controller
 
         DB::beginTransaction();
         try {
-            $apartado = Apartado::findOrFail($request->id_apartado);
+            $apartado = Apartado::with('productos')->findOrFail($request->id_apartado);
+
+            if ($apartado->estado === 'CANCELADO') {
+                DB::rollBack();
+                return response()->json([
+                    'lSuccess' => false,
+                    'cMensaje' => 'No se pueden agregar productos a un apartado cancelado.',
+                ]);
+            }
+
             $producto = Producto::findOrFail($request->id_producto);
             $cantidad = (float) $request->cantidad;
 
@@ -249,6 +272,68 @@ class ApartadosController extends Controller
             return response()->json([
                 'lSuccess' => false,
                 'cMensaje' => 'Error al agregar producto al apartado: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function cancelar(Request $request)
+    {
+        try {
+            $request->validate([
+                'id_apartado' => 'required|exists:apartados,id',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $e->validator->errors()->first() ?: 'Datos inválidos para cancelar el apartado.',
+                'errors' => $e->validator->errors(),
+            ]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $apartado = Apartado::findOrFail($request->id_apartado);
+
+            if ($apartado->estado === 'CANCELADO') {
+                DB::rollBack();
+                return response()->json([
+                    'lSuccess' => false,
+                    'cMensaje' => 'El apartado ya está cancelado.',
+                ]);
+            }
+
+            if ($apartado->estado === 'FINALIZADO') {
+                DB::rollBack();
+                return response()->json([
+                    'lSuccess' => false,
+                    'cMensaje' => 'No se puede cancelar un apartado finalizado.',
+                ]);
+            }
+
+            foreach ($apartado->productos as $productoApartado) {
+                $producto = Producto::lockForUpdate()->find($productoApartado->id_producto);
+                if (!$producto) {
+                    continue;
+                }
+
+                $producto->existencia = (float) $producto->existencia + (float) $productoApartado->cantidad;
+                $producto->save();
+            }
+
+            $apartado->update([
+                'estado' => 'CANCELADO',
+            ]);
+
+            DB::commit();
+            return response()->json([
+                'lSuccess' => true,
+                'cMensaje' => 'Apartado cancelado exitosamente.',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'Error al cancelar el apartado: ' . $e->getMessage(),
             ]);
         }
     }
@@ -377,7 +462,7 @@ class ApartadosController extends Controller
         $apartados->join("clientes", "clientes.id", "=", "apartados.id_cliente")
             ->join("users", "users.id", "=", "apartados.id_usuario")
             ->select("apartados.*", "clientes.nombre as cliente", "users.name as vendedor")
-            ->whereIn('apartados.estado', ['ABIERTO', 'LIQUIDADO']);
+            ->whereIn('apartados.estado', ['ABIERTO', 'LIQUIDADO', 'CANCELADO']);
 
         if (Auth::id() != 1) {
             $apartados->where('apartados.id_usuario', Auth::id());
@@ -404,7 +489,9 @@ class ApartadosController extends Controller
             ->map(function ($apartado) {
                 $abonos_total = ApartadoAbono::where('id_apartado', $apartado->id)->sum('monto');
                 $saldo_actual = $apartado->total - $abonos_total;
-                $estado_actual = $saldo_actual <= 0 ? 'LIQUIDADO' : 'ABIERTO';
+                $estado_actual = $apartado->estado === 'CANCELADO'
+                    ? 'CANCELADO'
+                    : ($saldo_actual <= 0 ? 'LIQUIDADO' : 'ABIERTO');
 
                 return [
                     'id' => $apartado->id,

@@ -51,6 +51,7 @@ Auth::routes([
                 Route::post("/apartados/eliminar-abono", "ApartadosController@eliminarAbono")->name("apartados.eliminarAbono");
                 Route::post("/apartados/editar-fecha-abono", "ApartadosController@editarFechaAbono")->name("apartados.editarFechaAbono");
                 Route::post("/apartados/agregar-producto", "ApartadosController@agregarProducto")->name("apartados.agregarProducto");
+                Route::post("/apartados/cancelar", "ApartadosController@cancelar")->name("apartados.cancelar");
                 Route::post("/apartados/ejecutar", "ApartadosController@ejecutar")->name("apartados.ejecutar");
                 Route::get("/apartados/pdf/{id}", "ApartadosController@pdf")->name("apartados.pdf");
                 Route::get("/apartados/ver-productos/{id}", "ApartadosController@verProductos")->name("apartados.verProductos");

@@ -17,7 +17,7 @@
 
         <div class="filters-container">
             <div class="row">
-                <div class="col-md">
+                <div class="col-12 col-md-6 mb-3">
                     <label for="cTipoBusquedaApartado">Cliente</label>
                     <select required class="form-control-modern" name="cTipoBusquedaApartado" id="cTipoBusquedaApartado">
                         <option value="T">Todos</option>
@@ -27,12 +27,13 @@
                     </select>
                 </div>
 
-                <div class="col-md">
+                <div class="col-12 col-md-6 mb-3">
                     <label for="cEstadoApartado">Estado</label>
                     <select class="form-control-modern" name="cEstadoApartado" id="cEstadoApartado">
                         <option value="T">Todos</option>
                         <option value="ABIERTO">Abierto</option>
                         <option value="LIQUIDADO">Liquidado</option>
+                        <option value="CANCELADO">Cancelado</option>
                     </select>
                 </div>
 

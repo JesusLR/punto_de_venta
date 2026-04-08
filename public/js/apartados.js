@@ -76,7 +76,7 @@ $("#cTipoBusquedaApartado").on("change", function () {
 //     $("#gridApartados").bootstrapTable("refresh");
 // });
 $("#cEstadoApartado").on("change", function () {
-    limitarRangoSemana();
+    // limitarRangoSemana();
     $("#gridApartados").bootstrapTable("refresh");
 });
 
@@ -167,6 +167,9 @@ function estadoApartadoFormatter(value, row) {
     if (row.estado === 'LIQUIDADO') {
         return '<span class="badge badge-success">LIQUIDADO</span>';
     }
+    if (row.estado === 'CANCELADO') {
+        return '<span class="badge badge-danger">CANCELADO</span>';
+    }
     return '<span class="badge badge-warning">ABIERTO</span>';
 }
 
@@ -175,8 +178,9 @@ function accionesApartadoFormatter(value, row) {
 
     html += '<button type="button" style="margin-right: 2px;" class="btn btn-light" title="Cambiar nombre de apartado" onclick="abrirModalNombreApartado(' + row.id + ', \'' + escaparTexto(row.nombre_apartado) + '\', ' + row.id_cliente + ')"><i class="fas fa-pen"></i></button>';
 
-    if (row.estado !== 'LIQUIDADO') {
+    if (row.estado === 'ABIERTO') {
         html += '<button type="button" style="margin-right: 2px;" class="btn btn-primary" title="Abonar" onclick="abrirModalAbono(' + row.id + ', \'' + escaparTexto(row.cliente) + '\', ' + row.total + ', ' + row.abonado + ', ' + row.saldo + ')"><i class="fas fa-money-bill"></i></button>';
+        html += '<button type="button" style="margin-right: 2px;" class="btn btn-warning" title="Cancelar apartado" onclick="cancelarApartado(' + row.id + ')"><i class="fas fa-ban"></i></button>';
     }
 
     html += '<button type="button" style="margin-right: 2px;" class="btn btn-info" title="Ver productos" onclick="verProductosApartado(' + row.id + ')"><i class="fas fa-box"></i></button>';
@@ -445,6 +449,58 @@ function agregarProductoAApartado() {
 
 function descargarPdfApartado(id) {
     window.open('/apartados/pdf/' + id, '_blank');
+}
+
+function cancelarApartado(id) {
+    swal.fire({
+        title: "¿Cancelar apartado?",
+        text: "El apartado quedará marcado como cancelado.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, cancelar",
+        confirmButtonColor: "#a72828",
+        cancelButtonText: "No",
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+
+        $.ajax({
+            url: "/apartados/cancelar",
+            type: "post",
+            dataType: "json",
+            data: {
+                id_apartado: id,
+            },
+            success: function (data) {
+                if (data.lSuccess) {
+                    swal.fire({
+                        title: "Apartados",
+                        text: data.cMensaje,
+                        icon: "success",
+                        showConfirmButton: true,
+                        confirmButtonText: "Aceptar",
+                    });
+                    $("#gridApartados").bootstrapTable("refresh");
+                } else {
+                    swal.fire({
+                        title: "Error",
+                        text: data.cMensaje,
+                        icon: "error",
+                        showConfirmButton: true,
+                        confirmButtonText: "Aceptar",
+                    });
+                }
+            },
+            error: function () {
+                swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al cancelar el apartado.",
+                    icon: "error",
+                    showConfirmButton: true,
+                    confirmButtonText: "Aceptar",
+                });
+            },
+        });
+    });
 }
 
 function ejecutarApartado(id) {
