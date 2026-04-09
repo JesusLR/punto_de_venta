@@ -46,6 +46,12 @@ Auth::routes([
                 Route::post("/precioProductoVenta", "VenderController@actualizarPrecioProductoVenta")->name("actualizarPrecioProductoVenta");
                 Route::post("/terminarOCancelarVenta", "VenderController@terminarOCancelarVenta")->name("terminarOCancelarVenta");
 
+                // Finanzas
+                Route::get('/finanzas', 'FinanzasController@index')->name('finanzas.index');
+                Route::get('/finanzas/excel', 'FinanzasController@exportExcel')->name('finanzas.excel');
+                Route::post('/finanzas/egresos', 'FinanzasController@store')->name('finanzas.store');
+                Route::delete('/finanzas/egresos/{id}', 'FinanzasController@destroy')->name('finanzas.destroy');
+
                 // Apartados
                 Route::get("/apartados", "ApartadosController@index")->name("apartados.index");
                 Route::post("/apartados/abonar", "ApartadosController@abonar")->name("apartados.abonar");
