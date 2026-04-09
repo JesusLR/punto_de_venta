@@ -105,6 +105,60 @@ $(document).ready(function () {
         });
     });
 
+    $(document).off('click', '.btnEditarPrecioVenta').on('click', '.btnEditarPrecioVenta', function () {
+        var indice = $(this).data('indice');
+        var precioActual = $(this).data('precio');
+        var nombreProducto = $(this).data('producto') || 'producto';
+
+        swal.fire({
+            title: 'Editar precio',
+            html: '<div style="font-size:0.95rem;color:#6c757d;">' + nombreProducto + '</div>',
+            input: 'number',
+            inputValue: precioActual,
+            inputAttributes: {
+                min: 0.01,
+                step: 0.01
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            inputValidator: function (value) {
+                if (!value || parseFloat(value) <= 0) {
+                    return 'Ingresa un precio válido mayor a 0';
+                }
+            }
+        }).then(function (result) {
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            $.ajax({
+                url: '/precioProductoVenta',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    indice: indice,
+                    precio_venta: result.value
+                },
+                success: function () {
+                    window.location.reload();
+                },
+                error: function (xhr) {
+                    var msg = 'No se pudo actualizar el precio.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    swal.fire({
+                        title: 'Error',
+                        text: msg,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        });
+    });
+
 });
 
 

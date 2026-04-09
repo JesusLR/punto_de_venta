@@ -43,6 +43,7 @@ Auth::routes([
                 Route::post("/vender/cliente-rapido", "VenderController@crearClienteRapido")->name("vender.crearClienteRapido");
                 Route::post("/productoDeVenta", "VenderController@agregarProductoVenta")->name("agregarProductoVenta");
                 Route::delete("/productoDeVenta", "VenderController@quitarProductoDeVenta")->name("quitarProductoDeVenta");
+                Route::post("/precioProductoVenta", "VenderController@actualizarPrecioProductoVenta")->name("actualizarPrecioProductoVenta");
                 Route::post("/terminarOCancelarVenta", "VenderController@terminarOCancelarVenta")->name("terminarOCancelarVenta");
 
                 // Apartados

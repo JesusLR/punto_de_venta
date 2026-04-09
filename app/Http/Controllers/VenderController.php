@@ -268,6 +268,62 @@ class VenderController extends Controller
             ->route("vender.index");
     }
 
+    public function actualizarPrecioProductoVenta(Request $request)
+    {
+        try {
+            $request->validate([
+                'indice' => 'required|integer|min:0',
+                'precio_venta' => 'required|numeric|min:0.01',
+            ], [
+                'precio_venta.required' => 'Debes ingresar un precio.',
+                'precio_venta.numeric' => 'El precio debe ser numérico.',
+                'precio_venta.min' => 'El precio debe ser mayor a 0.',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'lSuccess' => false,
+                    'message' => $e->validator->errors()->first(),
+                ], 422);
+            }
+            throw $e;
+        }
+
+        $indice = (int) $request->post('indice');
+        $nuevoPrecio = (float) $request->post('precio_venta');
+        $productos = $this->obtenerProductos();
+
+        if (!isset($productos[$indice])) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'lSuccess' => false,
+                    'message' => 'No se encontró el producto para actualizar el precio.',
+                ], 404);
+            }
+
+            return redirect()
+                ->route('vender.index')
+                ->with([
+                    'mensaje' => 'No se encontró el producto para actualizar el precio.',
+                    'tipo' => 'danger',
+                ]);
+        }
+
+        $productos[$indice]->precio_venta = $nuevoPrecio;
+        $this->guardarProductos($productos);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'lSuccess' => true,
+                'message' => 'Precio actualizado correctamente.',
+            ]);
+        }
+
+        return redirect()
+            ->route('vender.index')
+            ->with('mensaje', 'Precio actualizado correctamente.');
+    }
+
     private function agregarProductoACarrito($producto)
     {
         if ($producto->existencia <= 0) {

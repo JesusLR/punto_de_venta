@@ -107,6 +107,7 @@
                                 <th>Descripción</th>
                                 <th>Precio</th>
                                 <th>Cantidad</th>
+                                <th>Subtotal</th>
                                 <th>Quitar</th>
                             </tr>
                         </thead>
@@ -115,8 +116,20 @@
                                 <tr>
                                     <td>{{ $producto->codigo_barras }}</td>
                                     <td>{{ $producto->descripcion }}</td>
-                                    <td>${{ number_format($producto->precio_venta, 2) }}</td>
+                                    <td style="min-width: 160px; white-space: nowrap;">
+                                        <span style="font-weight: 700; margin-right: 6px;">${{ number_format($producto->precio_venta, 2) }}</span>
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-primary btnEditarPrecioVenta"
+                                            data-indice="{{ $loop->index }}"
+                                            data-precio="{{ number_format($producto->precio_venta, 2, '.', '') }}"
+                                            data-producto="{{ $producto->descripcion }}"
+                                            title="Editar precio">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                    </td>
                                     <td>{{ $producto->cantidad }}</td>
+                                    <td>${{ number_format($producto->precio_venta * $producto->cantidad, 2) }}</td>
                                     <td>
                                         <form action="{{route('quitarProductoDeVenta')}}" method="post">
                                             @method('delete')
