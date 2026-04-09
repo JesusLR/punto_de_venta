@@ -168,11 +168,18 @@ class VenderController extends Controller
 
     public function terminarVenta(Request $request)
     {
-        $request->all();
+        $request->validate([
+            'tipo_pago' => 'required|in:EFECTIVO,MERCADO_PAGO',
+        ], [
+            'tipo_pago.required' => 'Debes seleccionar un tipo de pago para terminar la venta.',
+            'tipo_pago.in' => 'El tipo de pago seleccionado no es válido.',
+        ]);
+
         $venta = new Venta();
         $venta->cNombreVenta = NULL;
         $venta->id_cliente = $request->input("id_cliente");
         $venta->id_usuario = $request->input("userID");
+        $venta->tipo_pago = $request->input("tipo_pago");
         $venta->saveOrFail();
         $idVenta = $venta->id;
         $productos = $this->obtenerProductos();

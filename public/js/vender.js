@@ -15,6 +15,48 @@ $(document).ready(function () {
         $('#modalNuevoClienteVenta').modal('show');
     });
 
+    $(document).off('click', 'button[name="accion"][value="terminar"]').on('click', 'button[name="accion"][value="terminar"]', function (e) {
+        e.preventDefault();
+
+        var $button = $(this);
+        var $form = $button.closest('form');
+
+        swal.fire({
+            title: 'Tipo de pago',
+            text: 'Selecciona cómo se realizó esta venta.',
+            icon: 'question',
+            input: 'select',
+            inputOptions: {
+                EFECTIVO: 'Efectivo',
+                MERCADO_PAGO: 'Mercado Pago'
+            },
+            inputPlaceholder: 'Selecciona una opción',
+            showCancelButton: true,
+            confirmButtonText: 'Continuar',
+            cancelButtonText: 'Cancelar',
+            inputValidator: function (value) {
+                if (!value) {
+                    return 'Debes seleccionar un tipo de pago';
+                }
+            }
+        }).then(function (result) {
+            if (!result.isConfirmed || !result.value) {
+                return;
+            }
+
+            $('#tipo_pago_venta').val(result.value);
+
+            $form.find('input[name="accion"][type="hidden"]').remove();
+            $('<input>')
+                .attr('type', 'hidden')
+                .attr('name', 'accion')
+                .val('terminar')
+                .appendTo($form);
+
+            $form.get(0).submit();
+        });
+    });
+
     $('#formNuevoClienteVenta').on('submit', function (e) {
         e.preventDefault();
 

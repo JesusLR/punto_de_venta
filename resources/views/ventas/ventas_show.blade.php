@@ -62,6 +62,17 @@
                 <div class="col-md-6">
                     <p><strong>Fecha:</strong> {{ $venta->created_at ? $venta->created_at->format('d/m/Y H:i') : '' }}</p>
                 </div>
+                <div class="col-md-6 mt-2">
+                    <p><strong>Tipo de pago:</strong>
+                        @if($venta->tipo_pago === 'MERCADO_PAGO')
+                            MERCADO PAGO
+                        @elseif($venta->tipo_pago === 'ABONOS')
+                            ABONOS
+                        @else
+                            EFECTIVO
+                        @endif
+                    </p>
+                </div>
             </div>
         </div>
 

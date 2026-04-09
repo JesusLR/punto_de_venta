@@ -37,6 +37,7 @@
                 <form action="{{route('terminarOCancelarVenta')}}" method="post" class="form-container">
                     @csrf
                     <input type="hidden" id="userID" name="userID" value="{{ Auth::user()->id }}">
+                    <input type="hidden" id="tipo_pago_venta" name="tipo_pago" value="">
 
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> Cliente</label>

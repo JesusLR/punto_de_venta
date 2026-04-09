@@ -130,6 +130,7 @@ class ApartadosController extends Controller
                 'id_cliente' => $apartado->id_cliente,
                 'id_usuario' => $apartado->id_usuario,
                 'cNombreVenta' => ($apartado->nombre_apartado == null ? 'Detalle de venta de Apartado #' . $apartado->id : $apartado->nombre_apartado),
+                'tipo_pago' => 'ABONOS',
             ]);
 
             foreach ($apartado->productos as $producto_apartado) {

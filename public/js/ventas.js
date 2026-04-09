@@ -39,6 +39,10 @@ $(document).ready(function () {
             title: "Total",
             formatter: "totalFormatter",
         }, {
+            field: "tipo_pago",
+            title: "Tipo de pago",
+            formatter: "tipoPagoFormatter",
+        }, {
             field: "name",
             title: "Vendio",
         },{
@@ -85,6 +89,20 @@ function totalFormatter(value, row) {
     total = Math.round(row.total * 100) / 100; 
 
     return "$" + total + ".00";
+}
+
+function tipoPagoFormatter(value, row) {
+    var tipo = row.tipo_pago || 'EFECTIVO';
+
+    if (tipo === 'MERCADO_PAGO') {
+        return '<span class="badge badge-warning">MERCADO PAGO</span>';
+    }
+
+    if (tipo === 'ABONOS') {
+        return '<span class="badge badge-info">ABONOS</span>';
+    }
+
+    return '<span class="badge badge-success">EFECTIVO</span>';
 }
 
 

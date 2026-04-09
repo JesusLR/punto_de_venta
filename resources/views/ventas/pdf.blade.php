@@ -178,6 +178,18 @@
                     <td class="info-label">Vendedor:</td>
                     <td>{{ $venta->user->name ?? 'N/A' }}</td>
                 </tr>
+                <tr>
+                    <td class="info-label">Pago:</td>
+                    <td>
+                        @if($venta->tipo_pago === 'MERCADO_PAGO')
+                            MERCADO PAGO
+                        @elseif($venta->tipo_pago === 'ABONOS')
+                            ABONOS
+                        @else
+                            EFECTIVO
+                        @endif
+                    </td>
+                </tr>
                 {{-- <tr>
                     <td class="info-label">Nombre:</td>
                     <td>{{ $venta->cNombreVenta ?: ('Detalle de venta #' . $venta->id) }}</td>
