@@ -5,8 +5,12 @@ $(document).ready(function () {
         },
     });
 
-    $('#cTipoBusquedaApartado').select2();
-    $('#cEstadoApartado').select2();
+    $('#cTipoBusquedaApartado').select2({
+        width: '100%',
+    });
+    $('#cEstadoApartado').select2({
+        width: '100%',
+    });
 
     $("#gridApartados").bootstrapTable({
         url: "/gridApartados/gridApartados",
@@ -374,7 +378,9 @@ function verProductosApartado(id) {
         type: "get",
         success: function (html) {
             $("#productosBody").html(html);
-            // $('#id_producto_apartado').select2();
+            $('#id_producto_apartado').select2({
+                width: '100%',
+            });
             $("#modalProductos").modal("show");
         },
         error: function () {

@@ -8,6 +8,11 @@ $(document).ready(function () {
     inputFechas();
     inicializarGridDetalle();
     cargarProductosFiltro();
+    $("#cProducto").select2({
+        width: '100%',
+        // placeholder: 'Selecciona un producto',
+        // allowClear: true
+    });
 
     $("#btnBuscarEstadistica").on('click', function () {
         cargarDetalleProductos();
@@ -29,7 +34,7 @@ function inicializarGridDetalle() {
         sidePagination: 'client',
         pageSize: 10,
         pageList: [10, 25, 50, 100],
-        search: false,
+        search: true,
         locale: 'es-MX',
         undefinedText: '-',
         columns: [
