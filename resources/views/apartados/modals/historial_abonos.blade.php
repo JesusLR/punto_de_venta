@@ -1,5 +1,5 @@
 @if($abonos && count($abonos) > 0)
-    <div class="table-responsive apartado-table-wrapper">
+    <div class="table-responsive apartado-table-wrapper" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
     <table class="table table-sm table-bordered apartado-table">
         <thead>
             <tr>

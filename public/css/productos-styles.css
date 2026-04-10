@@ -619,6 +619,8 @@
 
 .apartado-modal-body-soft {
     background: linear-gradient(180deg, #fffdf7 0%, #ffffff 100%);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .apartado-modal-input {

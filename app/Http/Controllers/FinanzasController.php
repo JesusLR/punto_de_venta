@@ -56,6 +56,7 @@ class FinanzasController extends Controller
                 'ventas.id',
                 'ventas.created_at',
                 'ventas.tipo_pago',
+                'ventas.cNombreVenta',
                 'clientes.nombre as cliente_nombre',
                 DB::raw('SUM(productos_vendidos.cantidad * productos_vendidos.precio) as monto')
             )
@@ -73,6 +74,8 @@ class FinanzasController extends Controller
                 'apartado_abonos.id',
                 'apartado_abonos.monto',
                 'apartado_abonos.tipo_pago',
+                'apartados.nombre_apartado',
+                'apartados.id as apartado_id',
                 'clientes.nombre as cliente_nombre',
                 DB::raw('COALESCE(apartado_abonos.fecha_abono, apartado_abonos.created_at) as fecha_movimiento')
             )
@@ -90,7 +93,7 @@ class FinanzasController extends Controller
                 'fecha' => Carbon::parse($venta->created_at),
                 'tipo' => 'VENTA',
                 'metodo' => $venta->tipo_pago ?: 'EFECTIVO',
-                'referencia' => 'Venta #' . $venta->id,
+                'referencia' => strlen($venta->cNombreVenta) == 0 ? 'Comprobante de venta folio #' . $venta->id : $venta->cNombreVenta,
                 'detalle' => 'Cliente: ' . ($venta->cliente_nombre ?: 'N/A'),
                 'monto' => (float) $venta->monto,
             ]);
@@ -101,7 +104,7 @@ class FinanzasController extends Controller
                 'fecha' => Carbon::parse($abono->fecha_movimiento),
                 'tipo' => 'ABONO',
                 'metodo' => $abono->tipo_pago ?: 'EFECTIVO',
-                'referencia' => 'Abono #' . $abono->id,
+                'referencia' => strlen($abono->nombre_apartado) == 0 ? 'Comprobante de apartado folio #' . $abono->apartado_id : $abono->nombre_apartado,
                 'detalle' => 'Cliente: ' . ($abono->cliente_nombre ?: 'N/A'),
                 'monto' => (float) $abono->monto,
             ]);
@@ -253,6 +256,7 @@ class FinanzasController extends Controller
                 'ventas.id',
                 'ventas.created_at',
                 'ventas.tipo_pago',
+                'ventas.cNombreVenta',
                 'clientes.nombre as cliente_nombre',
                 DB::raw('SUM(productos_vendidos.cantidad * productos_vendidos.precio) as monto')
             )
@@ -270,6 +274,8 @@ class FinanzasController extends Controller
                 'apartado_abonos.id',
                 'apartado_abonos.monto',
                 'apartado_abonos.tipo_pago',
+                'apartados.nombre_apartado',
+                'apartados.id as apartado_id',
                 'clientes.nombre as cliente_nombre',
                 DB::raw('COALESCE(apartado_abonos.fecha_abono, apartado_abonos.created_at) as fecha_movimiento')
             )
@@ -287,7 +293,7 @@ class FinanzasController extends Controller
                 'fecha' => Carbon::parse($venta->created_at),
                 'tipo' => 'VENTA',
                 'metodo' => $venta->tipo_pago ?: 'EFECTIVO',
-                'referencia' => 'Venta #' . $venta->id,
+                'referencia' => strlen($venta->cNombreVenta) == 0 ? 'Comprobante de venta folio #' . $venta->id : $venta->cNombreVenta,
                 'detalle' => 'Cliente: ' . ($venta->cliente_nombre ?: 'N/A'),
                 'monto' => (float) $venta->monto,
             ]);
@@ -298,7 +304,7 @@ class FinanzasController extends Controller
                 'fecha' => Carbon::parse($abono->fecha_movimiento),
                 'tipo' => 'ABONO',
                 'metodo' => $abono->tipo_pago ?: 'EFECTIVO',
-                'referencia' => 'Abono #' . $abono->id,
+                'referencia' => strlen($abono->nombre_apartado) == 0 ? 'Comprobante de apartado folio #' . $abono->apartado_id : $abono->nombre_apartado,
                 'detalle' => 'Cliente: ' . ($abono->cliente_nombre ?: 'N/A'),
                 'monto' => (float) $abono->monto,
             ]);
