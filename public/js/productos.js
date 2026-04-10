@@ -128,9 +128,11 @@ $(document).ready(function () {
             field: "precio_compra",
             title: "Precio Compra",
             visible: $("#userID").val() == 1 ? true : false,
+            formatter: "precioFormatter",
         }, {
             field: "precio_venta",
             title: "Precio Venta",
+            formatter: "precioFormatter",
         }, {
             field: "precio_compra",
             title: "Utilidad",
@@ -216,9 +218,13 @@ $("#btnExportPDF").off('click').on('click', function() {
 });
 });
 
+function precioFormatter(value) {
+    return '$' + parseFloat(value || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 function utilidadFormatter(value, row) {
     var precio = row.precio_venta - row.precio_compra;
-    return parseFloat(precio).toFixed(2);
+    return '$' + parseFloat(precio).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function imagenFormatter(value, row) {
