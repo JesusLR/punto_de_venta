@@ -83,7 +83,7 @@ function cargarProductosFiltro() {
 
             if (data.lSuccess && data.productos) {
                 data.productos.forEach(function (producto) {
-                    var texto = (producto.descripcion || '') + ' (' + (producto.codigo_barras || '-') + ')';
+                    var texto = (producto.codigo_barras || '-') + ' - ' + (producto.descripcion || '') + ' (Existencia: ' + (producto.existencia || 0) + ')';
                     $select.append('<option value="' + producto.codigo_barras + '">' + texto + '</option>');
                 });
             }

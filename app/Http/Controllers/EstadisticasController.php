@@ -121,11 +121,16 @@ class EstadisticasController extends Controller
     {
         try {
             $productos = ProductoVendido::query()
-                ->select('codigo_barras', 'descripcion')
-                ->whereNotNull('codigo_barras')
-                ->whereNotNull('descripcion')
-                ->groupBy('codigo_barras', 'descripcion')
-                ->orderBy('descripcion', 'asc')
+                ->select(
+                    'productos_vendidos.codigo_barras',
+                    'productos_vendidos.descripcion',
+                    \DB::raw('COALESCE(productos.existencia, 0) as existencia')
+                )
+                ->leftJoin('productos', 'productos.codigo_barras', '=', 'productos_vendidos.codigo_barras')
+                ->whereNotNull('productos_vendidos.codigo_barras')
+                ->whereNotNull('productos_vendidos.descripcion')
+                ->groupBy('productos_vendidos.codigo_barras', 'productos_vendidos.descripcion', 'productos.existencia')
+                ->orderBy('productos_vendidos.descripcion', 'asc')
                 ->get();
 
             return response()->json([
