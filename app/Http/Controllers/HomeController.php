@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use App\Apartado;
+use App\Egreso;
 use App\Materiales;
 use App\PrecioMateriales;
 
@@ -27,6 +30,9 @@ class HomeController extends Controller
     public function index()
     {
         $this->precio_materiales_dia();
+
+        $inicioMes = Carbon::now()->startOfMonth();
+        $finMes = Carbon::now()->endOfMonth();
 
         $precios_oro_gramo = [];
 
@@ -99,8 +105,48 @@ class HomeController extends Controller
             }
         }
 
+        $totalVentasMes = (float) DB::table('ventas')
+            ->join('productos_vendidos', 'productos_vendidos.id_venta', '=', 'ventas.id')
+            ->whereBetween('ventas.created_at', [$inicioMes->toDateTimeString(), $finMes->toDateTimeString()])
+            ->where(function ($query) {
+                $query->whereNull('ventas.tipo_pago')
+                    ->orWhereIn('ventas.tipo_pago', ['EFECTIVO', 'MERCADO_PAGO']);
+            })
+            ->sum(DB::raw('productos_vendidos.cantidad * productos_vendidos.precio'));
+
+        $totalAbonosMes = (float) DB::table('apartado_abonos')
+            ->whereBetween(
+                DB::raw('COALESCE(apartado_abonos.fecha_abono, apartado_abonos.created_at)'),
+                [$inicioMes->toDateTimeString(), $finMes->toDateTimeString()]
+            )
+            ->sum('apartado_abonos.monto');
+
+        $ingresosAutomaticosMes = $totalVentasMes + $totalAbonosMes;
+
+        $egresosCapturadosMes = (float) Egreso::whereBetween('fecha', [$inicioMes->toDateString(), $finMes->toDateString()])
+            ->sum('monto');
+
+        $balanceNetoMes = $ingresosAutomaticosMes - $egresosCapturadosMes;
+
+        $productosVendidosMes = (float) DB::table('productos_vendidos')
+            ->whereBetween('created_at', [$inicioMes->toDateTimeString(), $finMes->toDateTimeString()])
+            ->sum('cantidad');
+
+        $apartadosPendientes = (int) Apartado::whereIn('estado', ['ABIERTO', 'PENDIENTE'])
+            ->where('saldo', '>', 0)
+            ->count();
+
         // dd($precios_oro_gramo);
-        return view('home', compact('precios_oro_gramo'));
+        return view('home', compact(
+            'precios_oro_gramo',
+            'ingresosAutomaticosMes',
+            'egresosCapturadosMes',
+            'balanceNetoMes',
+            'productosVendidosMes',
+            'apartadosPendientes',
+            'inicioMes',
+            'finMes'
+        ));
     }
 
     public function precio_materiales_dia()
