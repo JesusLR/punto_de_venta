@@ -45,19 +45,19 @@ function inicializarGridDetalle() {
 
 function inputFechas() {
     var hoy = new Date();
-    var hace30 = new Date();
-    hace30.setDate(hoy.getDate() - 30);
+    var inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    var finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
 
-    var ddHoy = String(hoy.getDate()).padStart(2, '0');
-    var mmHoy = String(hoy.getMonth() + 1).padStart(2, '0');
-    var yyyyHoy = hoy.getFullYear();
+    var ddInicio = String(inicioMes.getDate()).padStart(2, '0');
+    var mmInicio = String(inicioMes.getMonth() + 1).padStart(2, '0');
+    var yyyyInicio = inicioMes.getFullYear();
 
-    var ddInicio = String(hace30.getDate()).padStart(2, '0');
-    var mmInicio = String(hace30.getMonth() + 1).padStart(2, '0');
-    var yyyyInicio = hace30.getFullYear();
+    var ddFin = String(finMes.getDate()).padStart(2, '0');
+    var mmFin = String(finMes.getMonth() + 1).padStart(2, '0');
+    var yyyyFin = finMes.getFullYear();
 
     $('#dtFechaInicio').val(yyyyInicio + '-' + mmInicio + '-' + ddInicio);
-    $('#dtFechaFinal').val(yyyyHoy + '-' + mmHoy + '-' + ddHoy);
+    $('#dtFechaFinal').val(yyyyFin + '-' + mmFin + '-' + ddFin);
 }
 
 function toggleFechasPorFiltro() {

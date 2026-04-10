@@ -80,6 +80,22 @@
         border-left: 4px solid #D4AF37;
     }
 
+    .kpi-card-link {
+        display: block;
+        text-decoration: none !important;
+        color: inherit;
+        border-radius: 12px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .kpi-card-link:hover {
+        transform: translateY(-3px);
+    }
+
+    .kpi-card-link:hover .kpi-card {
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.14);
+    }
+
     .kpi-card small {
         display: block;
         color: #666;
@@ -242,32 +258,42 @@
 
     <div class="kpi-grid">
         @if(Auth::user()->id == 1)
-            <div class="kpi-card">
-                <small>Ingresos automáticos</small>
-                <strong style="color: #2E7D32">${{ number_format((float) $ingresosAutomaticosMes, 2) }}</strong>
-                <div class="kpi-sub">{{ $inicioMes->format('d/m/Y') }} al {{ $finMes->format('d/m/Y') }}</div>
-            </div>
-            <div class="kpi-card">
-                <small>Egresos capturados</small>
-                <strong style="color: #C62828">${{ number_format((float) $egresosCapturadosMes, 2) }}</strong>
-                <div class="kpi-sub">Mes en curso</div>
-            </div>
-            <div class="kpi-card">
-                <small>Balance neto</small>
-                <strong style="color: {{ $balanceNetoMes >= 0 ? '#2E7D32' : '#C62828' }};">${{ number_format((float) $balanceNetoMes, 2) }}</strong>
-                <div class="kpi-sub">Mes en curso</div>
-            </div>
+            <a href="{{ route('finanzas.index') }}" class="kpi-card-link" title="Ir a Finanzas">
+                <div class="kpi-card">
+                    <small>Ingresos automáticos</small>
+                    <strong style="color: #2E7D32">${{ number_format((float) $ingresosAutomaticosMes, 2) }}</strong>
+                    <div class="kpi-sub">{{ $inicioMes->format('d/m/Y') }} al {{ $finMes->format('d/m/Y') }}</div>
+                </div>
+            </a>
+            <a href="{{ route('finanzas.index') }}" class="kpi-card-link" title="Ir a Finanzas">
+                <div class="kpi-card">
+                    <small>Egresos capturados</small>
+                    <strong style="color: #C62828">${{ number_format((float) $egresosCapturadosMes, 2) }}</strong>
+                    <div class="kpi-sub">Mes en curso</div>
+                </div>
+            </a>
+            <a href="{{ route('finanzas.index') }}" class="kpi-card-link" title="Ir a Finanzas">
+                <div class="kpi-card">
+                    <small>Balance neto</small>
+                    <strong style="color: {{ $balanceNetoMes >= 0 ? '#2E7D32' : '#C62828' }};">${{ number_format((float) $balanceNetoMes, 2) }}</strong>
+                    <div class="kpi-sub">Mes en curso</div>
+                </div>
+            </a>
         @endif
-        <div class="kpi-card">
-            <small>Productos vendidos</small>
-            <strong>{{ number_format((float) $productosVendidosMes, 2) }}</strong>
-            <div class="kpi-sub">Unidades del mes</div>
-        </div>
-        <div class="kpi-card">
-            <small>Apartados pendientes</small>
-            <strong>{{ number_format((int) $apartadosPendientes) }}</strong>
-            <div class="kpi-sub">Abiertos en general</div>
-        </div>
+        <a href="{{ route('estadisticas.index') }}" class="kpi-card-link" title="Ir a Estadísticas">
+            <div class="kpi-card">
+                <small>Productos vendidos</small>
+                <strong>{{ number_format((int) $productosVendidosMes, 0) }}</strong>
+                <div class="kpi-sub">Unidades del mes</div>
+            </div>
+        </a>
+        <a href="{{ route('apartados.index') }}" class="kpi-card-link" title="Ir a Apartados">
+            <div class="kpi-card">
+                <small>Apartados pendientes</small>
+                <strong>{{ number_format((int) $apartadosPendientes) }}</strong>
+                <div class="kpi-sub">Abiertos en general</div>
+            </div>
+        </a>
     </div>
 
     {{-- Card: Precio del oro (hoy) - Mejorado --}}

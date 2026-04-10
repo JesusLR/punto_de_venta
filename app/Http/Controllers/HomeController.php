@@ -128,9 +128,12 @@ class HomeController extends Controller
 
         $balanceNetoMes = $ingresosAutomaticosMes - $egresosCapturadosMes;
 
-        $productosVendidosMes = (float) DB::table('productos_vendidos')
-            ->whereBetween('created_at', [$inicioMes->toDateTimeString(), $finMes->toDateTimeString()])
-            ->sum('cantidad');
+        $productosVendidosMes = (int) round(
+            (float) DB::table('ventas')
+                ->join('productos_vendidos', 'productos_vendidos.id_venta', '=', 'ventas.id')
+                ->whereBetween('ventas.created_at', [$inicioMes->toDateTimeString(), $finMes->toDateTimeString()])
+                ->sum('productos_vendidos.cantidad')
+        );
 
         $apartadosPendientes = (int) Apartado::whereIn('estado', ['ABIERTO', 'PENDIENTE'])
             ->where('saldo', '>', 0)
