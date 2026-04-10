@@ -179,9 +179,9 @@
         box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
     }
 
-    .chart-container {
+    .table-container-estadisticas {
         background: white;
-        padding: 1rem; /* reducido */
+        padding: 1rem;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         margin-bottom: 1.25rem;
@@ -200,16 +200,33 @@
         justify-content: space-between;
     }
 
-    #myChart {
-        display: block;
-        margin: 0 auto;
-        width: 100% !important;
-        height: 300px; /* reducir altura */
-        max-height: 360px;
+    .resumen-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.25rem;
     }
 
-    @media (min-width: 1200px) {
-        #myChart { height: 320px; }
+    .resumen-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        padding: 1rem;
+        border-left: 4px solid #D4AF37;
+    }
+
+    .resumen-card small {
+        display: block;
+        color: #666;
+        margin-bottom: 0.4rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .resumen-card strong {
+        font-size: 1.25rem;
+        color: #1a1a1a;
     }
 
     @media (max-width: 768px) {
@@ -232,6 +249,10 @@
             gap: 1rem;
         }
 
+        .resumen-grid {
+            grid-template-columns: 1fr;
+        }
+
         .filters-container {
             padding: 1.5rem 1rem;
         }
@@ -240,9 +261,6 @@
             margin-bottom: 1rem;
         }
 
-        .chart-container {
-            padding: 1.5rem 1rem;
-        }
     }
 
     @media (max-width: 600px) {
@@ -257,11 +275,6 @@
         .btn-search {
             padding: 0.6rem 1.2rem;
             font-size: 0.85rem;
-        }
-
-        #myChart {
-            width: 100% !important;
-            height: auto !important;
         }
 
         .filter-row-dates {
@@ -307,34 +320,62 @@
                     <button class="btn-search" id="btnBuscarEstadistica" title="Buscar estadísticas"><i class="fas fa-search"></i> Buscar</button>
                 </div>
 
-                <!-- Fila 2: Tipo de Gráfico y Registros -->
+                <!-- Fila 2: Filtros -->
                 <div class="filter-row-selects">
                     <div class="filter-group">
-                        <label for="cTipoGrafica"><i class="fas fa-chart-line" style="color: #D4AF37; margin-right: 0.5rem;"></i>Tipo Gráfico</label>
-                        <select class="form-control" id="cTipoGrafica" name="cTipoGrafica">
-                            <option value="bar">Barras</option>
-                            <option value="line">Líneas</option>
-                            <option value="doughnut">Donut</option>
-                            <option value="pie">Pastel</option>
+                        <label for="cProducto"><i class="fas fa-box" style="color: #D4AF37; margin-right: 0.5rem;"></i>Producto</label>
+                        <select class="form-control" id="cProducto" name="cProducto">
+                            <option value="T">Todos</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label for="cLimiteRegistros"><i class="fas fa-list" style="color: #D4AF37; margin-right: 0.5rem;"></i>Registros a Mostrar</label>
-                        <select class="form-control" id="cLimiteRegistros" name="cLimiteRegistros">
-                            <option value="10">Top 10</option>
-                            <option value="20">Top 20</option>
-                            <option value="30">Top 30</option>
-                            <option value="50">Top 50</option>
+                        <label for="cFiltroUnidades"><i class="fas fa-cubes" style="color: #D4AF37; margin-right: 0.5rem;"></i>Unidades vendidas</label>
+                        <select class="form-control" id="cFiltroUnidades" name="cFiltroUnidades">
+                            <option value="RANGO">En el rango de fechas</option>
+                            <option value="GENERAL">General (histórico)</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <div class="chart-container">
-                <div class="chart-title">
-                    <i class="fas fa-bar-chart"></i> Gráfico de Ventas
+            <div class="resumen-grid">
+                <div class="resumen-card">
+                    <small>Productos vendidos</small>
+                    <strong id="txtTotalProductos">0</strong>
                 </div>
-                <canvas id="myChart" style="width:100%;height:420px;"></canvas>
+                <div class="resumen-card">
+                    <small>Unidades vendidas</small>
+                    <strong id="txtTotalUnidades">0</strong>
+                </div>
+                <div class="resumen-card">
+                    <small>Total vendido</small>
+                    <strong id="txtTotalVendido">$0.00</strong>
+                </div>
+            </div>
+
+            <div class="table-container-estadisticas">
+                <div class="chart-title">
+                    <i class="fas fa-table"></i> Detalle de productos vendidos
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm" id="gridDetalleVentas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Código de barras</th>
+                                <th>Producto</th>
+                                <th class="text-right">Unidades vendidas</th>
+                                <th class="text-right">Precio promedio</th>
+                                <th class="text-right">Total vendido</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Realiza una búsqueda para ver resultados</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

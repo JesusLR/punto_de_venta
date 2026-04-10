@@ -83,6 +83,7 @@ Auth::routes([
                 Route::resource("estadisticas", "EstadisticasController");
                 Route::post("/gridEstadisticas", "EstadisticasController@gridEstadisticas")->name("gridEstadisticas");
                 Route::post("/graficaVentas", "EstadisticasController@graficaVentas")->name("graficaVentas");
+                Route::post("/estadisticas/productos-filtro", "EstadisticasController@productosVendidosFiltro")->name("estadisticas.productosFiltro");
 
                 //Proveedores
                 Route::resource("proveedores", "ProveedoresController");
