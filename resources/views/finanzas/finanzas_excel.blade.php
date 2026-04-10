@@ -6,7 +6,7 @@
         <td colspan="6">Empresa: {{ $appName }}</td>
     </tr>
     <tr>
-        <td colspan="6">Rango: {{ $fechaInicio }} al {{ $fechaFin }} | Generado: {{ \Carbon\Carbon::now()->format('Y-m-d H:i') }}</td>
+        <td colspan="6">Rango: {{ \Carbon\Carbon::parse($fechaInicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($fechaFin)->format('d/m/Y') }} | Generado: {{ \Carbon\Carbon::now()->format('d/m/Y') }}</td>
     </tr>
     <tr></tr>
     <tr>
@@ -47,7 +47,7 @@
     <tbody>
         @forelse ($movimientosIngresos as $movimiento)
             <tr>
-                <td>{{ $movimiento['fecha']->format('Y-m-d H:i') }}</td>
+                <td>{{ $movimiento['fecha']->format('d/m/Y') }}</td>
                 <td>{{ $movimiento['tipo'] }}</td>
                 <td>{{ $movimiento['referencia'] }}</td>
                 <td>{{ str_replace('_', ' ', $movimiento['metodo']) }}</td>
@@ -78,7 +78,7 @@
     <tbody>
         @forelse ($egresos as $egreso)
             <tr>
-                <td>{{ \Carbon\Carbon::parse($egreso->fecha)->format('Y-m-d') }}</td>
+                <td>{{ \Carbon\Carbon::parse($egreso->fecha)->format('d/m/Y') }}</td>
                 <td>{{ $egreso->concepto }}</td>
                 <td>{{ optional($egreso->usuario)->name }}</td>
                 <td>{{ $egreso->observaciones }}</td>

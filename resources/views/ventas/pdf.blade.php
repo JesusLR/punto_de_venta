@@ -154,7 +154,11 @@
 <body>
     <div class="doc-header">
         <div class="brand">Joyería Colibrí</div>
-        <div class="doc-title">Comprobante de venta folio #{{ $venta->id }}</div>
+        @if (strlen($venta->cNombreVenta) == 0)
+            <div class="doc-title">Comprobante de venta folio #{{ $venta->id }}</div>
+        @else
+            <div class="doc-title">{{ $venta->cNombreVenta }}</div>
+        @endif
         <div class="meta-date">Generado: {{ now()->format('d/m/Y ') }}</div>
     </div>
 

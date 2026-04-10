@@ -76,12 +76,12 @@
 
                             <div class="form-group">
                                 <label for="concepto">Concepto</label>
-                                <input type="text" class="form-control-modern" id="concepto" name="concepto" maxlength="150" required>
+                                <input type="text" class="form-control-modern" id="concepto" name="concepto" maxlength="150" placeholder="..." required>
                             </div>
 
                             <div class="form-group">
                                 <label for="monto">Monto</label>
-                                <input type="number" class="form-control-modern" id="monto" name="monto" min="0.01" step="0.01" required>
+                                <input type="number" class="form-control-modern" id="monto" name="monto" placeholder="0.00" min="0.01" step="0.01" required>
                             </div>
 
                             <div class="form-group">
@@ -91,7 +91,7 @@
 
                             <div class="form-group">
                                 <label for="observaciones">Observaciones</label>
-                                <textarea class="form-control-modern" id="observaciones" name="observaciones" rows="3"></textarea>
+                                <textarea class="form-control-modern" id="observaciones" name="observaciones" rows="3" placeholder="Opcional..."></textarea>
                             </div>
 
                             <button type="submit" class="btn-modern btn-danger w-100">
@@ -267,6 +267,8 @@
             e.preventDefault();
 
             const $form = $(this);
+            const $monto = $form.find('#monto');
+            $monto.val(String($monto.val()).replace(',', '.'));
 
             $.ajax({
                 url: $form.attr('action'),
