@@ -107,6 +107,24 @@
                 <div class="table-container mb-3">
                     <div class="table-wrapper">
                         <h5 class="mb-3"><i class="fas fa-plus-circle text-success"></i> Ingresos automáticos</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-2">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted d-block mb-1">Total en efectivo</small>
+                                        <strong class="text-success">${{ number_format($totalIngresoEfectivo, 2) }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted d-block mb-1">Total en mercado pago</small>
+                                        <strong class="text-primary">${{ number_format($totalIngresoMercadoPago, 2) }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="table-responsive">
                             <table class="table table-bordered table-sm">
                                 <thead>
@@ -122,7 +140,7 @@
                                 <tbody>
                                     @forelse ($movimientosIngresos as $movimiento)
                                         <tr>
-                                            <td>{{ $movimiento['fecha']->format('Y-m-d H:i') }}</td>
+                                            <td>{{ $movimiento['fecha']->format('d/m/Y') }}</td>
                                             <td>{{ $movimiento['tipo'] }}</td>
                                             <td>{{ $movimiento['referencia'] }}</td>
                                             <td>{{ str_replace('_', ' ', $movimiento['metodo']) }}</td>
@@ -163,7 +181,7 @@
                                 <tbody>
                                     @forelse ($egresos as $egreso)
                                         <tr>
-                                            <td>{{ \Carbon\Carbon::parse($egreso->fecha)->format('Y-m-d') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($egreso->fecha)->format('d/m/Y') }}</td>
                                             <td>{{ $egreso->concepto }}</td>
                                             <td>{{ optional($egreso->usuario)->name }}</td>
                                             <td>{{ $egreso->observaciones }}</td>

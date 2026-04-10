@@ -111,6 +111,14 @@ class FinanzasController extends Controller
             ->sortByDesc('fecha')
             ->values();
 
+        $totalIngresoEfectivo = (float) $movimientosIngresos
+            ->where('metodo', 'EFECTIVO')
+            ->sum('monto');
+
+        $totalIngresoMercadoPago = (float) $movimientosIngresos
+            ->where('metodo', 'MERCADO_PAGO')
+            ->sum('monto');
+
         $ingresosPage = Paginator::resolveCurrentPage('ingresos_page');
         $ingresosPorPagina = 10;
         $ingresosTotales = $movimientosIngresos->count();
@@ -136,6 +144,8 @@ class FinanzasController extends Controller
             'egresos' => $egresos,
             'movimientosIngresos' => $movimientosIngresos,
             'totalIngresos' => $totalIngresos,
+            'totalIngresoEfectivo' => $totalIngresoEfectivo,
+            'totalIngresoMercadoPago' => $totalIngresoMercadoPago,
             'totalEgresos' => $totalEgresos,
             'balanceNeto' => $balanceNeto,
         ]);
