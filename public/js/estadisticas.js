@@ -141,9 +141,9 @@ function actualizarResumen(resumen) {
     var totalUnidades = parseFloat(resumen.total_unidades || 0);
     var totalVendido = parseFloat(resumen.total_vendido || 0);
 
-    $('#txtTotalProductos').text(totalProductos);
-    $('#txtTotalUnidades').text(totalUnidades.toFixed(2));
-    $('#txtTotalVendido').text('$' + totalVendido.toFixed(2));
+    $('#txtTotalProductos').text(totalProductos.toLocaleString('es-MX'));
+    $('#txtTotalUnidades').text(totalUnidades.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    $('#txtTotalVendido').text('$' + totalVendido.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 }
 
 function decimalFormatter(value) {
