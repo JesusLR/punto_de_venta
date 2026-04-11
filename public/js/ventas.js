@@ -505,6 +505,7 @@ function editarFechaAbono(idAbono, idApartado, fechaActual) {
         inputValue: fechaActual || obtenerFechaHoyLocal(),
         showCancelButton: true,
         confirmButtonText: "Guardar",
+        confirmButtonColor: "#28a745",
         cancelButtonText: "Cancelar",
         inputAttributes: {
             max: obtenerFechaHoyLocal(),
