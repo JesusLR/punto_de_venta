@@ -21,45 +21,56 @@ ____          _____               _ _           _
 @extends("maestra")
 @section("titulo", "Clientes")
 @section("contenido")
+<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
+
     <div class="row">
         <div class="col-12">
-            <h1>Clientes <i class="fa fa-users"></i></h1>
-            <a href="{{route("clientes.create")}}" class="btn btn-success mb-2"><i class="fas fa-plus"></i> Agregar</a>
+            <div class="productos-header">
+                <h1><i class="fa fa-users"></i> Clientes</h1>
+                <div class="header-actions">
+                    <a href="{{route("clientes.create")}}" class="btn-modern btn-success-modern">
+                        <i class="fas fa-plus"></i> Agregar cliente
+                    </a>
+                </div>
+            </div>
             @include("notificacion")
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Teléfono</th>
-
-                        <th>Editar</th>
-                        <th>Eliminar</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($clientes as $cliente)
-                        <tr>
-                            <td>{{$cliente->nombre}}</td>
-                            <td>{{$cliente->telefono}}</td>
-                            <td>
-                                <a class="btn btn-warning" href="{{route("clientes.edit",[$cliente])}}">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                            </td>
-                            <td>
-                                <form action="{{route("clientes.destroy", [$cliente])}}" method="post">
-                                    @method("delete")
-                                    @csrf
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
+            <div class="table-container">
+                <div class="table-wrapper">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Teléfono</th>
+                                <th>Editar</th>
+                                <th>Eliminar</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($clientes as $cliente)
+                                <tr>
+                                    <td>{{$cliente->nombre}}</td>
+                                    <td>{{$cliente->telefono}}</td>
+                                    <td>
+                                        <a class="btn btn-warning btn-table-action" href="{{route("clientes.edit",[$cliente])}}">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <form action="{{route("clientes.destroy", [$cliente])}}" method="post">
+                                            @method("delete")
+                                            @csrf
+                                            <button type="submit" class="btn btn-danger btn-table-action">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

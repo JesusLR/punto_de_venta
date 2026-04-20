@@ -270,6 +270,7 @@
                         <a class="dropdown-item" href="{{route("vender.index")}}"><i class="fa fa-cart-plus mr-2" style="color: #95E1D3;"></i>Vender</a>
                         <a class="dropdown-item" href="{{route("apartados.index")}}"><i class="fas fa-clipboard-list mr-2" style="color: #FF6B6B;"></i>Apartados</a>
                         <a class="dropdown-item" href="{{route("ventas.index")}}"><i class="fa fa-list mr-2" style="color: #45B7D1;"></i>Ventas</a>
+                        <a class="dropdown-item" href="{{route("finanzas.index")}}"><i class="fas fa-wallet mr-2" style="color: #2ECC71;"></i>Finanzas</a>
                     </div>
                 </li>
             @else

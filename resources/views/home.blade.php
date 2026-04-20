@@ -65,6 +65,58 @@
         margin-top: 2rem;
     }
 
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #D4AF37;
+    }
+
+    .kpi-card-link {
+        display: block;
+        text-decoration: none !important;
+        color: inherit;
+        border-radius: 12px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .kpi-card-link:hover {
+        transform: translateY(-3px);
+    }
+
+    .kpi-card-link:hover .kpi-card {
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.14);
+    }
+
+    .kpi-card small {
+        display: block;
+        color: #666;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        margin-bottom: 0.35rem;
+    }
+
+    .kpi-card strong {
+        font-size: 1.4rem;
+        color: #1a1a1a;
+        font-weight: 800;
+    }
+
+    .kpi-card .kpi-sub {
+        font-size: 0.8rem;
+        color: #888;
+        margin-top: 0.35rem;
+    }
+
     .module-card {
         background: white;
         border-radius: 12px;
@@ -170,6 +222,10 @@
             gap: 1.5rem;
         }
 
+        .kpi-grid {
+            grid-template-columns: repeat(2, minmax(180px, 1fr));
+        }
+
         .welcome-header h1 {
             font-size: 1.8rem;
         }
@@ -177,6 +233,12 @@
         .module-icon-container {
             height: 150px;
             font-size: 3.5rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .kpi-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -192,6 +254,46 @@
             <i class="far fa-calendar-alt" style="margin-right: 0.5rem;"></i>
             {{ date('d/m/Y') }} · {{ env("APP_NAME") }}
         </p>
+    </div>
+
+    <div class="kpi-grid">
+        @if(Auth::user()->id == 1)
+            <a href="{{ route('finanzas.index') }}" class="kpi-card-link" title="Ir a Finanzas">
+                <div class="kpi-card">
+                    <small>Ingresos automáticos</small>
+                    <strong style="color: #2E7D32">${{ number_format((float) $ingresosAutomaticosMes, 2) }}</strong>
+                    <div class="kpi-sub">{{ $inicioMes->format('d/m/Y') }} al {{ $finMes->format('d/m/Y') }}</div>
+                </div>
+            </a>
+            <a href="{{ route('finanzas.index') }}" class="kpi-card-link" title="Ir a Finanzas">
+                <div class="kpi-card">
+                    <small>Egresos capturados</small>
+                    <strong style="color: #C62828">${{ number_format((float) $egresosCapturadosMes, 2) }}</strong>
+                    <div class="kpi-sub">Mes en curso</div>
+                </div>
+            </a>
+            <a href="{{ route('finanzas.index') }}" class="kpi-card-link" title="Ir a Finanzas">
+                <div class="kpi-card">
+                    <small>Balance neto</small>
+                    <strong style="color: {{ $balanceNetoMes >= 0 ? '#2E7D32' : '#C62828' }};">${{ number_format((float) $balanceNetoMes, 2) }}</strong>
+                    <div class="kpi-sub">Mes en curso</div>
+                </div>
+            </a>
+        @endif
+        <a href="{{ route('estadisticas.index') }}" class="kpi-card-link" title="Ir a Estadísticas">
+            <div class="kpi-card">
+                <small>Productos vendidos</small>
+                <strong>{{ number_format((int) $productosVendidosMes, 0) }}</strong>
+                <div class="kpi-sub">Unidades del mes</div>
+            </div>
+        </a>
+        <a href="{{ route('apartados.index') }}" class="kpi-card-link" title="Ir a Apartados">
+            <div class="kpi-card">
+                <small>Apartados pendientes</small>
+                <strong>{{ number_format((int) $apartadosPendientes) }}</strong>
+                <div class="kpi-sub">Abiertos en general</div>
+            </div>
+        </a>
     </div>
 
     {{-- Card: Precio del oro (hoy) - Mejorado --}}

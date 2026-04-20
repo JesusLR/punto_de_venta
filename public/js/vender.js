@@ -6,6 +6,158 @@ $(document).ready(function () {
     });
 
     $('#id_producto').select2();
+    $('#id_cliente').select2();
+
+    $('#btnNuevoClienteVenta').on('click', function () {
+        $('#nuevo_cliente_nombre').val('');
+        $('#nuevo_cliente_telefono').val('');
+        $('#nuevo_cliente_observaciones').val('');
+        $('#modalNuevoClienteVenta').modal('show');
+    });
+
+    $(document).off('click', 'button[name="accion"][value="terminar"]').on('click', 'button[name="accion"][value="terminar"]', function (e) {
+        e.preventDefault();
+
+        var $button = $(this);
+        var $form = $button.closest('form');
+
+        swal.fire({
+            title: 'Tipo de pago',
+            text: 'Selecciona cómo se realizó esta venta.',
+            icon: 'question',
+            input: 'select',
+            inputOptions: {
+                EFECTIVO: 'Efectivo',
+                MERCADO_PAGO: 'Mercado Pago'
+            },
+            inputPlaceholder: 'Selecciona una opción',
+            showCancelButton: true,
+            confirmButtonText: 'Continuar',
+            cancelButtonText: 'Cancelar',
+            inputValidator: function (value) {
+                if (!value) {
+                    return 'Debes seleccionar un tipo de pago';
+                }
+            }
+        }).then(function (result) {
+            if (!result.isConfirmed || !result.value) {
+                return;
+            }
+
+            $('#tipo_pago_venta').val(result.value);
+
+            $form.find('input[name="accion"][type="hidden"]').remove();
+            $('<input>')
+                .attr('type', 'hidden')
+                .attr('name', 'accion')
+                .val('terminar')
+                .appendTo($form);
+
+            $form.get(0).submit();
+        });
+    });
+
+    $('#formNuevoClienteVenta').on('submit', function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: '/vender/cliente-rapido',
+            type: 'post',
+            dataType: 'json',
+            data: {
+                nombre: $('#nuevo_cliente_nombre').val(),
+                telefono: $('#nuevo_cliente_telefono').val(),
+                observaciones: $('#nuevo_cliente_observaciones').val(),
+            },
+            success: function (data) {
+                if (!data.lSuccess || !data.cliente) {
+                    swal.fire({
+                        title: 'Error',
+                        text: data.cMensaje || 'No se pudo guardar el cliente.',
+                        icon: 'error',
+                        showConfirmButton: true,
+                        confirmButtonText: 'Aceptar',
+                    });
+                    return;
+                }
+
+                var option = new Option(data.cliente.nombre, data.cliente.id, true, true);
+                $('#id_cliente').append(option).val(data.cliente.id).trigger('change');
+                $('#modalNuevoClienteVenta').modal('hide');
+
+                swal.fire({
+                    title: 'Clientes',
+                    text: data.cMensaje,
+                    icon: 'success',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Aceptar',
+                });
+            },
+            error: function () {
+                swal.fire({
+                    title: 'Error',
+                    text: 'Ocurrió un error al guardar el cliente.',
+                    icon: 'error',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Aceptar',
+                });
+            },
+        });
+    });
+
+    $(document).off('click', '.btnEditarPrecioVenta').on('click', '.btnEditarPrecioVenta', function () {
+        var indice = $(this).data('indice');
+        var precioActual = $(this).data('precio');
+        var nombreProducto = $(this).data('producto') || 'producto';
+
+        swal.fire({
+            title: 'Editar precio',
+            html: '<div style="font-size:0.95rem;color:#6c757d;">' + nombreProducto + '</div>',
+            input: 'number',
+            inputValue: precioActual,
+            inputAttributes: {
+                min: 0.01,
+                step: 0.01
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            inputValidator: function (value) {
+                if (!value || parseFloat(value) <= 0) {
+                    return 'Ingresa un precio válido mayor a 0';
+                }
+            }
+        }).then(function (result) {
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            $.ajax({
+                url: '/precioProductoVenta',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    indice: indice,
+                    precio_venta: result.value
+                },
+                success: function () {
+                    window.location.reload();
+                },
+                error: function (xhr) {
+                    var msg = 'No se pudo actualizar el precio.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    swal.fire({
+                        title: 'Error',
+                        text: msg,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        });
+    });
 
 });
 

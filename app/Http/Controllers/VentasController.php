@@ -40,6 +40,9 @@ class VentasController extends Controller
         $nombreImpresora = env("NOMBRE_IMPRESORA");
         $connector = new WindowsPrintConnector($nombreImpresora);
         $impresora = new Printer($connector);
+        $tipoPago = $venta->tipo_pago === 'MERCADO_PAGO'
+            ? 'MERCADO PAGO'
+            : ($venta->tipo_pago === 'ABONOS' ? 'ABONOS' : 'EFECTIVO');
         $impresora->setJustification(Printer::JUSTIFY_CENTER);
         $impresora->setEmphasis(true);
         $impresora->text("Ticket de venta\n");
@@ -47,6 +50,7 @@ class VentasController extends Controller
         $impresora->setEmphasis(false);
         $impresora->text("Cliente: ");
         $impresora->text($venta->cliente->nombre . "\n");
+        $impresora->text("Pago: " . $tipoPago . "\n");
         $impresora->text("\nhttps://parzibyte.me/blog\n");
         $impresora->text("\n===============================\n");
         $total = 0;

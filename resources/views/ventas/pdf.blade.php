@@ -154,8 +154,12 @@
 <body>
     <div class="doc-header">
         <div class="brand">Joyería Colibrí</div>
-        <div class="doc-title">Comprobante de venta folio #{{ $venta->id }}</div>
-        <div class="meta-date">Generado: {{ now()->format('d/m/Y H:i:s') }}</div>
+        @if (strlen($venta->cNombreVenta) == 0)
+            <div class="doc-title">Comprobante de venta folio #{{ $venta->id }}</div>
+        @else
+            <div class="doc-title">{{ $venta->cNombreVenta }}</div>
+        @endif
+        <div class="meta-date">Generado: {{ now()->format('d/m/Y ') }}</div>
     </div>
 
     <div class="info-box">
@@ -168,7 +172,7 @@
                 </tr>
                 <tr>
                     <td class="info-label">Fecha:</td>
-                    <td>{{ $venta->created_at ? $venta->created_at->format('d/m/Y H:i:s') : '-' }}</td>
+                    <td>{{ $venta->created_at ? $venta->created_at->format('d/m/Y') : '-' }}</td>
                 </tr>
                 <tr>
                     <td class="info-label">Cliente:</td>
@@ -177,6 +181,18 @@
                 <tr>
                     <td class="info-label">Vendedor:</td>
                     <td>{{ $venta->user->name ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Pago:</td>
+                    <td>
+                        @if($venta->tipo_pago === 'MERCADO_PAGO')
+                            MERCADO PAGO
+                        @elseif($venta->tipo_pago === 'ABONOS')
+                            ABONOS
+                        @else
+                            EFECTIVO
+                        @endif
+                    </td>
                 </tr>
                 {{-- <tr>
                     <td class="info-label">Nombre:</td>

@@ -21,19 +21,22 @@
 @extends("maestra")
 @section("titulo", "Categorias")
 @section("contenido")
+<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
+
 <input type="text" id="userID" value={{Auth::user()->id}} hidden>
 <input type="text" id="iIDCategoria" hidden>
     <div class="row">
         <div class="col-12">
-            <h1>Categorias <i class="fas fa-book"></i></h1>
-            @if (Auth::user()->id == 1)
-                <a href="#" id="btnAgregarCategoria" class="btn btn-success mb-2"  title="Agregar Categoria"><i class="fas fa-plus"></i> Agregar</a>
-                {{-- <button class="btn btn-primary mb-2" id="btnCargaExcell" title="Cargar Productos"><i class="fas fa-file-excel"></i> Cargar Productos</button> --}}
-                {{-- <a href="{{ asset('docs/plantilla_productos.xlsx') }}" class="btn btn-info mb-2" title="Descargar plantilla de excell"><i class="fas fa-file-download"></i> Descargar Plantilla</a> --}}
-
-                {{-- <span id="btnImgISAIspan"><a target='_blank' href="{{ asset('docs/plantilla_productos.xlsx') }}" tabindex="-1" id="" data-toggle="tooltip" title="Descargar plantilla de excell"><i class="fas fa-file-download"></i></a></span> --}}
-                {{-- <a  class="btn btn-primary mb-2"> <i class="fas fa-file-excel"></i> Cargar Productos</a> --}}
-            @endif
+            <div class="productos-header">
+                <h1><i class="fas fa-book"></i> Categorías</h1>
+                @if (Auth::user()->id == 1)
+                    <div class="header-actions">
+                        <a href="#" id="btnAgregarCategoria" class="btn-modern btn-success-modern" title="Agregar Categoria">
+                            <i class="fas fa-plus"></i> Agregar categoría
+                        </a>
+                    </div>
+                @endif
+            </div>
             @include("notificacion")
 
             {{-- <div class="form-group">
@@ -47,53 +50,57 @@
                 </select>
             </div> --}}
 
-            <div class="table-responsive">
-                <table class="table table-bordered" id="gridCategorias">
-                    {{-- <thead>
-                    <tr>
-                        <th>Código de barras</th>
-                        <th>Descripción</th>
-                        <th>Precio de compra</th>
-                        <th>Precio de venta</th>
-                        <th>Utilidad</th>
-                        <th>Existencia</th>
-                        <th>Imagen</th>
-                        @if (Auth::user()->id == 1)
-                            <th>Editar</th>
-                            <th>Eliminar</th>
-                        @endif
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($productos as $producto)
-                        <tr>
-                            <td>{{$producto->codigo_barras}}</td>
-                            <td>{{$producto->descripcion}}</td>
-                            <td>{{$producto->precio_compra}}</td>
-                            <td>{{$producto->precio_venta}}</td>
-                            <td>{{$producto->precio_venta - $producto->precio_compra}}</td>
-                            <td>{{$producto->existencia}}</td>
-                            <td><img src="img/productos/{{$producto->img}}" alt="{{$producto->img}}" width="100" height="100"></td>
-                            @if (Auth::user()->id == 1)
-                                <td>
-                                    <a class="btn btn-warning" href="{{route("productos.edit",[$producto])}}">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-                                </td>
-                                <td>
-                                    <form action="{{route("productos.destroy", [$producto])}}" method="post">
-                                        @method("delete")
-                                        @csrf
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            @endif
-                        </tr>
-                    @endforeach
-                    </tbody> --}}
-                </table>
+            <div class="table-container">
+                <div class="table-wrapper">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="gridCategorias">
+                            {{-- <thead>
+                            <tr>
+                                <th>Código de barras</th>
+                                <th>Descripción</th>
+                                <th>Precio de compra</th>
+                                <th>Precio de venta</th>
+                                <th>Utilidad</th>
+                                <th>Existencia</th>
+                                <th>Imagen</th>
+                                @if (Auth::user()->id == 1)
+                                    <th>Editar</th>
+                                    <th>Eliminar</th>
+                                @endif
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($productos as $producto)
+                                <tr>
+                                    <td>{{$producto->codigo_barras}}</td>
+                                    <td>{{$producto->descripcion}}</td>
+                                    <td>{{$producto->precio_compra}}</td>
+                                    <td>{{$producto->precio_venta}}</td>
+                                    <td>{{$producto->precio_venta - $producto->precio_compra}}</td>
+                                    <td>{{$producto->existencia}}</td>
+                                    <td><img src="img/productos/{{$producto->img}}" alt="{{$producto->img}}" width="100" height="100"></td>
+                                    @if (Auth::user()->id == 1)
+                                        <td>
+                                            <a class="btn btn-warning" href="{{route("productos.edit",[$producto])}}">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <form action="{{route("productos.destroy", [$producto])}}" method="post">
+                                                @method("delete")
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                            </tbody> --}}
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

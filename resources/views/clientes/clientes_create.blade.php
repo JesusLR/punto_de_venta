@@ -21,25 +21,33 @@ ____          _____               _ _           _
 @extends("maestra")
 @section("titulo", "Agregar cliente")
 @section("contenido")
+<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
+
     <div class="row">
         <div class="col-12">
-            <h1>Agregar cliente</h1>
-            <form method="POST" action="{{route("clientes.store")}}">
+            <div class="productos-header">
+                <h1><i class="fas fa-user-plus"></i> Agregar cliente</h1>
+            </div>
+
+            <form method="POST" action="{{route("clientes.store")}}" class="form-container">
                 @csrf
-                <div class="form-group">
-                    <label class="label">Nombre</label>
-                    <input required autocomplete="off" name="nombre" class="form-control"
-                           type="text" placeholder="Nombre">
+                <div class="section-title">
+                    <i class="fas fa-id-card"></i>
+                    Datos del cliente
                 </div>
-                <div class="form-group">
-                    <label class="label">Teléfono</label>
-                    <input required autocomplete="off" name="telefono" class="form-control"
-                           type="text" placeholder="Teléfono">
+
+                <div class="form-group-modern">
+                    <label for="nombre"><i class="fas fa-user"></i>Nombre</label>
+                    <input id="nombre" required autocomplete="off" name="nombre" class="form-control form-control-modern" type="text" placeholder="Nombre">
+                </div>
+                <div class="form-group-modern">
+                    <label for="telefono"><i class="fas fa-phone"></i>Teléfono</label>
+                    <input id="telefono" required autocomplete="off" name="telefono" class="form-control form-control-modern" type="text" placeholder="Teléfono">
                 </div>
 
                 @include("notificacion")
-                <button class="btn btn-success">Guardar</button>
-                <a class="btn btn-primary" href="{{route("clientes.index")}}">Volver al listado</a>
+                <button class="btn-action btn-success-modern"><i class="fas fa-save"></i> Guardar</button>
+                <a class="btn-action btn-secondary" href="{{route("clientes.index")}}"><i class="fas fa-arrow-left"></i> Volver al listado</a>
             </form>
         </div>
     </div>

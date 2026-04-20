@@ -32,9 +32,63 @@ use App\ProductoVendido;
 use App\Venta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class VenderController extends Controller
 {
+
+    public function crearClienteRapido(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nombre' => 'required|string|max:255',
+            'telefono' => 'required|string|max:255',
+            'observaciones' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $validator->errors()->first(),
+                'errors' => $validator->errors(),
+            ]);
+        }
+
+        try {
+
+
+            $clienteExistente = Cliente::where('nombre', $request->input('nombre'))
+                                ->first();
+                                
+            if ($clienteExistente) {
+                return response()->json([
+                    'lSuccess' => false,
+                    'cMensaje' => 'Ya existe un cliente con ese nombre.',
+                ]);
+            }
+
+            $cliente = Cliente::create([
+                'nombre' => strtoupper($request->input('nombre')),
+                'telefono' => $request->input('telefono'),
+                'observaciones' => strtoupper($request->input('observaciones')),
+            ]);
+
+            return response()->json([
+                'lSuccess' => true,
+                'cMensaje' => 'Cliente agregado correctamente.',
+                'cliente' => [
+                    'id' => $cliente->id,
+                    'nombre' => $cliente->nombre,
+                    'telefono' => $cliente->telefono,
+                    'observaciones' => $cliente->observaciones,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'No se pudo guardar el cliente.',
+            ]);
+        }
+    }
 
     public function terminarOCancelarVenta(Request $request)
     {
@@ -114,11 +168,18 @@ class VenderController extends Controller
 
     public function terminarVenta(Request $request)
     {
-        $request->all();
+        $request->validate([
+            'tipo_pago' => 'required|in:EFECTIVO,MERCADO_PAGO',
+        ], [
+            'tipo_pago.required' => 'Debes seleccionar un tipo de pago para terminar la venta.',
+            'tipo_pago.in' => 'El tipo de pago seleccionado no es válido.',
+        ]);
+
         $venta = new Venta();
         $venta->cNombreVenta = NULL;
         $venta->id_cliente = $request->input("id_cliente");
         $venta->id_usuario = $request->input("userID");
+        $venta->tipo_pago = $request->input("tipo_pago");
         $venta->saveOrFail();
         $idVenta = $venta->id;
         $productos = $this->obtenerProductos();
@@ -207,6 +268,62 @@ class VenderController extends Controller
             ->route("vender.index");
     }
 
+    public function actualizarPrecioProductoVenta(Request $request)
+    {
+        try {
+            $request->validate([
+                'indice' => 'required|integer|min:0',
+                'precio_venta' => 'required|numeric|min:0.01',
+            ], [
+                'precio_venta.required' => 'Debes ingresar un precio.',
+                'precio_venta.numeric' => 'El precio debe ser numérico.',
+                'precio_venta.min' => 'El precio debe ser mayor a 0.',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'lSuccess' => false,
+                    'message' => $e->validator->errors()->first(),
+                ], 422);
+            }
+            throw $e;
+        }
+
+        $indice = (int) $request->post('indice');
+        $nuevoPrecio = (float) $request->post('precio_venta');
+        $productos = $this->obtenerProductos();
+
+        if (!isset($productos[$indice])) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'lSuccess' => false,
+                    'message' => 'No se encontró el producto para actualizar el precio.',
+                ], 404);
+            }
+
+            return redirect()
+                ->route('vender.index')
+                ->with([
+                    'mensaje' => 'No se encontró el producto para actualizar el precio.',
+                    'tipo' => 'danger',
+                ]);
+        }
+
+        $productos[$indice]->precio_venta = $nuevoPrecio;
+        $this->guardarProductos($productos);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'lSuccess' => true,
+                'message' => 'Precio actualizado correctamente.',
+            ]);
+        }
+
+        return redirect()
+            ->route('vender.index')
+            ->with('mensaje', 'Precio actualizado correctamente.');
+    }
+
     private function agregarProductoACarrito($producto)
     {
         if ($producto->existencia <= 0) {
@@ -259,7 +376,7 @@ class VenderController extends Controller
             [
                 "total" => $total,
                 "clientes" => Cliente::all(),
-                "productos" => Producto::where('lActivo', 1)->get(),
+                "productos" => Producto::where('lActivo', 1)->where('existencia', '>', 0)->get(),
             ]);
     }
 }

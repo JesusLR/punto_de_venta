@@ -128,9 +128,11 @@ $(document).ready(function () {
             field: "precio_compra",
             title: "Precio Compra",
             visible: $("#userID").val() == 1 ? true : false,
+            formatter: "precioFormatter",
         }, {
             field: "precio_venta",
             title: "Precio Venta",
+            formatter: "precioFormatter",
         }, {
             field: "precio_compra",
             title: "Utilidad",
@@ -216,9 +218,13 @@ $("#btnExportPDF").off('click').on('click', function() {
 });
 });
 
+function precioFormatter(value) {
+    return '$' + parseFloat(value || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 function utilidadFormatter(value, row) {
     var precio = row.precio_venta - row.precio_compra;
-    return parseFloat(precio).toFixed(2);
+    return '$' + parseFloat(precio).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function imagenFormatter(value, row) {
@@ -502,32 +508,103 @@ function downloadCSV(filename) {
     URL.revokeObjectURL(url);
 }
 
-/* Excel export: NO incluir imágenes, sólo el nombre de archivo si existe */
+/* Excel export: SpreadsheetML con estilos, colores por stock y formateo de moneda */
 function exportToExcelHtml(filename) {
     var out = getTableExportData();
-    var html = '<html><head><meta charset="utf-8"><title>' + filename + '</title>';
-    html += '<style>table{border-collapse:collapse}th,td{border:1px solid #ccc;padding:6px;text-align:left}</style>';
-    html += '</head><body>';
-    html += '<table><thead><tr>';
-    out.cols.forEach(function(c){ html += '<th>' + (c.title || c.field) + '</th>'; });
-    html += '</tr></thead><tbody>';
-    out.data.forEach(function(r){
-        html += '<tr>';
-        out.cols.forEach(function(c){
-            var v = r[c.field];
-            if (c.field === 'img') {
-                // En Excel no mostramos la imagen; mostramos el nombre de archivo si existe
-                html += '<td>' + (v ? String(v).replace(/<[^>]*>/g, '') : '') + '</td>';
-            } else {
-                if (v === null || v === undefined) v = '';
-                v = String(v).replace(/<[^>]*>/g, '');
-                html += '<td>' + v + '</td>';
-            }
-        });
-        html += '</tr>';
+    var now = new Date();
+    var fechaExport = now.toLocaleDateString('es-MX') + ' ' + now.toLocaleTimeString('es-MX');
+
+    var colWidths = {
+        'codigo_barras': 110, 'descripcion': 240,
+        'precio_compra': 100, 'precio_venta': 100,
+        'existencia': 80, 'proveedor': 130,
+        'material': 100, 'categoria': 100,
+    };
+
+    var xml = '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?>';
+    xml += '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"'
+         + ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"'
+         + ' xmlns:o="urn:schemas-microsoft-com:office:office"'
+         + ' xmlns:x="urn:schemas-microsoft-com:office:excel">';
+
+    xml += '<Styles>';
+    xml += '<Style ss:ID="title"><Font ss:Bold="1" ss:Size="13" ss:Color="#1D4A1E"/></Style>';
+    xml += '<Style ss:ID="sub"><Font ss:Italic="1" ss:Size="9" ss:Color="#888888"/></Style>';
+    xml += '<Style ss:ID="hdr"><Font ss:Bold="1" ss:Color="#FFFFFF"/>'
+         + '<Interior ss:Color="#1D6F42" ss:Pattern="Solid"/>'
+         + '<Alignment ss:Horizontal="Center" ss:Vertical="Center"/>'
+         + '<Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#145A32"/></Borders></Style>';
+    // normal
+    xml += '<Style ss:ID="d"><Alignment ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DDDDDD"/></Borders></Style>';
+    xml += '<Style ss:ID="m"><NumberFormat ss:Format="&quot;$&quot;#,##0.00"/><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DDDDDD"/></Borders></Style>';
+    xml += '<Style ss:ID="n"><NumberFormat ss:Format="#,##0"/><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DDDDDD"/></Borders></Style>';
+    // rojo (sin stock)
+    xml += '<Style ss:ID="dr"><Interior ss:Color="#FFEBEE" ss:Pattern="Solid"/><Alignment ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#FFCDD2"/></Borders></Style>';
+    xml += '<Style ss:ID="mr"><NumberFormat ss:Format="&quot;$&quot;#,##0.00"/><Interior ss:Color="#FFEBEE" ss:Pattern="Solid"/><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#FFCDD2"/></Borders></Style>';
+    xml += '<Style ss:ID="nr"><NumberFormat ss:Format="#,##0"/><Interior ss:Color="#FFEBEE" ss:Pattern="Solid"/><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#FFCDD2"/></Borders></Style>';
+    // amarillo (stock bajo)
+    xml += '<Style ss:ID="dy"><Interior ss:Color="#FFFDE7" ss:Pattern="Solid"/><Alignment ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#FFF9C4"/></Borders></Style>';
+    xml += '<Style ss:ID="my"><NumberFormat ss:Format="&quot;$&quot;#,##0.00"/><Interior ss:Color="#FFFDE7" ss:Pattern="Solid"/><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#FFF9C4"/></Borders></Style>';
+    xml += '<Style ss:ID="ny"><NumberFormat ss:Format="#,##0"/><Interior ss:Color="#FFFDE7" ss:Pattern="Solid"/><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#FFF9C4"/></Borders></Style>';
+    xml += '</Styles>';
+
+    xml += '<Worksheet ss:Name="Productos"><Table>';
+
+    out.cols.forEach(function(c) {
+        xml += '<Column ss:Width="' + (colWidths[c.field] || 120) + '"/>';
     });
-    html += '</tbody></table></body></html>';
-    var blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+
+    var span = out.cols.length - 1;
+    xml += '<Row ss:Height="22"><Cell ss:StyleID="title" ss:MergeAcross="' + span + '"><Data ss:Type="String">Listado de Productos</Data></Cell></Row>';
+    xml += '<Row ss:Height="14"><Cell ss:StyleID="sub" ss:MergeAcross="' + span + '"><Data ss:Type="String">Exportado: ' + fechaExport + '</Data></Cell></Row>';
+    xml += '<Row ss:Height="6"><Cell ss:MergeAcross="' + span + '"><Data ss:Type="String"></Data></Cell></Row>';
+
+    xml += '<Row ss:Height="26">';
+    out.cols.forEach(function(c) {
+        xml += '<Cell ss:StyleID="hdr"><Data ss:Type="String">' + escXml(c.title || c.field) + '</Data></Cell>';
+    });
+    xml += '</Row>';
+
+    var moneyFields = ['precio_compra', 'precio_venta'];
+
+    out.data.forEach(function(r) {
+        var existencia = parseFloat(r.existencia);
+        var s = (existencia < 1) ? 'r' : (existencia < 4 ? 'y' : '');
+
+        xml += '<Row ss:Height="18">';
+        out.cols.forEach(function(c) {
+            if (c.field === 'img' || c.field === 'acciones') {
+                xml += '<Cell ss:StyleID="d' + s + '"><Data ss:Type="String"></Data></Cell>';
+                return;
+            }
+            if (c.title === 'Utilidad') {
+                var u = (parseFloat(r.precio_venta) || 0) - (parseFloat(r.precio_compra) || 0);
+                xml += '<Cell ss:StyleID="m' + s + '"><Data ss:Type="Number">' + u + '</Data></Cell>';
+                return;
+            }
+            if (moneyFields.indexOf(c.field) !== -1) {
+                xml += '<Cell ss:StyleID="m' + s + '"><Data ss:Type="Number">' + (parseFloat(r[c.field]) || 0) + '</Data></Cell>';
+                return;
+            }
+            if (c.field === 'existencia') {
+                xml += '<Cell ss:StyleID="n' + s + '"><Data ss:Type="Number">' + (parseFloat(r[c.field]) || 0) + '</Data></Cell>';
+                return;
+            }
+            var v = r[c.field];
+            if (v === null || v === undefined) v = '';
+            v = String(v).replace(/<[^>]*>/g, '');
+            xml += '<Cell ss:StyleID="d' + s + '"><Data ss:Type="String">' + escXml(v) + '</Data></Cell>';
+        });
+        xml += '</Row>';
+    });
+
+    xml += '</Table>';
+    xml += '<WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">'
+         + '<FreezePanes/><FrozenNoSplit/><SplitHorizontal>4</SplitHorizontal><TopRowBottomPane>4</TopRowBottomPane>'
+         + '</WorksheetOptions>';
+    xml += '</Worksheet></Workbook>';
+
+    var blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
     var link = document.createElement('a');
     var url = URL.createObjectURL(blob);
     link.href = url;
@@ -536,6 +613,15 @@ function exportToExcelHtml(filename) {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+}
+
+function escXml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
 }
 
 /* PDF/Imprimir: mantener imágenes (sin cambios) */

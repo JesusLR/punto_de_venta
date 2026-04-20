@@ -21,32 +21,38 @@ ____          _____               _ _           _
 @extends("maestra")
 @section("titulo", "Editar usuario")
 @section("contenido")
+<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
+
     <div class="row">
         <div class="col-12">
-            <h1>Editar usuario</h1>
-            <form method="POST" action="{{route("usuarios.update", [$usuario])}}">
+            <div class="productos-header">
+                <h1><i class="fas fa-user-edit"></i> Editar usuario</h1>
+            </div>
+
+            <form method="POST" action="{{route("usuarios.update", [$usuario])}}" class="form-container">
                 @method("PUT")
                 @csrf
-                <div class="form-group">
-                    <label class="label">Nombre</label>
-                    <input required value="{{$usuario->name}}" autocomplete="off" name="name" class="form-control"
-                           type="text" placeholder="Nombre">
+                <div class="section-title">
+                    <i class="fas fa-user-shield"></i>
+                    Datos del usuario
                 </div>
-                <div class="form-group">
-                    <label class="label">Correo electrónico</label>
-                    <input required value="{{$usuario->email}}" autocomplete="off" name="email" class="form-control"
-                           type="email" placeholder="Correo electrónico">
+
+                <div class="form-group-modern">
+                    <label for="name"><i class="fas fa-user"></i>Nombre</label>
+                    <input id="name" required value="{{$usuario->name}}" autocomplete="off" name="name" class="form-control form-control-modern" type="text" placeholder="Nombre">
                 </div>
-                <div class="form-group">
-                    <label class="label">Contraseña</label>
-                    <input required value="{{$usuario->password}}" autocomplete="off" name="password"
-                           class="form-control"
-                           type="password" placeholder="Contraseña">
+                <div class="form-group-modern">
+                    <label for="email"><i class="fas fa-envelope"></i>Correo electrónico</label>
+                    <input id="email" required value="{{$usuario->email}}" autocomplete="off" name="email" class="form-control form-control-modern" type="email" placeholder="Correo electrónico">
+                </div>
+                <div class="form-group-modern">
+                    <label for="password"><i class="fas fa-lock"></i>Contraseña</label>
+                    <input id="password" required value="{{$usuario->password}}" autocomplete="off" name="password" class="form-control form-control-modern" type="password" placeholder="Contraseña">
                 </div>
 
                 @include("notificacion")
-                <button class="btn btn-success">Guardar</button>
-                <a class="btn btn-primary" href="{{route("usuarios.index")}}">Volver</a>
+                <button class="btn-action btn-success-modern"><i class="fas fa-save"></i> Guardar</button>
+                <a class="btn-action btn-secondary" href="{{route("usuarios.index")}}"><i class="fas fa-arrow-left"></i> Volver</a>
             </form>
         </div>
     </div>

@@ -111,27 +111,41 @@
 </div>
 
 <!-- Modal Carga Excel -->
-<div class="modal fade" id="cargaExcellModal" tabindex="-1" role="dialog">
+<div class="modal fade apartado-modal" id="cargaExcellModal" tabindex="-1" role="dialog" aria-labelledby="cargaExcellModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-file-excel"></i> Importar Productos desde Excel
-                </h5>
-                <button type="button" class="close text-white" data-dismiss="modal">
+                <div>
+                    <span class="apartado-modal-badge">
+                        <i class="fas fa-file-excel"></i> Importación
+                    </span>
+                    <h5 class="modal-title" id="cargaExcellModalLabel">
+                        <i class="fas fa-upload"></i> Importar productos desde Excel
+                    </h5>
+                    <p class="apartado-modal-subtitle mb-0">Carga tu archivo para registrar varios productos de forma rápida.</p>
+                </div>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span>&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="form-group-modern">
-                    <label><i class="fas fa-upload"></i>Seleccionar Archivo Excel</label>
-                    <input type="file" class="form-control-modern" id="fileExcellProductos" accept=".xlsx,.xls">
-                    <small class="form-text text-muted">Formato aceptado: .xlsx, .xls</small>
+                <div class="apartado-modal-helper">
+                    <i class="fas fa-table"></i>
+                    <span>Selecciona un archivo válido en formato .xlsx o .xls para comenzar la importación.</span>
+                </div>
+
+                <div class="form-group-modern mb-0">
+                    <label for="fileExcellProductos"><i class="fas fa-upload"></i>Seleccionar archivo Excel</label>
+                    <input type="file" class="form-control form-control-modern apartado-modal-input" id="fileExcellProductos" accept=".xlsx,.xls">
+                    <small class="form-text">
+                        <i class="fas fa-info-circle"></i>
+                        Formatos aceptados: .xlsx y .xls.
+                    </small>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    <i class="fas fa-times"></i> Cancelar
+                <button type="button" class="btn apartado-modal-btn-cancel" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
                 </button>
                 <button type="button" class="btn-modern btn-success-modern" id="btnGuardarInfoExcell">
                     <i class="fas fa-check"></i> Importar
@@ -142,17 +156,30 @@
 </div>
 
 <!-- Modal Ver Imagen -->
-<div class="modal fade" id="imagenProductoModal" tabindex="-1" role="dialog">
+<div class="modal fade apartado-modal" id="imagenProductoModal" tabindex="-1" role="dialog" aria-labelledby="tituloImagenModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="tituloImagenModal"></h5>
-                <button type="button" class="close text-white" data-dismiss="modal">
+                <div>
+                    <span class="apartado-modal-badge">
+                        <i class="fas fa-image"></i> Vista previa
+                    </span>
+                    <h5 class="modal-title" id="tituloImagenModal">
+                        <i class="fas fa-search-plus"></i> Imagen del producto
+                    </h5>
+                    <p class="apartado-modal-subtitle mb-0">Consulta la fotografía en grande para revisar mejor los detalles del producto.</p>
+                </div>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span>&times;</span>
                 </button>
             </div>
-            <div class="modal-body text-center" id="divImagenProductoModal">
+            <div class="modal-body text-center apartado-modal-body-soft" id="divImagenProductoModal">
                 <!-- Imagen aquí -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn apartado-modal-btn-cancel" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
             </div>
         </div>
     </div>

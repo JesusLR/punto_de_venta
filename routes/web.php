@@ -40,19 +40,32 @@ Auth::routes([
                 Route::get("/ventas/pdf/{id}", "VentasController@pdf")->name("ventas.pdf");
                 Route::resource("ventas", "VentasController");
                 Route::get("/vender", "VenderController@index")->name("vender.index");
+                Route::post("/vender/cliente-rapido", "VenderController@crearClienteRapido")->name("vender.crearClienteRapido");
                 Route::post("/productoDeVenta", "VenderController@agregarProductoVenta")->name("agregarProductoVenta");
                 Route::delete("/productoDeVenta", "VenderController@quitarProductoDeVenta")->name("quitarProductoDeVenta");
+                Route::post("/precioProductoVenta", "VenderController@actualizarPrecioProductoVenta")->name("actualizarPrecioProductoVenta");
                 Route::post("/terminarOCancelarVenta", "VenderController@terminarOCancelarVenta")->name("terminarOCancelarVenta");
+
+                // Finanzas
+                Route::get('/finanzas', 'FinanzasController@index')->name('finanzas.index');
+                Route::get('/finanzas/excel', 'FinanzasController@exportExcel')->name('finanzas.excel');
+                Route::post('/finanzas/egresos', 'FinanzasController@store')->name('finanzas.store');
+                Route::delete('/finanzas/egresos/{id}', 'FinanzasController@destroy')->name('finanzas.destroy');
 
                 // Apartados
                 Route::get("/apartados", "ApartadosController@index")->name("apartados.index");
                 Route::post("/apartados/abonar", "ApartadosController@abonar")->name("apartados.abonar");
+                Route::post("/apartados/eliminar-abono", "ApartadosController@eliminarAbono")->name("apartados.eliminarAbono");
+                Route::post("/apartados/editar-fecha-abono", "ApartadosController@editarFechaAbono")->name("apartados.editarFechaAbono");
+                Route::post("/apartados/agregar-producto", "ApartadosController@agregarProducto")->name("apartados.agregarProducto");
+                Route::post("/apartados/cancelar", "ApartadosController@cancelar")->name("apartados.cancelar");
                 Route::post("/apartados/ejecutar", "ApartadosController@ejecutar")->name("apartados.ejecutar");
                 Route::get("/apartados/pdf/{id}", "ApartadosController@pdf")->name("apartados.pdf");
                 Route::get("/apartados/ver-productos/{id}", "ApartadosController@verProductos")->name("apartados.verProductos");
                 Route::get("/apartados/ver-abonos/{id}", "ApartadosController@verAbonos")->name("apartados.verAbonos");
                 Route::get("/apartados/detalle/{id}", "ApartadosController@detalle")->name("apartados.detalle");
-                Route::post("/gridApartados", "ApartadosController@gridApartados")->name("gridApartados");
+                Route::post("/gridApartados/gridApartados", "ApartadosController@gridApartados")->name("gridApartados");
+                Route::post("/apartados/cambiarNombre", "ApartadosController@cambiarNombre")->name("apartados.cambiarNombre");
 
                 //Productos
                 Route::post("/gridProductos", "ProductosController@gridProductos")->name("gridProductos");
@@ -70,6 +83,7 @@ Auth::routes([
                 Route::resource("estadisticas", "EstadisticasController");
                 Route::post("/gridEstadisticas", "EstadisticasController@gridEstadisticas")->name("gridEstadisticas");
                 Route::post("/graficaVentas", "EstadisticasController@graficaVentas")->name("graficaVentas");
+                Route::post("/estadisticas/productos-filtro", "EstadisticasController@productosVendidosFiltro")->name("estadisticas.productosFiltro");
 
                 //Proveedores
                 Route::resource("proveedores", "ProveedoresController");
