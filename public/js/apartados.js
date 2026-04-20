@@ -202,21 +202,50 @@ function escaparTexto(texto) {
     return (texto || '').replace(/'/g, "\\'");
 }
 
+function redondearMonto(valor) {
+    return Math.round((parseFloat(valor) || 0) * 100) / 100;
+}
+
+function normalizarMonto(valor) {
+    let texto = (valor || "").toString().trim().replace(/\s+/g, "").replace(/,/g, ".");
+    texto = texto.replace(/[^\d.]/g, "");
+
+    const partes = texto.split(".");
+    if (partes.length > 2) {
+        texto = partes.shift() + "." + partes.join("");
+    }
+
+    return texto;
+}
+
 function abrirModalAbono(id, cliente, total, abonado, saldo) {
+    const saldoDisponible = redondearMonto(saldo);
+
     $("#id_apartado_abono").val(id);
     $("#folio-abono").text("#" + id);
     $("#cliente-abono").text(cliente);
     $("#total-abono").text("$" + parseFloat(total).toFixed(2));
     $("#abonado-abono").text("$" + parseFloat(abonado).toFixed(2));
-    $("#saldo-abono").html('$' + parseFloat(saldo).toFixed(2));
-    $("#monto_abono").attr("max", saldo).val("");
-    $("#max-abono").text("Máximo: $" + parseFloat(saldo).toFixed(2));
+    $("#saldo-abono").html('$' + saldoDisponible.toFixed(2));
+    $("#monto_abono")
+        .attr("max", saldoDisponible.toFixed(2))
+        .attr("data-max", saldoDisponible.toFixed(2))
+        .val("");
+    $("#max-abono").text("Máximo: $" + saldoDisponible.toFixed(2));
     $("#fecha_abono").val(obtenerFechaActual());
     $("#tipo_pago_abono").val("EFECTIVO");
     $("#observaciones_abono").val("");
 
     $("#modalAbono").modal("show");
 }
+
+$(document).on("input", "#monto_abono", function () {
+    const valorNormalizado = normalizarMonto($(this).val());
+
+    if ($(this).val() !== valorNormalizado) {
+        $(this).val(valorNormalizado);
+    }
+});
 function abrirModalNombreApartado(id, nombre, idCliente) {
     $("#id_apartado_nombre").val(id);
     $("#nombre-apartado").val(nombre);
@@ -562,13 +591,40 @@ function ejecutarApartado(id) {
 
 $("#formAbono").on("submit", function (e) {
     e.preventDefault();
+
+    const montoNormalizado = normalizarMonto($("#monto_abono").val());
+    const montoAbono = redondearMonto(montoNormalizado);
+    const saldoMaximo = redondearMonto($("#monto_abono").attr("data-max"));
+
+    if (!montoNormalizado || isNaN(montoAbono) || montoAbono < 0.01) {
+        swal.fire({
+            title: "Error",
+            text: "Ingresa un monto válido. Puedes usar decimales.",
+            icon: "error",
+            showConfirmButton: true,
+            confirmButtonText: "Aceptar",
+        });
+        return;
+    }
+
+    if (saldoMaximo > 0 && montoAbono - saldoMaximo > 0.009) {
+        swal.fire({
+            title: "Error",
+            text: "El monto del abono no puede ser mayor al saldo.",
+            icon: "error",
+            showConfirmButton: true,
+            confirmButtonText: "Aceptar",
+        });
+        return;
+    }
+
     $.ajax({
         url: "/apartados/abonar",
         type: "post",
         dataType: "json",
         data: {
             id_apartado: $("#id_apartado_abono").val(),
-            monto_abono: $("#monto_abono").val(),
+            monto_abono: montoAbono.toFixed(2),
             fecha_abono: $("#fecha_abono").val(),
             tipo_pago: $("#tipo_pago_abono").val(),
             observaciones: $("#observaciones_abono").val(),

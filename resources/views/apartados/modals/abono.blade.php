@@ -26,7 +26,7 @@
 
                     <div class="form-group-modern">
                         <label for="monto_abono"><i class="fas fa-dollar-sign"></i>Monto</label>
-                        <input type="number" id="monto_abono" class="form-control form-control-modern apartado-modal-input" name="monto_abono" min="1" step="1" placeholder="0.00" required>
+                        <input type="text" id="monto_abono" class="form-control form-control-modern apartado-modal-input" name="monto_abono" inputmode="decimal" autocomplete="off" placeholder="0.00" required>
                     </div>
 
                     <div class="form-group-modern">

@@ -33,6 +33,11 @@ class ApartadosController extends Controller
 
     public function abonar(Request $request)
     {
+        $montoAbono = str_replace(',', '.', (string) $request->input('monto_abono'));
+        $request->merge([
+            'monto_abono' => $montoAbono,
+        ]);
+
         try {
             $request->validate([
                 'id_apartado' => 'required|exists:apartados,id',
@@ -58,9 +63,10 @@ class ApartadosController extends Controller
         }
 
         $total_abonado = $apartado->abonos()->sum('monto');
-        $saldo = $apartado->total - $total_abonado;
+        $saldo = round((float) $apartado->total - (float) $total_abonado, 2);
+        $montoAbono = round((float) $request->monto_abono, 2);
 
-        if ($request->monto_abono > $saldo) {
+        if ($montoAbono - $saldo > 0.00001) {
             return response()->json([
                 'lSuccess' => false,
                 'cMensaje' => 'El monto del abono no puede ser mayor al saldo.',
@@ -72,7 +78,7 @@ class ApartadosController extends Controller
             $abono = ApartadoAbono::create([
                 'id_apartado' => $apartado->id,
                 'id_usuario' => Auth::id(),
-                'monto' => $request->monto_abono,
+                'monto' => $montoAbono,
                 'tipo_pago' => $request->tipo_pago,
                 'observaciones' => $request->observaciones ?? null,
                 'fecha_abono' => Carbon::createFromFormat('Y-m-d', $request->fecha_abono)->startOfDay(),
