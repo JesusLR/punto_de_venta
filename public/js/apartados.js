@@ -190,6 +190,7 @@ function accionesApartadoFormatter(value, row) {
     html += '<button type="button" style="margin-right: 2px;" class="btn btn-info" title="Ver productos" onclick="verProductosApartado(' + row.id + ')"><i class="fas fa-box"></i></button>';
     html += '<button type="button" style="margin-right: 2px;" class="btn btn-secondary" title="Ver historial de abonos" onclick="verHistorialAbonos(' + row.id + ')"><i class="fas fa-history"></i></button>';
     html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" title="Descargar PDF Historial de abonos" onclick="descargarPdfApartado(' + row.id + ')"><i class="fas fa-file-pdf"></i></button>';
+    html += '<button type="button" style="margin-right: 2px;" class="btn btn-success" title="Mensaje de prueba" onclick="enviarPdfWhatsApp(' + row.id + ', \'' + escaparTexto(row.telefono) + '\')"><i class="fab fa-whatsapp"></i></button>';
 
     if (row.estado === 'LIQUIDADO') {
         html += '<button type="button" style="margin-right: 2px;" class="btn btn-success" title="Ejecutar venta" onclick="ejecutarApartado(' + row.id + ')"><i class="fas fa-check"></i></button>';
@@ -216,6 +217,24 @@ function normalizarMonto(valor) {
     }
 
     return texto;
+}
+
+function normalizarTelefonoMx(valor) {
+    const soloDigitos = (valor || '').toString().replace(/\D/g, '');
+
+    if (soloDigitos.startsWith('521') && soloDigitos.length > 10) {
+        return soloDigitos.substring(3);
+    }
+
+    if (soloDigitos.startsWith('52') && soloDigitos.length > 10) {
+        return soloDigitos.substring(2);
+    }
+
+    if (soloDigitos.startsWith('1') && soloDigitos.length === 11) {
+        return soloDigitos.substring(1);
+    }
+
+    return soloDigitos;
 }
 
 function abrirModalAbono(id, cliente, total, abonado, saldo) {
@@ -705,3 +724,80 @@ $("#btnSaveNombreApartado").on("click", function (e) {
         },
     });
 });
+
+function enviarPdfWhatsApp(id, telefonoCliente) {
+    const telefonoInicial = normalizarTelefonoMx(telefonoCliente || '');
+
+    swal.fire({
+        title: "Confirmar envío de historial de abonos a WhatsApp",
+        html: '\n            <div style="text-align:left; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">\n                <div style="font-size:13px; color:#475569; margin-bottom:6px;">Número de WhatsApp</div>\n                <div>\n                    <input id="telefonoWhatsapp" class="swal2-input" style="margin:0; width:100%; height:40px; border:1px solid #cbd5e1; border-radius:8px;" maxlength="10" value="' + telefonoInicial + '" placeholder="999 999 9999" />\n                </div>\n                <small style="display:block; margin-top:8px; color:#64748b;">Ingresa 10 dígitos.</small>\n            </div>\n        ',
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí, enviar",
+        cancelButtonText: "Cancelar",
+        focusConfirm: false,
+        preConfirm: () => {
+            const telefonoCapturado = document.getElementById('telefonoWhatsapp').value;
+            const telefono = normalizarTelefonoMx(telefonoCapturado);
+
+            if (!telefono || telefono.length !== 10) {
+                swal.showValidationMessage('Ingresa un número válido de 10 dígitos.');
+                return false;
+            }
+
+            return telefono;
+        }
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+
+        $.ajax({
+            url: "/apartados/openWA",
+            type: "post",
+            dataType: "json",
+            data: {
+                id_apartado: id,
+                telefono: result.value,
+            },
+            beforeSend: function () {
+                swal.fire({
+                    title: "Enviando...",
+                    text: "Por favor espera mientras se envía el PDF",
+                    icon: "info",
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                if (data.lSuccess) {
+                    swal.fire({
+                        title: "Apartados",
+                        text: data.cMensaje,
+                        icon: "success",
+                        showConfirmButton: true,
+                        confirmButtonText: "Aceptar",
+                    });
+                } else {
+                    swal.fire({
+                        title: "Error",
+                        text: data.cMensaje,
+                        icon: "error",
+                        showConfirmButton: true,
+                        confirmButtonText: "Aceptar",
+                    });
+                }
+            },
+            error: function () {
+                swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al enviar el mensaje de WhatsApp.",
+                    icon: "error",
+                    showConfirmButton: true,
+                    confirmButtonText: "Aceptar",
+                });
+            },
+        });
+    });
+}

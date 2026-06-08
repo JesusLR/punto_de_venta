@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use PDF;
 
@@ -468,7 +469,7 @@ class ApartadosController extends Controller
         $apartados = Apartado::query();
         $apartados->join("clientes", "clientes.id", "=", "apartados.id_cliente")
             ->join("users", "users.id", "=", "apartados.id_usuario")
-            ->select("apartados.*", "clientes.nombre as cliente", "users.name as vendedor")
+            ->select("apartados.*", "clientes.nombre as cliente", "clientes.telefono as telefono", "users.name as vendedor")
             ->whereIn('apartados.estado', ['ABIERTO', 'LIQUIDADO', 'CANCELADO']);
 
         if (Auth::id() != 1) {
@@ -504,6 +505,7 @@ class ApartadosController extends Controller
                     'id' => $apartado->id,
                     'id_cliente' => $apartado->id_cliente,
                     'cliente' => $apartado->cliente ? $apartado->cliente : 'N/A',
+                    'telefono' => $apartado->telefono,
                     'name' => $apartado->vendedor,
                     'total' => (float) $apartado->total,
                     'abonado' => (float) $abonos_total,
@@ -543,5 +545,81 @@ class ApartadosController extends Controller
             'lSuccess' => true,
             'cMensaje' => 'Nombre del apartado actualizado exitosamente.',
         ]);
+    }
+
+    public function openWA(Request $request)
+    {
+        try {
+            $request->validate([
+                'id_apartado' => 'required|exists:apartados,id',
+                'telefono' => 'nullable|string|max:20',
+            ]);
+
+            $apartado = Apartado::with(['cliente', 'abonos.usuario'])->findOrFail($request->id_apartado);
+
+            $telUsuario = $request->filled('telefono')
+                ? $request->telefono
+                : ($apartado->cliente ? $apartado->cliente->telefono : null);
+
+            $telUsuario = preg_replace('/\D/', '', (string) $telUsuario);
+
+            if (strpos($telUsuario, '521') === 0 && strlen($telUsuario) > 10) {
+                $telUsuario = substr($telUsuario, 3);
+            } elseif (strpos($telUsuario, '52') === 0 && strlen($telUsuario) > 10) {
+                $telUsuario = substr($telUsuario, 2);
+            } elseif (strpos($telUsuario, '1') === 0 && strlen($telUsuario) === 11) {
+                $telUsuario = substr($telUsuario, 1);
+            }
+
+            if (empty($telUsuario) || strlen($telUsuario) !== 10) {
+                throw ValidationException::withMessages([
+                    'telefono' => ['Debes indicar un número de teléfono válido de 10 dígitos.'],
+                ]);
+            }
+
+            $totalAbonado = (float) $apartado->abonos->sum('monto');
+            $saldoRestante = round((float) $apartado->total - $totalAbonado, 2);
+
+            $pdf = PDF::loadView('apartados.pdf', [
+                'apartado' => $apartado,
+                'totalAbonado' => $totalAbonado,
+                'saldo' => $saldoRestante,
+            ])->setPaper('letter', 'portrait');
+
+            $base64 = base64_encode($pdf->output());
+
+            $response = Http::post(url('/api/openwa/send-document'), [
+                'chatId' => '521' . $telUsuario . '@c.us',
+                'base64' => $base64,
+                'mimetype' => 'application/pdf',
+                'filename' => 'Resumen_de_apartados_' . $apartado->id . '.pdf',
+            ]);
+            // dd( $response);
+            if (!$response->successful()) {
+                return response()->json([
+                    'lSuccess' => false,
+                    'cMensaje' => 'No se pudo enviar el PDF por WhatsApp.',
+                    'response' => $response->json(),
+                ], $response->status());
+            }
+
+            return response()->json([
+                'lSuccess' => true,
+                'cMensaje' => 'PDF enviado a WhatsApp exitosamente.',
+                'response' => $response->json(),
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $e->validator->errors()->first() ?: 'Datos inválidos para abrir WhatsApp.',
+                'errors' => $e->validator->errors(),
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'Error al enviar PDF: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

@@ -29,5 +29,9 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    'openwa' => [
+    'url' => env('OPENWA_API_URL', 'http://127.0.0.1:2785'),
+    'key' => env('OPENWA_API_KEY'),
+],
 
 ];

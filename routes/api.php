@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Producto;
 use App\Cliente;
 use App\Venta;
+use App\Http\Controllers\OpenWaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,10 +35,6 @@ Route::group(['prefix' => 'auth'], function () {
         Route::get("productos", function () {
             return response()->json(Producto::all());
         });
-        /*
-            Si existe un dios, que me perdone por dejar todas las peticiones aquí
-            en lugar de separarlas a otro archivo o invocar un controlador
-        */
         Route::post("/producto", function(Request $request){
             $producto = new Producto($request->input());
             $producto->saveOrFail();
@@ -110,3 +107,7 @@ Route::group(['prefix' => 'auth'], function () {
 //Catalogo de productos
 Route::resource("catalogoProductos", "CatalogoController");
 Route::get("/verCategoria/{id_categoria}/{id_material}", "CatalogoController@verCategoria")->name("verCategoria");
+
+//OpenWA
+Route::post('/openwa/send-text', [OpenWaController::class, 'sendText']);
+Route::post('/openwa/send-document', [OpenWaController::class, 'sendDocument']);

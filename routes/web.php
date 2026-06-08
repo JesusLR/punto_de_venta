@@ -66,6 +66,7 @@ Auth::routes([
                 Route::get("/apartados/detalle/{id}", "ApartadosController@detalle")->name("apartados.detalle");
                 Route::post("/gridApartados/gridApartados", "ApartadosController@gridApartados")->name("gridApartados");
                 Route::post("/apartados/cambiarNombre", "ApartadosController@cambiarNombre")->name("apartados.cambiarNombre");
+                Route::post("/apartados/openWA", "ApartadosController@openWA")->name("apartados.openWA");
 
                 //Productos
                 Route::post("/gridProductos", "ProductosController@gridProductos")->name("gridProductos");
@@ -77,6 +78,7 @@ Auth::routes([
                 //Ventas
                 Route::post("/gridVentas", "VentasController@gridVentas")->name("gridVentas");
                 Route::post("/saveNombreVenta", "VentasController@saveNombreVenta")->name("saveNombreVenta");
+                Route::post("/ventas/enviar-pdf-whatsapp", "VentasController@enviarPdfWhatsapp")->name("ventas.enviarPdfWhatsapp");
                 
 
                 //Estadisticas
