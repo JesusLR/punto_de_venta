@@ -96,6 +96,9 @@ $(document).ready(function () {
         classes: "table-striped",
         method: "post",
         contentType: "application/x-www-form-urlencoded",
+        dataField: "rows",
+        totalField: "total",
+        sidePagination: "server",
         pagination: true,
         pageSize: 10,
         search: true,
@@ -108,6 +111,8 @@ $(document).ready(function () {
           },
         queryParams: function (p) {
             return {
+                offset: p.offset || 0,
+                limit: p.limit || 10,
                 cTipoBusqueda: $("#cTipoBusquedaProductos").val(),
                 cTipoBusquedaProveedor: $("#cTipoBusquedaProveedor").val(),
                 cTipoBusquedaMaterial: $("#cTipoBusquedaMaterial").val(),

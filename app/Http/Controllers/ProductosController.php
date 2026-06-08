@@ -177,9 +177,12 @@ class ProductosController extends Controller
 
     public function gridProductos(Request $request){
         try{
-            $lstProductos = array();
+            $lstProductos = [];
 
-            $productos = Producto::query();
+            $productos = Producto::query()->with(['Proveedores', 'Materiales', 'Categorias']);
+
+            $offset = (int) $request->input('offset', 0);
+            $limit = (int) $request->input('limit', 10);
 
             switch($request->cTipoBusqueda){
                 case 'T':
@@ -235,7 +238,21 @@ class ProductosController extends Controller
                 break;
             }
 
-            $productos = $productos->get(); 
+            $search = trim((string) $request->input('search', ''));
+            if ($search !== '') {
+                $productos->where(function ($q) use ($search) {
+                    $q->where('codigo_barras', 'like', '%' . $search . '%')
+                      ->orWhere('descripcion', 'like', '%' . $search . '%');
+                });
+            }
+
+            $total = (clone $productos)->count();
+
+            $productos = $productos
+                ->orderBy('id', 'desc')
+                ->offset($offset)
+                ->limit($limit)
+                ->get();
 
             foreach($productos as $producto){
                 $lstProductos[] = array (
@@ -247,18 +264,21 @@ class ProductosController extends Controller
                     "existencia" => $producto->existencia,
                     "img" => $producto->img,
                     "lActivo" => $producto->lActivo,
-                    "proveedor" => ($producto->id_proveedor == 0) ? "N/A" : $producto->Proveedores->cNombreProveedor,
+                    "proveedor" => ($producto->id_proveedor == 0 || !$producto->Proveedores) ? "N/A" : $producto->Proveedores->cNombreProveedor,
                     "id_proveedor" => $producto->id_proveedor,
-                    "material" => ($producto->id_material == 0) ? "N/A" : $producto->Materiales->cNombreMaterial,
+                    "material" => ($producto->id_material == 0 || !$producto->Materiales) ? "N/A" : $producto->Materiales->cNombreMaterial,
                     "id_material" => $producto->id_material,
-                    "categoria" => ($producto->id_categoria == 0) ? "N/A" : $producto->Categorias->cNombreCategoria,
+                    "categoria" => ($producto->id_categoria == 0 || !$producto->Categorias) ? "N/A" : $producto->Categorias->cNombreCategoria,
                     "id_categoria" => $producto->id_categoria,
                     // "material" => $producto->codigo_barras,
                     // "categoria" => $producto->codigo_barras,
                 );
             }
 
-            return  $lstProductos;
+            return response()->json([
+                'rows' => $lstProductos,
+                'total' => $total,
+            ]);
 
         }catch(Exception $ex){
             return response()->json([

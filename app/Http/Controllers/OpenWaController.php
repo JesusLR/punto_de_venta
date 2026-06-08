@@ -9,7 +9,7 @@ class OpenWaController extends Controller
 {
     private function sessionId(): string
     {
-        return config('services.openwa.session_id') ?: 'ee45e07b-59fd-4d59-80d5-ab40977c2b2f';
+        return config('services.openwa.session_id') ?: 'ee45e07b-59fd-4d59-80d5-ab40977c2b2f'; //Guardar en variable de configuracion
     }
 
     public function sendText(Request $request, OpenWaService $openwa)
