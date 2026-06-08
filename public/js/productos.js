@@ -263,12 +263,13 @@ function imagenFormatter(value, row) {
 function accionesFormatter(value, row) {
     var user = $("#userID").val()
     html = ''
+    html += '<button type="button" class="btn btn-table-action btn-light" onclick="editProducto('+row.id+')"><i class="fa fa-edit"></i></button>'
     if(user == 1){
         // if(row.existencia < 1){
             // html += '<button type="button" class="btn btn-table-action btn-warning" onclick="editProducto('+row.id+')"><i class="fa fa-edit"></i></button>'
             // html += '<button type="button" class="btn btn-table-action btn-light" onclick="confirmDeleteProducto(' + row.id + ', \'' + row.codigo_barras + '\')"><i class="fa fa-trash"></i></button>'
         // }else if(row.existencia > 0 && row.existencia < 4){
-            html += '<button type="button" class="btn btn-table-action btn-light" onclick="editProducto('+row.id+')"><i class="fa fa-edit"></i></button>'
+            // html += '<button type="button" class="btn btn-table-action btn-light" onclick="editProducto('+row.id+')"><i class="fa fa-edit"></i></button>'
             html += '<button type="button" class="btn btn-table-action btn-danger" onclick="confirmDeleteProducto(' + row.id + ', \'' + row.codigo_barras + '\')"><i class="fa fa-trash"></i></button>'
         // }else{
             // html += '<button type="button" class="btn btn-table-action btn-warning" onclick="editProducto('+row.id+')"><i class="fa fa-edit"></i></button>'

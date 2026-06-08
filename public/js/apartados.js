@@ -179,18 +179,21 @@ function estadoApartadoFormatter(value, row) {
 
 function accionesApartadoFormatter(value, row) {
     let html = '';
+     var user = $("#userID").val()
 
     html += '<button type="button" style="margin-right: 2px;" class="btn btn-light" title="Cambiar nombre de apartado" onclick="abrirModalNombreApartado(' + row.id + ', \'' + escaparTexto(row.nombre_apartado) + '\', ' + row.id_cliente + ')"><i class="fas fa-pen"></i></button>';
 
     if (row.estado === 'ABIERTO') {
         html += '<button type="button" style="margin-right: 2px;" class="btn btn-primary" title="Abonar" onclick="abrirModalAbono(' + row.id + ', \'' + escaparTexto(row.cliente) + '\', ' + row.total + ', ' + row.abonado + ', ' + row.saldo + ')"><i class="fas fa-money-bill"></i></button>';
-        html += '<button type="button" style="margin-right: 2px;" class="btn btn-warning" title="Cancelar apartado" onclick="cancelarApartado(' + row.id + ')"><i class="fas fa-ban"></i></button>';
+        if(user == 1){
+            html += '<button type="button" style="margin-right: 2px;" class="btn btn-warning" title="Cancelar apartado" onclick="cancelarApartado(' + row.id + ')"><i class="fas fa-ban"></i></button>';
+        }
     }
 
     html += '<button type="button" style="margin-right: 2px;" class="btn btn-info" title="Ver productos" onclick="verProductosApartado(' + row.id + ')"><i class="fas fa-box"></i></button>';
     html += '<button type="button" style="margin-right: 2px;" class="btn btn-secondary" title="Ver historial de abonos" onclick="verHistorialAbonos(' + row.id + ')"><i class="fas fa-history"></i></button>';
     html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" title="Descargar PDF Historial de abonos" onclick="descargarPdfApartado(' + row.id + ')"><i class="fas fa-file-pdf"></i></button>';
-    html += '<button type="button" style="margin-right: 2px;" class="btn btn-success" title="Mensaje de prueba" onclick="enviarPdfWhatsApp(' + row.id + ', \'' + escaparTexto(row.telefono) + '\')"><i class="fab fa-whatsapp"></i></button>';
+    html += '<button type="button" style="margin-right: 2px;" class="btn btn-success" title="Enviar PDF Historial de abonos por WhatsApp" onclick="enviarPdfWhatsApp(' + row.id + ', \'' + escaparTexto(row.telefono) + '\')"><i class="fab fa-whatsapp"></i></button>';
 
     if (row.estado === 'LIQUIDADO') {
         html += '<button type="button" style="margin-right: 2px;" class="btn btn-success" title="Ejecutar venta" onclick="ejecutarApartado(' + row.id + ')"><i class="fas fa-check"></i></button>';

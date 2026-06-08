@@ -43,7 +43,9 @@ ____          _____               _ _           _
                                 <th>Nombre</th>
                                 <th>Teléfono</th>
                                 <th>Editar</th>
+                                @if(Auth::user()->id == 1)
                                 <th>Eliminar</th>
+                                @endif
                             </tr>
                             </thead>
                             <tbody>
@@ -56,15 +58,17 @@ ____          _____               _ _           _
                                             <i class="fa fa-edit"></i>
                                         </a>
                                     </td>
-                                    <td>
-                                        <form action="{{route("clientes.destroy", [$cliente])}}" method="post">
-                                            @method("delete")
-                                            @csrf
-                                            <button type="submit" class="btn btn-danger btn-table-action">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
+                                    @if(Auth::user()->id == 1)
+                                        <td>
+                                            <form action="{{route("clientes.destroy", [$cliente])}}" method="post">
+                                                @method("delete")
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger btn-table-action">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    @endif
                                 </tr>
                             @endforeach
                             </tbody>

@@ -131,12 +131,19 @@ class HomeController extends Controller
         $productosVendidosMes = (int) round(
             (float) DB::table('ventas')
                 ->join('productos_vendidos', 'productos_vendidos.id_venta', '=', 'ventas.id')
-                ->whereBetween('ventas.created_at', [$inicioMes->toDateTimeString(), $finMes->toDateTimeString()])
+                ->whereBetween('ventas.created_at', [
+                    $inicioMes->toDateTimeString(),
+                    $finMes->toDateTimeString()
+                ])
+                ->when(auth()->id() != 1, fn ($query) => $query->where('ventas.id_usuario', auth()->id()))
                 ->sum('productos_vendidos.cantidad')
         );
 
         $apartadosPendientes = (int) Apartado::whereIn('estado', ['ABIERTO', 'PENDIENTE'])
             ->where('saldo', '>', 0)
+            ->when(auth()->id() != 1, function ($query) {
+                $query->where('id_usuario', auth()->id());
+            })
             ->count();
 
         // dd($precios_oro_gramo);

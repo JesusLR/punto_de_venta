@@ -100,7 +100,8 @@ class VentasController extends Controller
                 "clientes.nombre",
                 "users.name",
                 "apartados.id as apartado_id",
-                "apartados.id_venta as apartado_id_venta"
+                "apartados.id_venta as apartado_id_venta",
+                "clientes.telefono"
             )
             ->groupBy(
                 "ventas.id",
@@ -110,11 +111,12 @@ class VentasController extends Controller
                 "clientes.nombre",
                 "users.name",
                 "apartados.id",
-                "apartados.id_venta"
+                "apartados.id_venta",
+                "clientes.telefono"
             );
 
         if($request->cTipoBusqueda != "T"){
-            $ventasConTotales->where("id_usuario", $request->cTipoBusqueda);
+            $ventasConTotales->where("ventas.id_usuario", $request->cTipoBusqueda);
         }
 
         $ventasConTotales = $ventasConTotales->get(); 

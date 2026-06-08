@@ -67,7 +67,7 @@
 
     .kpi-grid {
         display: grid;
-        grid-template-columns: repeat(5, minmax(180px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 1rem;
         margin-bottom: 2rem;
     }
@@ -222,10 +222,6 @@
             gap: 1.5rem;
         }
 
-        .kpi-grid {
-            grid-template-columns: repeat(2, minmax(180px, 1fr));
-        }
-
         .welcome-header h1 {
             font-size: 1.8rem;
         }
@@ -237,7 +233,7 @@
     }
 
     @media (max-width: 576px) {
-        .kpi-grid {
+        .modules-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -280,7 +276,7 @@
                 </div>
             </a>
         @endif
-        <a href="{{ route('estadisticas.index') }}" class="kpi-card-link" title="Ir a Estadísticas">
+        <a @if(Auth::user()->id == 1) href="{{ route('estadisticas.index') }}" @endif class="kpi-card-link" title="Ir a Estadísticas">
             <div class="kpi-card">
                 <small>Productos vendidos</small>
                 <strong>{{ number_format((int) $productosVendidosMes, 0) }}</strong>

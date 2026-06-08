@@ -36,10 +36,10 @@
         @include("notificacion")
 
         <div class="filters-container">
-            <div class="row" @if (Auth::user()->id != 1) style="display: none;"  @endif>
+            <div class="row" >
                 <div class="col-md-6 mb-3">
                     <label for="cTipoBusquedaProductos">Usuario</label>
-                    <select required class="form-control-modern" name="cTipoBusquedaVenta" id="cTipoBusquedaVenta">
+                    <select required class="form-control-modern" name="cTipoBusquedaVenta" id="cTipoBusquedaVenta" @if (Auth::user()->id != 1) disabled @endif>
                         <option value="T">Todos</option>
                         @foreach ($users as $user)
                         <option @if ($user->id != 1 && Auth::user()->id == $user->id) selected @endif value="{{$user->id}}">{{$user->name}}</option>

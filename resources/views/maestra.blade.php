@@ -277,17 +277,35 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{route("home")}}"><i class="fa fa-home mr-1"></i>Inicio</a>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="categoriasDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-book mr-1"></i>Catálogos
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="categoriasDropdown">
+                        <a class="dropdown-item" href="{{route("categorias.index")}}"><i class="fa fa-tags mr-2" style="color: #FF6B6B;"></i>Categorías</a>
+                        <a class="dropdown-item" href="{{route("clientes.index")}}"><i class="fa fa-users mr-2" style="color: #4ECDC4;"></i>Clientes</a>
+                        <a class="dropdown-item" href="{{route("materiales.index")}}"><i class="fa fa-hammer mr-2" style="color: #45B7D1;"></i>Materiales</a>
+                        <a class="dropdown-item" href="{{route("proveedores.index")}}"><i class="fa fa-truck mr-2" style="color: #FFA502;"></i>Proveedores</a>
+                        {{-- <a class="dropdown-item" href="{{route("usuarios.index")}}"><i class="fa fa-user-tie mr-2" style="color: #95E1D3;"></i>Usuarios</a> --}}
+                    </div>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{route("productos.index")}}"><i class="fa fa-box mr-1"></i>Productos</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{route("vender.index")}}"><i class="fa fa-cart-plus mr-1"></i>Vender</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{route("apartados.index")}}"><i class="fas fa-clipboard-list mr-1"></i>Apartados</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{route("ventas.index")}}"><i class="fa fa-list mr-1"></i>Ventas</a>
+                {{-- <li class="nav-item">
+                    <a class="nav-link" href="{{route("estadisticas.index")}}"><i class="fas fa-chart-pie mr-1"></i>Estadísticas</a>
+                </li> --}}
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="ventasDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-book mr-1"></i>Tienda
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="ventasDropdown">
+                        <a class="dropdown-item" href="{{route("vender.index")}}"><i class="fa fa-cart-plus mr-2" style="color: #95E1D3;"></i>Vender</a>
+                        <a class="dropdown-item" href="{{route("apartados.index")}}"><i class="fas fa-clipboard-list mr-2" style="color: #FF6B6B;"></i>Apartados</a>
+                        <a class="dropdown-item" href="{{route("ventas.index")}}"><i class="fa fa-list mr-2" style="color: #45B7D1;"></i>Ventas</a>
+                        {{-- <a class="dropdown-item" href="{{route("finanzas.index")}}"><i class="fas fa-wallet mr-2" style="color: #2ECC71;"></i>Finanzas</a> --}}
+                    </div>
                 </li>
             @endif
 

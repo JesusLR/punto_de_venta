@@ -111,14 +111,16 @@ function accionesFormatter(value, row) {
     html = ''
 
     html += ' <button type="button" style="margin-right: 2px;" class="btn btn-success" title="Visualizar venta" onclick="verVenta('+row.id+')"><i class="far fa-list-alt"></i></button>'
-    if(user == 1){
+    // if(user == 1){
     //    html += ' <button type="button" style="margin-right: 2px;" class="btn btn-info" title="Imprimir ticket" onclick="imprimirTicket('+row.id+')"><i class="fa fa-print"></i></button>'
        html += ' <button type="button" style="margin-right: 2px;" class="btn btn-light" title="Editar nombre de venta" onclick="editNombreVenta('+row.id+', \''+row.cNombreVenta+'\')"><i class="fa fa-edit"></i></button>';
-    }
+    // }
     // console.log(row.apartado_id_venta > 0)
     if(row.apartado_id_venta > 0){
         html += '<button type="button" style="margin-right: 2px;" class="btn btn-secondary" title="Ver historial de abonos" onclick="verHistorialAbonos(' + row.apartado_id + ')"><i class="fas fa-history"></i></button>';
-         html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" title="Descargar PDF Historial de abonos" onclick="descargarPdfApartado(' + row.apartado_id + ')"><i class="fas fa-file-pdf"></i></button>';
+        html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" title="Descargar PDF Historial de abonos" onclick="descargarPdfApartado(' + row.apartado_id + ')"><i class="fas fa-file-pdf"></i></button>';
+        html += '<button type="button" style="margin-right: 2px;" class="btn btn-success" title="Enviar PDF Historial de abonos por WhatsApp" onclick="enviarPdfWhatsApp(' + row.apartado_id + ', \'' + escaparTexto(row.telefono) + '\')"><i class="fab fa-whatsapp"></i></button>';
+
     }
     return html;
 }
@@ -567,4 +569,103 @@ function editarFechaAbono(idAbono, idApartado, fechaActual) {
 
 function descargarPdfApartado(id) {
     window.open('/apartados/pdf/' + id, '_blank');
+}
+
+function escaparTexto(texto) {
+    return (texto || '').replace(/'/g, "\\'");
+}
+
+function normalizarTelefonoMx(valor) {
+    const soloDigitos = (valor || '').toString().replace(/\D/g, '');
+
+    if (soloDigitos.startsWith('521') && soloDigitos.length > 10) {
+        return soloDigitos.substring(3);
+    }
+
+    if (soloDigitos.startsWith('52') && soloDigitos.length > 10) {
+        return soloDigitos.substring(2);
+    }
+
+    if (soloDigitos.startsWith('1') && soloDigitos.length === 11) {
+        return soloDigitos.substring(1);
+    }
+
+    return soloDigitos;
+}
+
+function enviarPdfWhatsApp(id, telefonoCliente) {
+    const telefonoInicial = normalizarTelefonoMx(telefonoCliente || '');
+
+    swal.fire({
+        title: "Confirmar envío de historial de abonos a WhatsApp",
+        html: '\n            <div style="text-align:left; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">\n                <div style="font-size:13px; color:#475569; margin-bottom:6px;">Número de WhatsApp</div>\n                <div>\n                    <input id="telefonoWhatsapp" class="swal2-input" style="margin:0; width:100%; height:40px; border:1px solid #cbd5e1; border-radius:8px;" maxlength="10" value="' + telefonoInicial + '" placeholder="999 999 9999" />\n                </div>\n                <small style="display:block; margin-top:8px; color:#64748b;">Ingresa 10 dígitos.</small>\n            </div>\n        ',
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí, enviar",
+        cancelButtonText: "Cancelar",
+        focusConfirm: false,
+        preConfirm: () => {
+            const telefonoCapturado = document.getElementById('telefonoWhatsapp').value;
+            const telefono = normalizarTelefonoMx(telefonoCapturado);
+
+            if (!telefono || telefono.length !== 10) {
+                swal.showValidationMessage('Ingresa un número válido de 10 dígitos.');
+                return false;
+            }
+
+            return telefono;
+        }
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+
+        $.ajax({
+            url: "/apartados/openWA",
+            type: "post",
+            dataType: "json",
+            data: {
+                id_apartado: id,
+                telefono: result.value,
+            },
+            beforeSend: function () {
+                swal.fire({
+                    title: "Enviando...",
+                    text: "Por favor espera mientras se envía el PDF",
+                    icon: "info",
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+            },
+            success: function (data) {
+                if (data.lSuccess) {
+                    swal.fire({
+                        title: "Apartados",
+                        text: data.cMensaje,
+                        icon: "success",
+                        showConfirmButton: true,
+                        confirmButtonText: "Aceptar",
+                    });
+                } else {
+                    swal.fire({
+                        title: "Error",
+                        text: data.cMensaje,
+                        icon: "error",
+                        showConfirmButton: true,
+                        confirmButtonText: "Aceptar",
+                    });
+                }
+            },
+            error: function () {
+                swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al enviar el mensaje de WhatsApp.",
+                    icon: "error",
+                    showConfirmButton: true,
+                    confirmButtonText: "Aceptar",
+                });
+            },
+        });
+    });
 }
