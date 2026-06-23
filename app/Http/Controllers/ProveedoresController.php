@@ -10,6 +10,14 @@ use App\Imports\importProductos;
 
 class ProveedoresController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:ver_proveedores')->only(['index', 'gridProveedores']);
+        $this->middleware('permission:manage_suppliers')->only(['saveProveedores', 'getProveedor']);
+        $this->middleware('permission:delete_suppliers')->only(['deleteProveedor']);
+    }
+
     public function index(){
         return view('proveedores.proveedores_index');
     }

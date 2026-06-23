@@ -23,6 +23,8 @@ class ApartadosController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permission:ver_apartados')->only(['index', 'gridApartados', 'detalle', 'verAbonos', 'verProductos', 'pdf', 'openWA']);
+        $this->middleware('permission:manage_apartados')->only(['abonar', 'ejecutar', 'agregarProducto', 'cancelar', 'eliminarAbono', 'editarFechaAbono', 'cambiarNombre']);
     }
 
     public function index()
@@ -392,7 +394,7 @@ class ApartadosController extends Controller
 
     public function editarFechaAbono(Request $request)
     {
-        if (Auth::id() != 1) {
+        if (!Auth::user()->hasPermission('manage_apartados')) {
             return response()->json([
                 'lSuccess' => false,
                 'cMensaje' => 'No tienes permiso para editar la fecha del abono.',
@@ -472,7 +474,7 @@ class ApartadosController extends Controller
             ->select("apartados.*", "clientes.nombre as cliente", "clientes.telefono as telefono", "users.name as vendedor")
             ->whereIn('apartados.estado', ['ABIERTO', 'LIQUIDADO', 'CANCELADO']);
 
-        if (Auth::id() != 1) {
+        if (!Auth::user()->hasPermission('manage_apartados')) {
             $apartados->where('apartados.id_usuario', Auth::id());
         }
 

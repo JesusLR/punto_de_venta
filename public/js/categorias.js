@@ -52,11 +52,12 @@ $(document).ready(function () {
 });
 
 function accionesFormatter(value, row) {
-    var user = $("#userID").val()
-    html = ''
-    if(user == 1){
-        html += '<button type="button" style="margin-right: 2px;" class="btn btn-warning" onclick="editCategoria('+row.id+')"><i class="fa fa-edit"></i></button>'
-        html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" onclick="confirmDeleteCategoria(' + row.id + ', \'' + row.cNombreCategoria + '\')"><i class="fa fa-trash"></i></button>'
+    var html = '';
+    if (hasPermission('manage_categories')) {
+        html += '<button type="button" style="margin-right: 2px;" class="btn btn-warning" onclick="editCategoria('+row.id+')"><i class="fa fa-edit"></i></button>';
+    }
+    if (hasPermission('delete_categories')) {
+        html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" onclick="confirmDeleteCategoria(' + row.id + ', \'' + row.cNombreCategoria + '\')"><i class="fa fa-trash"></i></button>';
     }
     return html;
 }

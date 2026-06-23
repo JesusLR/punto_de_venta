@@ -35,6 +35,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class VentasController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:view_sales')->only(['index', 'gridVentas', 'show', 'pdf', 'enviarPdfWhatsapp']);
+        $this->middleware('permission:manage_sales')->only(['destroy', 'saveNombreVenta']);
+    }
 
     public function ticket($id){
         $venta = Venta::findOrFail($id);

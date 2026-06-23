@@ -9,6 +9,8 @@ use App\Apartado;
 use App\Egreso;
 use App\Materiales;
 use App\PrecioMateriales;
+use App\Producto;
+use App\Venta;
 
 class HomeController extends Controller
 {
@@ -146,7 +148,122 @@ class HomeController extends Controller
             })
             ->count();
 
-        // dd($precios_oro_gramo);
+        // 1. Estadísticas de Flujo de Caja (últimos 15 días)
+        $ventasDias = DB::table('ventas')
+            ->join('productos_vendidos', 'productos_vendidos.id_venta', '=', 'ventas.id')
+            ->select(DB::raw('DATE(ventas.created_at) as fecha'), DB::raw('SUM(productos_vendidos.cantidad * productos_vendidos.precio) as total'))
+            ->where('ventas.created_at', '>=', Carbon::now()->subDays(15)->startOfDay())
+            ->where(function ($query) {
+                $query->whereNull('ventas.tipo_pago')
+                    ->orWhereIn('ventas.tipo_pago', ['EFECTIVO', 'MERCADO_PAGO']);
+            })
+            ->groupBy(DB::raw('DATE(ventas.created_at)'))
+            ->get();
+
+        $abonosDias = DB::table('apartado_abonos')
+            ->select(DB::raw('DATE(COALESCE(apartado_abonos.fecha_abono, apartado_abonos.created_at)) as fecha'), DB::raw('SUM(apartado_abonos.monto) as total'))
+            ->where(DB::raw('COALESCE(apartado_abonos.fecha_abono, apartado_abonos.created_at)'), '>=', Carbon::now()->subDays(15)->startOfDay())
+            ->groupBy('fecha')
+            ->get();
+
+        $egresosDias = DB::table('egresos')
+            ->select('fecha', DB::raw('SUM(monto) as total'))
+            ->where('fecha', '>=', Carbon::now()->subDays(15)->toDateString())
+            ->groupBy('fecha')
+            ->get();
+
+        $chartData = [];
+        for ($i = 14; $i >= 0; $i--) {
+            $dateStr = Carbon::now()->subDays($i)->toDateString();
+            $dateFormatted = Carbon::now()->subDays($i)->format('d M');
+            $chartData[$dateStr] = [
+                'fecha' => $dateFormatted,
+                'ingresos' => 0.0,
+                'egresos' => 0.0
+            ];
+        }
+
+        foreach ($ventasDias as $v) {
+            $f = Carbon::parse($v->fecha)->toDateString();
+            if (isset($chartData[$f])) {
+                $chartData[$f]['ingresos'] += (float) $v->total;
+            }
+        }
+        foreach ($abonosDias as $a) {
+            $f = Carbon::parse($a->fecha)->toDateString();
+            if (isset($chartData[$f])) {
+                $chartData[$f]['ingresos'] += (float) $a->total;
+            }
+        }
+        foreach ($egresosDias as $e) {
+            $f = Carbon::parse($e->fecha)->toDateString();
+            if (isset($chartData[$f])) {
+                $chartData[$f]['egresos'] += (float) $e->total;
+            }
+        }
+        $dailyStats = array_values($chartData);
+
+        // 2. Ventas por Categoría (mes en curso)
+        $categoriasPopulares = DB::table('productos_vendidos')
+            ->join('ventas', 'productos_vendidos.id_venta', '=', 'ventas.id')
+            ->join('productos', 'productos_vendidos.codigo_barras', '=', 'productos.codigo_barras')
+            ->join('categorias', 'productos.id_categoria', '=', 'categorias.id')
+            ->select('categorias.cNombreCategoria as categoria', DB::raw('SUM(productos_vendidos.cantidad * productos_vendidos.precio) as total'))
+            ->whereBetween('ventas.created_at', [$inicioMes->toDateTimeString(), $finMes->toDateTimeString()])
+            ->groupBy('categorias.id', 'categorias.cNombreCategoria')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        // 3. Productos con Bajo Stock (existencia <= 3)
+        $productosBajoStock = Producto::with(['Materiales', 'Categorias'])
+            ->where('existencia', '<=', 3)
+            ->orderBy('existencia', 'asc')
+            ->limit(5)
+            ->get();
+
+        // 4. Ventas Recientes (últimas 5)
+        $ventasRecientes = Venta::with(['cliente', 'usuario'])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function ($venta) {
+                $total = DB::table('productos_vendidos')
+                    ->where('id_venta', $venta->id)
+                    ->sum(DB::raw('cantidad * precio'));
+                return [
+                    'id' => $venta->id,
+                    'cliente' => $venta->cliente ? $venta->cliente->nombre : 'Público General',
+                    'vendedor' => $venta->usuario ? $venta->usuario->name : 'N/A',
+                    'tipo_pago' => $venta->tipo_pago ?: 'EFECTIVO',
+                    'total' => (float)$total,
+                    'fecha' => $venta->created_at->format('d/m H:i'),
+                    'hace_tiempo' => $venta->created_at->diffForHumans()
+                ];
+            });
+
+        // 5. Historial del precio del oro (últimos 7 registros)
+        $oroHistoricoRaw = PrecioMateriales::join("materiales", "precios_materiales.id_material", "=", "materiales.id")
+            ->where('materiales.lActivoConsulta', 1)
+            ->where('materiales.cSimbolo', "XAU")
+            ->select('precios_materiales.created_at', 'precios_materiales.json')
+            ->orderBy('precios_materiales.created_at', 'desc')
+            ->limit(7)
+            ->get();
+
+        $oroHistorico = [];
+        foreach ($oroHistoricoRaw->reverse() as $h) {
+            $decoded = json_decode($h->json);
+            if ($decoded) {
+                $oroHistorico[] = [
+                    'fecha' => Carbon::parse($h->created_at)->format('d/m'),
+                    'price_10k' => isset($decoded->price_gram_10k) ? (float) $decoded->price_gram_10k : 0.0,
+                    'price_14k' => isset($decoded->price_gram_14k) ? (float) $decoded->price_gram_14k : 0.0,
+                    'price_24k' => isset($decoded->price_gram_24k) ? (float) $decoded->price_gram_24k : 0.0,
+                ];
+            }
+        }
+
         return view('home', compact(
             'precios_oro_gramo',
             'ingresosAutomaticosMes',
@@ -155,7 +272,12 @@ class HomeController extends Controller
             'productosVendidosMes',
             'apartadosPendientes',
             'inicioMes',
-            'finMes'
+            'finMes',
+            'dailyStats',
+            'categoriasPopulares',
+            'productosBajoStock',
+            'ventasRecientes',
+            'oroHistorico'
         ));
     }
 
@@ -217,6 +339,7 @@ class HomeController extends Controller
 
     public function inicio()
     {
-        return view('about');
+        $settings = \App\HomepageSetting::pluck('value', 'key')->toArray();
+        return view('about', compact('settings'));
     }
 }

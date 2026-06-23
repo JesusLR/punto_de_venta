@@ -8,7 +8,7 @@
                 <th>Monto</th>
                 <th>Tipo de pago</th>
                 <th>Observaciones</th>
-                @if (Auth::user()->id == 1)
+                @if (Auth::user()->hasPermission('manage_apartados'))
                     <th>Acciones</th>
                 @endif
             </tr>
@@ -21,7 +21,7 @@
                     <td>${{ number_format($abono->monto, 2) }}</td>
                     <td>{!! $abono->tipo_pago === 'MERCADO_PAGO' ? '<span class="badge badge-warning">MERCADO PAGO</span>' : '<span class="badge badge-info">EFECTIVO</span>' !!}</td>
                     <td>{{ $abono->observaciones ?: '-' }}</td>
-                    @if (Auth::user()->id == 1)
+                    @if (Auth::user()->hasPermission('manage_apartados'))
                         <td>
                                 <button type="button" class="btn btn-sm btn-primary apartado-action-btn" title="Editar fecha"
                                         onclick="editarFechaAbono({{ $abono->id }}, {{ $apartado->id }}, '{{ optional($abono->fecha_registro)->format('Y-m-d') }}')">

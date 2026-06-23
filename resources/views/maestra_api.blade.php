@@ -229,16 +229,13 @@
 
     <div class="collapse navbar-collapse" id="menu">
         <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('inicio') }}"><i class="fas fa-home mr-1"></i>Inicio</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('catalogoProductos.index') }}"><i class="fas fa-gem mr-1"></i>Catálogo</a>
+            </li>
             @guest
-                {{-- <li class="nav-item">
-                    <a class="nav-link" href="{{ route('login') }}">Login</a>
-                </li> --}}
-
-                {{-- <li class="nav-item">
-                    <a class="nav-link" href="{{ route('register') }}">
-                        Registro
-                    </a>
-                </li> --}}
             @else
             @if (Auth::user()->id == 1)
                 <li class="nav-item">
@@ -323,11 +320,11 @@
 
             @endguest
         </ul>
-        {{-- <ul class="navbar-nav ml-auto">
+        <ul class="navbar-nav ml-auto">
             @guest
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('login') }}"><i class="fa fa-sign-in-alt mr-1"></i>Login</a>
-                </li>
+                <!-- <li class="nav-item">
+                    <a class="nav-link" href="{{ route('login') }}"><i class="fa fa-sign-in-alt mr-1"></i>Iniciar Sesión</a>
+                </li> -->
             @else
                 @auth
                     <li class="nav-item">
@@ -337,7 +334,7 @@
                     </li>
                 @endauth
             @endguest
-        </ul> --}}
+        </ul>
     </div>
 </nav>
 

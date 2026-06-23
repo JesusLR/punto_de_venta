@@ -48,6 +48,15 @@ ____          _____               _ _           _
                     <label for="password"><i class="fas fa-lock"></i>Contraseña</label>
                     <input id="password" required autocomplete="off" name="password" class="form-control form-control-modern" type="password" placeholder="Contraseña">
                 </div>
+                <div class="form-group-modern">
+                    <label for="role_id"><i class="fas fa-user-tag"></i>Rol del Usuario</label>
+                    <select id="role_id" required name="role_id" class="form-control form-control-modern">
+                        <option value="">Seleccione un Rol</option>
+                        @foreach($roles as $role)
+                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
                 @include("notificacion")
                 <button class="btn-action btn-success-modern"><i class="fas fa-save"></i> Guardar</button>

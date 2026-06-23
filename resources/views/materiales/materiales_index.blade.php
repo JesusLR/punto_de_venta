@@ -29,7 +29,7 @@
         <div class="col-12">
             <div class="productos-header">
                 <h1><i class="fas fa-hammer"></i> Materiales</h1>
-                @if (Auth::user()->id == 1)
+                @if (Auth::user()->hasPermission('manage_materials'))
                     <div class="header-actions">
                         <a href="#" id="btnAgregarMaterial" class="btn-modern btn-success-modern" title="Agregar Material">
                             <i class="fas fa-plus"></i> Agregar material

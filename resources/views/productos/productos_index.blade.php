@@ -14,10 +14,12 @@
                 Gestión de Productos
             </h1>
             <div class="header-actions">
-                <a href="{{route("productos.create")}}" class="btn-modern btn-success-modern">
-                    <i class="fas fa-plus-circle"></i>
-                    Nuevo Producto
-                </a>
+                @if(Auth::user()->hasPermission('manage_products'))
+                    <a href="{{route("productos.create")}}" class="btn-modern btn-success-modern">
+                        <i class="fas fa-plus-circle"></i>
+                        Nuevo Producto
+                    </a>
+                @endif
                 <button type="button" class="btn-modern btn-excel" id="btnExportExcel">
                     <i class="fas fa-file-excel"></i>
                     Exportar Excel
@@ -26,10 +28,12 @@
                     <i class="fas fa-file-pdf"></i>
                     Exportar PDF
                 </button>
-                <button type="button" class="btn-modern btn-excel" id="btnCargaExcell">
-                    <i class="fas fa-upload"></i>
-                    Importar Excel
-                </button>
+                @if(Auth::user()->hasPermission('manage_products'))
+                    <button type="button" class="btn-modern btn-excel" id="btnCargaExcell">
+                        <i class="fas fa-upload"></i>
+                        Importar Excel
+                    </button>
+                @endif
             </div>
         </div>
 
@@ -55,7 +59,7 @@
                     </div>
                 </div>
                 {{-- @if(Auth::user()->id == 1) --}}
-                    <div class="col-md-3" @if(Auth::user()->id != 1) style="display:none;" @endif>
+                    <div class="col-md-3" @if(!Auth::user()->hasPermission('view_cost_and_utility')) style="display:none;" @endif>
                         <div class="form-group-modern">
                             <label><i class="fas fa-truck"></i>Proveedor:</label>
                             <select class="form-control-modern" id="cTipoBusquedaProveedor">

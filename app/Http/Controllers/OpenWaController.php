@@ -9,7 +9,7 @@ class OpenWaController extends Controller
 {
     private function sessionId(): string
     {
-        return config('services.openwa.session_id') ?: 'ee45e07b-59fd-4d59-80d5-ab40977c2b2f'; //Guardar en variable de configuracion
+        return config('services.openwa.session_id') ?: '581655e7-d546-4e9c-88da-f1f8843bc8f6'; //Guardar en variable de configuracion
     }
 
     public function sendText(Request $request, OpenWaService $openwa)
@@ -22,7 +22,7 @@ class OpenWaController extends Controller
         ]);
 
         $response = $openwa->sendText($this->sessionId(), $request->chatId, $request->text);
-    // dd($response);
+
         return response()->json($response->json(), $response->status());
     }
 

@@ -10,6 +10,14 @@ use App\Imports\importProductos;
 
 class CategoriasController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:ver_categorias')->only(['index', 'gridCategorias']);
+        $this->middleware('permission:manage_categories')->only(['saveCategorias', 'getCategoria']);
+        $this->middleware('permission:delete_categories')->only(['deleteCategoria']);
+    }
+
     public function index(){
         return view('categorias.categorias_index');
     }

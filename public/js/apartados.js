@@ -127,7 +127,6 @@ function obtenerFechaISO(fecha) {
 }
 
 function fechaApartadoFormatter(value, row) {
-    var user = $("#userID").val()
     const fecha = new Date(row.created_at);
 
     // Extraer el día, mes y año
@@ -179,13 +178,12 @@ function estadoApartadoFormatter(value, row) {
 
 function accionesApartadoFormatter(value, row) {
     let html = '';
-     var user = $("#userID").val()
 
     html += '<button type="button" style="margin-right: 2px;" class="btn btn-light" title="Cambiar nombre de apartado" onclick="abrirModalNombreApartado(' + row.id + ', \'' + escaparTexto(row.nombre_apartado) + '\', ' + row.id_cliente + ')"><i class="fas fa-pen"></i></button>';
 
     if (row.estado === 'ABIERTO') {
         html += '<button type="button" style="margin-right: 2px;" class="btn btn-primary" title="Abonar" onclick="abrirModalAbono(' + row.id + ', \'' + escaparTexto(row.cliente) + '\', ' + row.total + ', ' + row.abonado + ', ' + row.saldo + ')"><i class="fas fa-money-bill"></i></button>';
-        if(user == 1){
+        if (hasPermission('manage_apartados')) {
             html += '<button type="button" style="margin-right: 2px;" class="btn btn-warning" title="Cancelar apartado" onclick="cancelarApartado(' + row.id + ')"><i class="fas fa-ban"></i></button>';
         }
     }

@@ -70,7 +70,7 @@ Auth::routes([
 
                 //Productos
                 Route::post("/gridProductos", "ProductosController@gridProductos")->name("gridProductos");
-                Route::get("/editarProducto/{id}", "ProductosController@editarProducto")->name("editarProducto");
+                Route::get("/editarProducto/{id}", "ProductosController@editarProducto")->name("productos.editarProducto");
                 Route::post("/deleteProducto", "ProductosController@deleteProducto")->name("deleteProducto");
                 Route::get("/getProductos", "ProductosController@getProductos")->name("getProductos");
                 Route::post("/cargarProductosExcell", "ProductosController@cargarProductosExcell")->name("cargarProductosExcell");
@@ -101,12 +101,21 @@ Auth::routes([
                 Route::post("/deleteCategoria", "CategoriasController@deleteCategoria")->name("deleteCategoria");
                 Route::get("/getCategoria/{id}", "CategoriasController@getCategoria")->name("getCategoria");
 
+                //Roles y Permisos
+                Route::resource("roles", "RoleController");
+
                 //Materiales
                 Route::resource("materiales", "MaterialesController");
                 Route::post("/gridMateriales", "MaterialesController@gridMateriales")->name("gridMateriales");
                 Route::post("/saveMateriales", "MaterialesController@saveMateriales")->name("saveMateriales");
                 Route::post("/deleteMaterial", "MaterialesController@deleteMaterial")->name("deleteMaterial");
                 Route::get("/getMaterial/{id}", "MaterialesController@getMaterial")->name("getMaterial");
+
+                // Configuración de Portada
+                Route::middleware('permission:manage_homepage')->group(function() {
+                    Route::get('/configuracion-portada', 'HomepageSettingController@index')->name('homepage.settings.index');
+                    Route::post('/configuracion-portada/update', 'HomepageSettingController@update')->name('homepage.settings.update');
+                });
 
                 Route::post('/about/upload-image', [AboutController::class, 'uploadImage'])->name('about.upload.image');
                 Route::get('/gold-price', [HomeController::class, 'goldPrice'])->name('gold.price');

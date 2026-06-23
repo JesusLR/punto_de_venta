@@ -29,7 +29,7 @@
         <div class="col-12">
             <div class="productos-header">
                 <h1><i class="fas fa-book"></i> Categorías</h1>
-                @if (Auth::user()->id == 1)
+                @if (Auth::user()->hasPermission('manage_categories'))
                     <div class="header-actions">
                         <a href="#" id="btnAgregarCategoria" class="btn-modern btn-success-modern" title="Agregar Categoria">
                             <i class="fas fa-plus"></i> Agregar categoría

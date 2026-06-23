@@ -34,6 +34,14 @@ use App\Imports\importProductos;
 
 class ProductosController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:ver_productos')->only(['index', 'gridProductos', 'getProductos']);
+        $this->middleware('permission:manage_products')->only(['create', 'store', 'editarProducto', 'update', 'cargarProductosExcell']);
+        $this->middleware('permission:delete_products')->only(['deleteProducto', 'destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      *

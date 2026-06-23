@@ -4,29 +4,44 @@
 
 <style>
     .estadisticas-header {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         color: white;
         padding: 2.5rem 2rem;
-        border-radius: 12px;
-        margin-bottom: 2rem;
-        border-left: 4px solid #D4AF37;
+        border-radius: 16px;
+        margin-bottom: 2.5rem;
+        border-left: 5px solid #D4AF37;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
         display: flex;
         justify-content: space-between;
         align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .estadisticas-header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 350px;
+        height: 350px;
+        background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
     }
 
     .estadisticas-header h1 {
         font-size: 2.2rem;
-        font-weight: 700;
+        font-weight: 800;
         margin: 0;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
+        letter-spacing: -0.5px;
+        position: relative;
+        z-index: 1;
     }
 
     .estadisticas-header i {
-        font-size: 2.5rem;
-        margin-left: 1rem;
         color: #D4AF37;
+        text-shadow: 0 2px 10px rgba(212, 175, 55, 0.2);
     }
 
     .filters-container {

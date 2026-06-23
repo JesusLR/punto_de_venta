@@ -60,7 +60,6 @@ $(document).ready(function () {
 });
 
 function fechaFormatter(value, row) {
-    var user = $("#userID").val()
     const fecha = new Date(row.created_at);
 
     // Extraer el día, mes y año
@@ -107,7 +106,6 @@ function tipoPagoFormatter(value, row) {
 
 
 function accionesFormatter(value, row) {
-    var user = $("#userID").val()
     html = ''
 
     html += ' <button type="button" style="margin-right: 2px;" class="btn btn-success" title="Visualizar venta" onclick="verVenta('+row.id+')"><i class="far fa-list-alt"></i></button>'
