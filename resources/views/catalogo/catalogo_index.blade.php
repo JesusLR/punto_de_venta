@@ -581,6 +581,11 @@
             height: 280px;
         }
     }
+    #btnLoadMore:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(212,175,55,0.3) !important;
+        color: white !important;
+    }
 </style>
 
 <div class="catalog-container">
@@ -640,9 +645,9 @@
                  data-price="{{ $producto->precio_venta ?? 0 }}">
                 <div class="jewel-media">
                     @if($producto->img)
-                        <img src="{{ asset('img/productos/'.$producto->img) }}" alt="{{ $producto->descripcion }}">
+                        <img src="{{ asset('img/productos/'.$producto->img) }}" alt="{{ $producto->descripcion }}" loading="lazy">
                     @else
-                        <img src="{{ asset('img/logo.jpg') }}" alt="imagen">
+                        <img src="{{ asset('img/logo.jpg') }}" alt="imagen" loading="lazy">
                     @endif
                     @if($producto->es_nuevo ?? false)
                         <div class="jewel-badge">Nuevo</div>
@@ -674,6 +679,13 @@
                 </div>
             </div>
         @endforeach
+    </div>
+
+    <!-- Botón Cargar Más -->
+    <div class="text-center my-4" style="display: flex; justify-content: center; margin-bottom: 2rem;">
+        <button type="button" id="btnLoadMore" class="btn" style="background: linear-gradient(135deg, var(--dark) 0%, var(--dark-secondary) 100%); color: var(--gold); border: 2px solid var(--gold); border-radius: 12px; font-weight: 700; padding: 0.9rem 2.5rem; display: none; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <i class="fas fa-plus mr-2"></i> Cargar más
+        </button>
     </div>
 
     <div id="catalogEmptyState" class="empty-state">
@@ -718,11 +730,19 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     $(function(){
-        function applyCatalogFilters(){
+        var visibleLimit = 12;
+
+        function applyCatalogFilters(resetLimit){
+            if (resetLimit === true) {
+                visibleLimit = 12;
+            }
+
             var q = ($('#catalogSearch').val() || '').toLowerCase().trim();
             var activeCat = $('.cat-pill.active').data('cat');
             var sort = $('#catalogSort').val();
+            
             var cards = $('#productsGrid .jewel-card').get();
+            var matchedCards = [];
 
             cards.forEach(function(el){
                 var $el = $(el);
@@ -731,11 +751,16 @@
                 var material = ($el.data('material') || '').toString().toLowerCase();
                 var inSearch = !q || title.indexOf(q) !== -1 || code.indexOf(q) !== -1 || material.indexOf(q) !== -1;
                 var inCategory = (activeCat === 'all') || ($el.data('categoria') == activeCat);
-                $el.toggle(inSearch && inCategory);
+                
+                if (inSearch && inCategory) {
+                    matchedCards.push(el);
+                } else {
+                    $el.hide();
+                }
             });
 
-            var visible = $('#productsGrid .jewel-card:visible').get();
-            visible.sort(function(a, b){
+            // Ordenamiento de los elementos que coinciden
+            matchedCards.sort(function(a, b){
                 var $a = $(a), $b = $(b);
                 var priceA = parseFloat($a.data('price')) || 0;
                 var priceB = parseFloat($b.data('price')) || 0;
@@ -748,20 +773,39 @@
                 return indexA - indexB;
             });
 
-            visible.forEach(function(card){
+            // Mostrar solo hasta el límite visible y re-ordenar en el grid
+            matchedCards.forEach(function(card, index){
+                var $card = $(card);
                 $('#productsGrid').append(card);
+                if (index < visibleLimit) {
+                    $card.show();
+                } else {
+                    $card.hide();
+                }
             });
 
-            $('#catalogEmptyState').toggle(visible.length === 0);
+            // Mensaje vacío
+            $('#catalogEmptyState').toggle(matchedCards.length === 0);
+
+            // Botón Cargar Más
+            if (matchedCards.length > visibleLimit) {
+                $('#btnLoadMore').show();
+            } else {
+                $('#btnLoadMore').hide();
+            }
         }
 
-        $('#catalogSearch').on('input', applyCatalogFilters);
-        $('#catalogSort').on('change', applyCatalogFilters);
+        $('#catalogSearch').on('input', function() {
+            applyCatalogFilters(true);
+        });
+        $('#catalogSort').on('change', function() {
+            applyCatalogFilters(true);
+        });
 
         $('.cat-pill').on('click', function(){
             $('.cat-pill').removeClass('active');
             $(this).addClass('active');
-            applyCatalogFilters();
+            applyCatalogFilters(true);
         });
 
         $('#btnClearCatalogFilters').on('click', function(){
@@ -769,10 +813,15 @@
             $('#catalogSort').val('popular');
             $('.cat-pill').removeClass('active');
             $('.cat-pill[data-cat="all"]').addClass('active');
-            applyCatalogFilters();
+            applyCatalogFilters(true);
         });
 
-        applyCatalogFilters();
+        $('#btnLoadMore').on('click', function(){
+            visibleLimit += 12;
+            applyCatalogFilters(false);
+        });
+
+        applyCatalogFilters(true);
 
         // Modal ver detalle
         $('.btn-view').on('click', function(){
@@ -781,24 +830,73 @@
             var material = $(this).data('material');
             var categoria = $(this).data('categoria');
             var price = $(this).data('price');
+            var code = $(this).closest('.jewel-card').data('code') || '';
             
             $('#modalImage').attr('src', img);
             $('#modalTitle').text(title);
             $('#modalMaterial span').text(material);
             $('#modalCategoria span').text(categoria);
-            $('#modalPrice').text('$' + price);
+            // Formatear precio
+            var rawPrice = price.toString().replace(/,/g, '');
+            $('#modalPrice').text('$' + parseFloat(rawPrice).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+            // Populate modalWhatsapp data attributes
+            $('#modalWhatsapp')
+                .data('title', title)
+                .data('material', material)
+                .data('img', img)
+                .data('code', code)
+                .data('price', rawPrice);
+
             $('#catalogImageModal').modal('show');
         });
 
         // WhatsApp rápido
         $('.btn-whatsapp, #modalWhatsapp').on('click', function(){
-            var title = $(this).data('title') || $('#modalTitle').text();
-            var material = $('#modalMaterial span').text() || '';
-            // var phone = $(this).data('phone') || '';
-            var phone = "9991629742"; // Número fijo para contacto';
-            var text = 'Hola, estoy interesado en: ' + title + (material ? ' (' + material + ')' : '');
-            var url = phone ? 'https://wa.me/' + phone.replace(/\D/g,'') + '?text=' + encodeURIComponent(text)
-                            : 'https://web.whatsapp.com/send?text=' + encodeURIComponent(text);
+            var title = '';
+            var material = '';
+            var imgUrl = '';
+            var code = '';
+            var price = '';
+
+            if ($(this).attr('id') === 'modalWhatsapp') {
+                title = $(this).data('title') || '';
+                material = $(this).data('material') || '';
+                imgUrl = $(this).data('img') || '';
+                code = $(this).data('code') || '';
+                price = $(this).data('price') || '';
+            } else {
+                var $card = $(this).closest('.jewel-card');
+                title = $card.data('title') || $card.find('.jewel-title').text().trim();
+                code = $card.data('code') || '';
+                material = $card.data('material') || '';
+                price = $card.data('price') || '';
+                imgUrl = $card.find('.jewel-media img').attr('src') || '';
+            }
+
+            // Normalización de material
+            if (material) {
+                material = material.toString().toUpperCase().replace('N/A', '').trim();
+            }
+
+            var text = '✨ *Nueva consulta de producto* ✨\n\n' +
+                       '👋 Hola, me gustaría obtener más información sobre el siguiente artículo:\n\n' +
+                       '📝 *Descripción:* ' + title + '\n';
+            if (code) {
+                text += '🏷️ *Código:* ' + code.toString().toUpperCase() + '\n';
+            }
+            if (material) {
+                text += '💎 *Material:* ' + material + '\n';
+            }
+            if (price) {
+                text += '💵 *Precio:* $' + parseFloat(price).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\n';
+            }
+            if (imgUrl) {
+                text += '\n🔗 *Imagen de referencia:* ' + imgUrl + '\n';
+            }
+
+            var phone = "529991629742";
+            var url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(text);
             window.open(url, '_blank');
         });
     });

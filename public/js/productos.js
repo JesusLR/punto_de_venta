@@ -1,89 +1,89 @@
 var url_logo = "{{ url('/img/productos/') }}";
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Vista previa de imagen
-        const imgInput = document.getElementById('img');
-        const previewContainer = document.getElementById('preview-container');
+document.addEventListener('DOMContentLoaded', function () {
+    // Vista previa de imagen
+    const imgInput = document.getElementById('img');
+    const previewContainer = document.getElementById('preview-container');
 
-        imgInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                if (file.size > 2 * 1024 * 1024) {
-                    Swal.fire({
-                        title: 'Archivo muy grande',
-                        text: 'La imagen debe ser menor a 2MB',
-                        icon: 'warning',
-                        confirmButtonColor: '#D4AF37'
-                    });
-                    imgInput.value = '';
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewContainer.innerHTML = `<img src="${e.target.result}" class="preview-image" alt="Preview">`;
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Cálculo de margen de ganancia
-        const precioCompra = document.getElementById('precio_compra');
-        const precioVenta = document.getElementById('precio_venta');
-        const profitInfo = document.getElementById('profit-info');
-        const profitMargin = document.getElementById('profit-margin');
-        const profitAmount = document.getElementById('profit-amount');
-
-        function calcularGanancia() {
-            const compra = parseFloat(precioCompra.value) || 0;
-            const venta = parseFloat(precioVenta.value) || 0;
-
-            if (compra > 0 && venta > 0) {
-                const ganancia = venta - compra;
-                const margen = ((ganancia / compra) * 100).toFixed(2);
-                
-                profitMargin.textContent = margen + '%';
-                profitAmount.textContent = ganancia.toFixed(2);
-                profitInfo.style.display = 'flex';
-                
-                if (ganancia > 0) {
-                    profitInfo.className = 'profit-indicator profit-positive';
-                } else {
-                    profitInfo.className = 'profit-indicator profit-negative';
-                }
-            } else {
-                profitInfo.style.display = 'none';
-            }
-        }
-
-        precioCompra.addEventListener('input', calcularGanancia);
-        precioVenta.addEventListener('input', calcularGanancia);
-
-        // Validación del formulario
-        document.getElementById('formProducto').addEventListener('submit', function(e) {
-            const compra = parseFloat(precioCompra.value) || 0;
-            const venta = parseFloat(precioVenta.value) || 0;
-
-            if (venta < compra) {
-                e.preventDefault();
+    imgInput.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
                 Swal.fire({
-                    title: '¿Confirmar?',
-                    text: 'El precio de venta es menor al precio de compra',
+                    title: 'Archivo muy grande',
+                    text: 'La imagen debe ser menor a 2MB',
                     icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#D4AF37',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Continuar',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById('formProducto').submit();
-                    }
+                    confirmButtonColor: '#D4AF37'
                 });
+                imgInput.value = '';
+                return;
             }
-        });
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewContainer.innerHTML = `<img src="${e.target.result}" class="preview-image" alt="Preview">`;
+            }
+            reader.readAsDataURL(file);
+        }
     });
-    
+
+    // Cálculo de margen de ganancia
+    const precioCompra = document.getElementById('precio_compra');
+    const precioVenta = document.getElementById('precio_venta');
+    const profitInfo = document.getElementById('profit-info');
+    const profitMargin = document.getElementById('profit-margin');
+    const profitAmount = document.getElementById('profit-amount');
+
+    function calcularGanancia() {
+        const compra = parseFloat(precioCompra.value) || 0;
+        const venta = parseFloat(precioVenta.value) || 0;
+
+        if (compra > 0 && venta > 0) {
+            const ganancia = venta - compra;
+            const margen = ((ganancia / compra) * 100).toFixed(2);
+
+            profitMargin.textContent = margen + '%';
+            profitAmount.textContent = ganancia.toFixed(2);
+            profitInfo.style.display = 'flex';
+
+            if (ganancia > 0) {
+                profitInfo.className = 'profit-indicator profit-positive';
+            } else {
+                profitInfo.className = 'profit-indicator profit-negative';
+            }
+        } else {
+            profitInfo.style.display = 'none';
+        }
+    }
+
+    precioCompra.addEventListener('input', calcularGanancia);
+    precioVenta.addEventListener('input', calcularGanancia);
+
+    // Validación del formulario
+    document.getElementById('formProducto').addEventListener('submit', function (e) {
+        const compra = parseFloat(precioCompra.value) || 0;
+        const venta = parseFloat(precioVenta.value) || 0;
+
+        if (venta < compra) {
+            e.preventDefault();
+            Swal.fire({
+                title: '¿Confirmar?',
+                text: 'El precio de venta es menor al precio de compra',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#D4AF37',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Continuar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('formProducto').submit();
+                }
+            });
+        }
+    });
+});
+
 $(document).ready(function () {
     $.ajaxSetup({
         headers: {
@@ -106,9 +106,9 @@ $(document).ready(function () {
         exportTypes: ['excel', 'pdf'],
         exportOptions: {
             fileName: function () {
-              return 'Productos'
+                return 'Productos'
             }
-          },
+        },
         queryParams: function (p) {
             return {
                 offset: p.offset || 0,
@@ -201,26 +201,26 @@ $(document).ready(function () {
         },
     });
 
-    
-$("#btnExportExcel").off('click').on('click', function() {
-    try {
-        if (typeof $('#gridProductos').bootstrapTable('exportTable') === 'function') {
-            $('#gridProductos').bootstrapTable('exportTable', {
-                type: 'excel',
-                fileName: 'productos_' + new Date().getTime()
-            });
-            return;
-        }
-    } catch (e) {
-        // fallback to HTML-based Excel
-    }
-    exportToExcelHtml('productos_' + new Date().getTime());
-});
 
-$("#btnExportPDF").off('click').on('click', function() {
-    // open printable window with images; user can print/save as PDF
-    exportToPrintableWindow('Productos - Exportar (Imprimir a PDF)');
-});
+    $("#btnExportExcel").off('click').on('click', function () {
+        try {
+            if (typeof $('#gridProductos').bootstrapTable('exportTable') === 'function') {
+                $('#gridProductos').bootstrapTable('exportTable', {
+                    type: 'excel',
+                    fileName: 'productos_' + new Date().getTime()
+                });
+                return;
+            }
+        } catch (e) {
+            // fallback to HTML-based Excel
+        }
+        exportToExcelHtml('productos_' + new Date().getTime());
+    });
+
+    $("#btnExportPDF").off('click').on('click', function () {
+        // open printable window with images; user can print/save as PDF
+        exportToPrintableWindow('Productos - Exportar (Imprimir a PDF)');
+    });
 });
 
 function precioFormatter(value) {
@@ -234,12 +234,12 @@ function utilidadFormatter(value, row) {
 
 function imagenFormatter(value, row) {
     html = ''
-    if(row.img == null){
+    if (row.img == null) {
         html = `<div class="img-placeholder" title="Sin imagen disponible">
                     <i class="fas fa-image"></i>
                     <span>SIN FOTO</span>
                 </div>`
-    }else{
+    } else {
         html = `<div class="img-wrapper" onclick="verImagen('${row.img}', '${row.codigo_barras}')" title="Haz clic para ver en grande">
                     <img src="img/productos/${row.img}" alt="${row.img}" class="product-img">
                     <div class="img-overlay">
@@ -262,8 +262,13 @@ function imagenFormatter(value, row) {
 
 function accionesFormatter(value, row) {
     var html = '';
+    if (row.img) {
+        var ext = row.img.split('.').pop();
+        var downloadName = row.codigo_barras + '.' + ext;
+        html += '<a href="img/productos/' + row.img + '" download="' + downloadName + '" class="btn btn-table-action btn-success" title="Descargar imagen"><i class="fa fa-download"></i></a>';
+    }
     if (hasPermission('manage_products')) {
-        html += '<button type="button" class="btn btn-table-action btn-light" onclick="editProducto('+row.id+')"><i class="fa fa-edit"></i></button>';
+        html += '<button type="button" class="btn btn-table-action btn-light" onclick="editProducto(' + row.id + ')"><i class="fa fa-edit"></i></button>';
     }
     if (hasPermission('delete_products')) {
         html += '<button type="button" class="btn btn-table-action btn-danger" onclick="confirmDeleteProducto(' + row.id + ', \'' + row.codigo_barras + '\')"><i class="fa fa-trash"></i></button>';
@@ -277,14 +282,14 @@ function montoFormatter(value, row) {
     return html;
 }
 
-function editProducto(id){
-    window.location.href = "/editarProducto/"+id;
+function editProducto(id) {
+    window.location.href = "/editarProducto/" + id;
 }
 
 function confirmDeleteProducto(id, codigo_barras) {
     swal.fire({
         title: "Eliminar Producto",
-        text: "¿Desea eliminar el producto "+codigo_barras+"?",
+        text: "¿Desea eliminar el producto " + codigo_barras + "?",
         icon: "warning",
         showCloseButton: false,
         showCancelButton: true,
@@ -300,7 +305,7 @@ function confirmDeleteProducto(id, codigo_barras) {
         }, () => { });
 }
 
-function deleteProducto(id){
+function deleteProducto(id) {
     $.ajax({
         url: "/deleteProducto",
         type: "post",
@@ -346,21 +351,21 @@ function deleteProducto(id){
     });
 }
 
-$( "#cTipoBusquedaProductos" ).on( "change", function() {
+$("#cTipoBusquedaProductos").on("change", function () {
     $("#gridProductos").bootstrapTable('refresh');
-  } );
+});
 
-$( "#cTipoBusquedaProveedor" ).on( "change", function() {
+$("#cTipoBusquedaProveedor").on("change", function () {
     $("#gridProductos").bootstrapTable('refresh');
-  } );
+});
 
-$( "#cTipoBusquedaMaterial" ).on( "change", function() {
+$("#cTipoBusquedaMaterial").on("change", function () {
     $("#gridProductos").bootstrapTable('refresh');
-  } );
+});
 
-$( "#cTipoBusquedaCategoria" ).on( "change", function() {
+$("#cTipoBusquedaCategoria").on("change", function () {
     $("#gridProductos").bootstrapTable('refresh');
-  } );
+});
 
 $("#btnCargaExcell").on('click', function () {
     document.getElementById("fileExcellProductos").value = "";
@@ -433,7 +438,7 @@ $("#btnGuardarInfoExcell").on('click', function () {
     });
 });
 
-function verImagen(img, codigo_barras){
+function verImagen(img, codigo_barras) {
     var src = window.location.origin + "/img/productos/" + img;
     var title = `Producto ${codigo_barras}`;
 
@@ -444,7 +449,7 @@ function verImagen(img, codigo_barras){
     var imgEl = document.createElement('img');
     imgEl.src = src;
     imgEl.alt = codigo_barras;
-    imgEl.onload = function(){
+    imgEl.onload = function () {
         // opcional: ajustar dialogo si quieres basarte en dimensiones naturales
         // no necesario si CSS ya limita tamaño
     };
@@ -457,34 +462,34 @@ function verImagen(img, codigo_barras){
 var $table = $('#table')
 
 function idFormatter() {
-  return 'Total'
+    return 'Total'
 }
 
 function nameFormatter(data) {
-  return data.length
+    return data.length
 }
 
 function priceFormatter(data) {
-  var field = this.field
-  return '$' + data.map(function (row) {
-    return +row[field].substring(1)
-  }).reduce(function (sum, i) {
-    return sum + i
-  }, 0)
+    var field = this.field
+    return '$' + data.map(function (row) {
+        return +row[field].substring(1)
+    }).reduce(function (sum, i) {
+        return sum + i
+    }, 0)
 }
 
 // helper para obtener columnas y datos visibles
 function getTableExportData() {
-    var cols = $('#gridProductos').bootstrapTable('getVisibleColumns').filter(function(c){ return c.field && c.title; });
-    var data = $('#gridProductos').bootstrapTable('getData', {useCurrentPage: false, includeHidden: false}) || [];
+    var cols = $('#gridProductos').bootstrapTable('getVisibleColumns').filter(function (c) { return c.field && c.title; });
+    var data = $('#gridProductos').bootstrapTable('getData', { useCurrentPage: false, includeHidden: false }) || [];
     return { cols: cols, data: data };
 }
 
 function downloadCSV(filename) {
     var out = getTableExportData();
-    var headers = out.cols.map(function(c){ return '"' + (c.title || c.field).replace(/"/g, '""') + '"'; }).join(',');
-    var rows = out.data.map(function(r){
-        return out.cols.map(function(c){
+    var headers = out.cols.map(function (c) { return '"' + (c.title || c.field).replace(/"/g, '""') + '"'; }).join(',');
+    var rows = out.data.map(function (r) {
+        return out.cols.map(function (c) {
             var v = r[c.field];
             if (v === null || v === undefined) v = '';
             // eliminar tags html si los hay
@@ -520,17 +525,17 @@ function exportToExcelHtml(filename) {
 
     var xml = '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?>';
     xml += '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"'
-         + ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"'
-         + ' xmlns:o="urn:schemas-microsoft-com:office:office"'
-         + ' xmlns:x="urn:schemas-microsoft-com:office:excel">';
+        + ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"'
+        + ' xmlns:o="urn:schemas-microsoft-com:office:office"'
+        + ' xmlns:x="urn:schemas-microsoft-com:office:excel">';
 
     xml += '<Styles>';
     xml += '<Style ss:ID="title"><Font ss:Bold="1" ss:Size="13" ss:Color="#1D4A1E"/></Style>';
     xml += '<Style ss:ID="sub"><Font ss:Italic="1" ss:Size="9" ss:Color="#888888"/></Style>';
     xml += '<Style ss:ID="hdr"><Font ss:Bold="1" ss:Color="#FFFFFF"/>'
-         + '<Interior ss:Color="#1D6F42" ss:Pattern="Solid"/>'
-         + '<Alignment ss:Horizontal="Center" ss:Vertical="Center"/>'
-         + '<Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#145A32"/></Borders></Style>';
+        + '<Interior ss:Color="#1D6F42" ss:Pattern="Solid"/>'
+        + '<Alignment ss:Horizontal="Center" ss:Vertical="Center"/>'
+        + '<Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#145A32"/></Borders></Style>';
     // normal
     xml += '<Style ss:ID="d"><Alignment ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DDDDDD"/></Borders></Style>';
     xml += '<Style ss:ID="m"><NumberFormat ss:Format="&quot;$&quot;#,##0.00"/><Alignment ss:Vertical="Center" ss:Horizontal="Right"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DDDDDD"/></Borders></Style>';
@@ -547,7 +552,7 @@ function exportToExcelHtml(filename) {
 
     xml += '<Worksheet ss:Name="Productos"><Table>';
 
-    out.cols.forEach(function(c) {
+    out.cols.forEach(function (c) {
         xml += '<Column ss:Width="' + (colWidths[c.field] || 120) + '"/>';
     });
 
@@ -557,19 +562,19 @@ function exportToExcelHtml(filename) {
     xml += '<Row ss:Height="6"><Cell ss:MergeAcross="' + span + '"><Data ss:Type="String"></Data></Cell></Row>';
 
     xml += '<Row ss:Height="26">';
-    out.cols.forEach(function(c) {
+    out.cols.forEach(function (c) {
         xml += '<Cell ss:StyleID="hdr"><Data ss:Type="String">' + escXml(c.title || c.field) + '</Data></Cell>';
     });
     xml += '</Row>';
 
     var moneyFields = ['precio_compra', 'precio_venta'];
 
-    out.data.forEach(function(r) {
+    out.data.forEach(function (r) {
         var existencia = parseFloat(r.existencia);
         var s = (existencia < 1) ? 'r' : (existencia < 4 ? 'y' : '');
 
         xml += '<Row ss:Height="18">';
-        out.cols.forEach(function(c) {
+        out.cols.forEach(function (c) {
             if (c.field === 'img' || c.field === 'acciones') {
                 xml += '<Cell ss:StyleID="d' + s + '"><Data ss:Type="String"></Data></Cell>';
                 return;
@@ -597,8 +602,8 @@ function exportToExcelHtml(filename) {
 
     xml += '</Table>';
     xml += '<WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">'
-         + '<FreezePanes/><FrozenNoSplit/><SplitHorizontal>4</SplitHorizontal><TopRowBottomPane>4</TopRowBottomPane>'
-         + '</WorksheetOptions>';
+        + '<FreezePanes/><FrozenNoSplit/><SplitHorizontal>4</SplitHorizontal><TopRowBottomPane>4</TopRowBottomPane>'
+        + '</WorksheetOptions>';
     xml += '</Worksheet></Workbook>';
 
     var blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
@@ -629,11 +634,11 @@ function exportToPrintableWindow(title) {
     html += '</head><body>';
     html += '<h2>' + title + '</h2>';
     html += '<table><thead><tr>';
-    out.cols.forEach(function(c){ html += '<th>' + (c.title || c.field) + '</th>'; });
+    out.cols.forEach(function (c) { html += '<th>' + (c.title || c.field) + '</th>'; });
     html += '</tr></thead><tbody>';
-    out.data.forEach(function(r){
+    out.data.forEach(function (r) {
         html += '<tr>';
-        out.cols.forEach(function(c){
+        out.cols.forEach(function (c) {
             var v = r[c.field];
             if (c.field === 'img') {
                 if (v) {
@@ -657,5 +662,5 @@ function exportToPrintableWindow(title) {
     w.document.write(html);
     w.document.close();
     // esperar a que cargue antes de imprimir
-    setTimeout(function(){ w.focus(); w.print(); }, 500);
+    setTimeout(function () { w.focus(); w.print(); }, 500);
 }
