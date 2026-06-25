@@ -86,6 +86,9 @@ Auth::routes([
                 Route::post("/gridEstadisticas", "EstadisticasController@gridEstadisticas")->name("gridEstadisticas");
                 Route::post("/graficaVentas", "EstadisticasController@graficaVentas")->name("graficaVentas");
                 Route::post("/estadisticas/productos-filtro", "EstadisticasController@productosVendidosFiltro")->name("estadisticas.productosFiltro");
+                Route::get("/analytics", function () {
+                    return view("estadisticas.analytics");
+                })->name("analytics.index")->middleware("permission:view_statistics");
 
                 //Proveedores
                 Route::resource("proveedores", "ProveedoresController");

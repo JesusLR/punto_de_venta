@@ -382,6 +382,10 @@
                     <i class="fas fa-chart-pie"></i>
                     <span>Estadísticas</span>
                 </a>
+                <a class="sidebar-link {{ request()->routeIs('analytics.*') ? 'active' : '' }}" href="{{route("analytics.index")}}">
+                    <i class="fab fa-google" style="color: #4285F4;"></i>
+                    <span>Tráfico Web (GA4)</span>
+                </a>
             @endif
 
             {{-- Tienda --}}

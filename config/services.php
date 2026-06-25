@@ -35,6 +35,7 @@ return [
     ],
     'google' => [
         'analytics_id' => env('GOOGLE_ANALYTICS_ID'),
+        'report_url' => env('ANALYTICS_REPORT_URL'),
     ],
 
 ];
