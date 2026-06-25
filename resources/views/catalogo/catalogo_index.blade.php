@@ -846,7 +846,19 @@
                 .data('material', material)
                 .data('img', img)
                 .data('code', code)
-                .data('price', rawPrice);
+                .data('price', rawPrice)
+                .data('categoria', categoria);
+
+            // Evento de Google Analytics 4 (Ver detalle del producto)
+            if (typeof gtag === 'function') {
+                gtag('event', 'view_product_detail', {
+                    'product_code': code,
+                    'product_name': title,
+                    'product_material': material,
+                    'product_category': categoria,
+                    'product_price': rawPrice
+                });
+            }
 
             $('#catalogImageModal').modal('show');
         });
@@ -858,25 +870,41 @@
             var imgUrl = '';
             var code = '';
             var price = '';
+            var categoria = '';
+            var isModal = $(this).attr('id') === 'modalWhatsapp';
 
-            if ($(this).attr('id') === 'modalWhatsapp') {
+            if (isModal) {
                 title = $(this).data('title') || '';
                 material = $(this).data('material') || '';
                 imgUrl = $(this).data('img') || '';
                 code = $(this).data('code') || '';
                 price = $(this).data('price') || '';
+                categoria = $(this).data('categoria') || '';
             } else {
                 var $card = $(this).closest('.jewel-card');
                 title = $card.data('title') || $card.find('.jewel-title').text().trim();
                 code = $card.data('code') || '';
                 material = $card.data('material') || '';
                 price = $card.data('price') || '';
+                categoria = $card.data('categoria') || '';
                 imgUrl = $card.find('.jewel-media img').attr('src') || '';
             }
 
             // Normalización de material
             if (material) {
                 material = material.toString().toUpperCase().replace('N/A', '').trim();
+            }
+
+            // Evento de Google Analytics 4 (Click en WhatsApp)
+            if (typeof gtag === 'function') {
+                gtag('event', 'click_whatsapp_contact', {
+                    'product_code': code,
+                    'product_name': title,
+                    'product_material': material,
+                    'product_category': categoria,
+                    'product_price': price,
+                    'click_source': isModal ? 'modal' : 'grid'
+                });
             }
 
             var text = '✨ *Nueva consulta de producto* ✨\n\n' +
