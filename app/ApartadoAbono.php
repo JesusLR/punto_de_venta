@@ -6,6 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class ApartadoAbono extends Model
 {
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($abono) {
+            \DB::table('notificaciones_leidas')
+                ->where('notification_type', 'apartado_inactivo')
+                ->where('notification_id', $abono->id_apartado)
+                ->delete();
+        });
+
+        static::deleted(function ($abono) {
+            \DB::table('notificaciones_leidas')
+                ->where('notification_type', 'apartado_inactivo')
+                ->where('notification_id', $abono->id_apartado)
+                ->delete();
+        });
+    }
+
     protected $table = 'apartado_abonos';
 
     protected $dates = [

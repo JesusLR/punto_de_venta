@@ -69,6 +69,12 @@ $(document).ready(function () {
 
     // configurarRangoSemanaFechas();
 
+    // Abrir automáticamente historial de abonos si viene el parámetro ver_abonos en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const verAbonosId = urlParams.get('ver_abonos');
+    if (verAbonosId) {
+        verHistorialAbonos(verAbonosId);
+    }
 });
 
 $("#cTipoBusquedaApartado").on("change", function () {

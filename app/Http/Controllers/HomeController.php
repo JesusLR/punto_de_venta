@@ -342,4 +342,123 @@ class HomeController extends Controller
         $settings = \App\HomepageSetting::pluck('value', 'key')->toArray();
         return view('about', compact('settings'));
     }
+
+    public function obtenerNotificaciones()
+    {
+        try {
+            $notifications = [];
+
+            // Obtener notificaciones ya leídas/descartadas por el usuario actual
+            $readNotifications = \DB::table('notificaciones_leidas')
+                ->where('user_id', \Auth::id())
+                ->get()
+                ->groupBy('notification_type')
+                ->map(function ($items) {
+                    return $items->pluck('notification_id')->toArray();
+                })
+                ->toArray();
+
+            $readApartados = $readNotifications['apartado_inactivo'] ?? [];
+            $readProducts = $readNotifications['stock_bajo'] ?? [];
+
+            // 1. Apartados Inactivos (Reminders)
+            $diasInactividad = (int) \App\HomepageSetting::getValue('apartado_inactive_days', 30);
+            $limitDate = now()->subDays($diasInactividad);
+
+            $apartados = Apartado::where('estado', 'ABIERTO')
+                ->whereNotIn('id', $readApartados)
+                ->where('updated_at', '<', $limitDate)
+                ->whereDoesntHave('abonos', function ($query) use ($limitDate) {
+                    $query->where('fecha_abono', '>=', $limitDate)
+                          ->orWhere('created_at', '>=', $limitDate);
+                })
+                ->with(['cliente'])
+                ->orderBy('updated_at', 'asc')
+                ->get();
+
+            foreach ($apartados as $ap) {
+                $ultimoAbono = $ap->abonos()->latest('fecha_abono')->first();
+                $fechaReferencia = $ultimoAbono ? Carbon::parse($ultimoAbono->fecha_abono) : Carbon::parse($ap->created_at);
+                $diasTranscurridos = now()->diffInDays($fechaReferencia);
+                $clienteNombre = $ap->cliente ? $ap->cliente->nombre : 'Cliente General';
+                $apNombre = $ap->nombre_apartado ?: 'Sin nombre';
+
+                $notifications[] = [
+                    'id' => $ap->id,
+                    'type' => 'apartado_inactivo',
+                    'icon' => 'fas fa-exclamation-triangle',
+                    'title' => 'Apartado sin movimiento',
+                    'description' => "El apartado <strong>\"{$apNombre}\"</strong> de <strong>{$clienteNombre}</strong> lleva <strong>{$diasTranscurridos} días</strong> sin abonos (Saldo pendiente: $" . number_format($ap->saldo, 2) . ").",
+                    'time_ago' => "Último abono: " . $fechaReferencia->format('d/m/Y'),
+                    'url' => route('apartados.index') . "?ver_abonos={$ap->id}"
+                ];
+            }
+
+            /*
+            // 2. Productos con Bajo Stock (stock_bajo)
+            $productosBajoStock = \App\Producto::where('lActivo', 1)
+                ->whereNotIn('id', $readProducts)
+                ->where('existencia', '<=', 3)
+                ->orderBy('existencia', 'asc')
+                ->take(5)
+                ->get();
+
+            foreach ($productosBajoStock as $prod) {
+                $notifications[] = [
+                    'id' => $prod->id,
+                    'type' => 'stock_bajo',
+                    'icon' => 'fas fa-box-open',
+                    'title' => 'Bajo stock de producto',
+                    'description' => "El producto <strong>\"{$prod->descripcion}\"</strong> tiene un stock muy bajo: <strong>" . (float)$prod->existencia . " unidades</strong>.",
+                    'time_ago' => "Código: {$prod->codigo_barras}",
+                    'url' => route('productos.index') . "?buscar={$prod->codigo_barras}"
+                ];
+            }
+            */
+
+            return response()->json([
+                'lSuccess' => true,
+                'notifications' => $notifications
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'Error al obtener notificaciones: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Marcar una notificación como leída (guardar en base de datos para excluirla de la lista).
+     */
+    public function marcarNotificacionLeida(Request $request)
+    {
+        try {
+            $request->validate([
+                'type' => 'required|string',
+                'id' => 'required'
+            ]);
+
+            \DB::table('notificaciones_leidas')->updateOrInsert(
+                [
+                    'user_id' => \Auth::id(),
+                    'notification_type' => $request->type,
+                    'notification_id' => $request->id,
+                ],
+                [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+
+            return response()->json([
+                'lSuccess' => true
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'Error al marcar como leída: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

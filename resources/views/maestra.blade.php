@@ -191,10 +191,12 @@
         /* Cabecera Móvil */
         .mobile-header {
             display: none;
-            background: #0f172a;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: white;
-            padding: 0.8rem 1.5rem;
-            border-bottom: 2px solid #D4AF37;
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             z-index: 1040;
             align-items: center;
             justify-content: space-between;
@@ -202,7 +204,38 @@
             top: 0;
             left: 0;
             right: 0;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            height: 56px;
+        }
+
+        .mobile-header a {
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            color: #fff !important;
+            transition: color 0.2s ease;
+        }
+
+        .mobile-header a:hover {
+            color: #D4AF37 !important;
+        }
+
+        .mobile-header .btn-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-header .btn-link:hover {
+            color: #D4AF37 !important;
+        }
+
+        .mobile-header-icon {
+            color: #dfb743;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .mobile-header .btn-link:hover .mobile-header-icon {
+            color: #f1c40f;
+            transform: scale(1.08);
         }
 
         /* Overlay */
@@ -263,6 +296,110 @@
                 display: none;
             }
         }
+
+        /* Notificaciones estilo Facebook dentro de Modal / Dropdown */
+        .notification-list-container {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s ease;
+            text-decoration: none !important;
+        }
+
+        .notification-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .notification-icon-container {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: #eff6ff;
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            margin-right: 14px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 5px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Colores según el tipo de alerta (para escalabilidad futura) */
+        .notification-item[data-type="apartado_inactivo"] .notification-icon-container {
+            background-color: #ffe4e6;
+            color: #e11d48;
+            box-shadow: 0 2px 5px rgba(225, 29, 72, 0.1);
+        }
+
+        .notification-item[data-type="apartado_inactivo"] .notification-time {
+            color: #e11d48;
+        }
+
+        .notification-item[data-type="stock_bajo"] .notification-icon-container {
+            background-color: #fef3c7;
+            color: #d97706;
+            box-shadow: 0 2px 5px rgba(217, 119, 6, 0.1);
+        }
+
+        .notification-item[data-type="stock_bajo"] .notification-time {
+            color: #d97706;
+        }
+
+        .notification-content {
+            flex-grow: 1;
+        }
+
+        .notification-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 3px;
+        }
+
+        .notification-desc {
+            font-size: 0.8rem;
+            color: #475569;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .badge-counter-sidebar {
+            background-color: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 10px;
+            margin-left: auto;
+            border: 1.5px solid #1a1a1a;
+            line-height: 1;
+        }
+
+        .badge-counter-mobile {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: 800;
+            border: 2px solid #0f172a;
+            line-height: 1;
+        }
     </style>
 </head>
 <body class="@auth authenticated @endauth">
@@ -271,12 +408,16 @@
     <!-- Cabecera Móvil (solo autenticados) -->
     <div class="mobile-header">
         <button class="btn btn-link text-white p-0 mr-3" id="botonMenuMobile" style="font-size: 1.5rem; text-decoration: none;">
-            <i class="fas fa-bars" style="color: #D4AF37;"></i>
+            <i class="fas fa-bars mobile-header-icon"></i>
         </button>
-        <a href="{{route("home")}}" class="text-white font-weight-bold text-uppercase" style="letter-spacing: 1.5px; font-size: 1.05rem; text-decoration: none;">
+        <a href="{{route("home")}}" class="text-white font-weight-bold text-uppercase" style="letter-spacing: 1.5px; font-size: 1.05rem; text-decoration: none; margin-right: auto;">
             {{env("APP_NAME")}}
         </a>
-        <div style="width: 24px;"></div> <!-- Espaciador para centrar -->
+        <!-- Bell Mobile -->
+        <button class="btn btn-link position-relative p-1 text-white mr-2" type="button" data-toggle="modal" data-target="#notificationsModal" style="font-size: 1.25rem; text-decoration: none;">
+            <i class="far fa-bell mobile-header-icon"></i>
+            <span class="badge badge-danger badge-counter-mobile d-none" id="notificationBadgeMobile">0</span>
+        </button>
     </div>
 
     <!-- Sidebar (solo autenticados) -->
@@ -292,6 +433,11 @@
             <a class="sidebar-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{route("home")}}">
                 <i class="fa fa-home"></i>
                 <span>Inicio</span>
+            </a>
+            <a class="sidebar-link" data-toggle="modal" data-target="#notificationsModal" style="cursor: pointer;">
+                <i class="fas fa-bell" style="color: #D4AF37;"></i>
+                <span>Notificaciones</span>
+                <span class="badge badge-danger badge-counter-sidebar d-none" id="notificationBadge">0</span>
             </a>
             <a class="sidebar-link" href="{{ route('inicio') }}" target="_blank">
                 <i class="fas fa-external-link-alt" style="color: #64748b;"></i>
@@ -342,22 +488,28 @@
                     @endif
                 </div>
             @endif
-
-            {{-- Configuracion --}}
-            @if (Auth::user()->hasPermission('manage_roles') || Auth::user()->hasPermission('manage_homepage'))
-                <a class="sidebar-link {{ request()->routeIs(['roles.*', 'homepage.settings.*']) ? '' : 'collapsed' }}" 
+                        {{-- Configuracion --}}
+            @if (Auth::user()->hasPermission('manage_roles') || Auth::user()->hasPermission('manage_homepage') || Auth::user()->hasPermission('manage_general_settings'))
+                <a class="sidebar-link {{ request()->routeIs(['roles.*', 'homepage.settings.*', 'general.settings.*']) ? '' : 'collapsed' }}" 
                    data-toggle="collapse" href="#configuracionesCollapse" role="button" 
-                   aria-expanded="{{ request()->routeIs(['roles.*', 'homepage.settings.*']) ? 'true' : 'false' }}" 
+                   aria-expanded="{{ request()->routeIs(['roles.*', 'homepage.settings.*', 'general.settings.*']) ? 'true' : 'false' }}" 
                    aria-controls="configuracionesCollapse">
                     <i class="fas fa-cog"></i>
                     <span>Configuraciones</span>
                     <i class="fas fa-chevron-down ml-auto submenu-arrow"></i>
                 </a>
-                <div class="collapse sidebar-submenu {{ request()->routeIs(['roles.*', 'homepage.settings.*']) ? 'show' : '' }}" id="configuracionesCollapse">
+                <div class="collapse sidebar-submenu {{ request()->routeIs(['roles.*', 'homepage.settings.*', 'general.settings.*']) ? 'show' : '' }}" id="configuracionesCollapse">
  
                     @if(Auth::user()->hasPermission('manage_roles'))
                         <a class="sidebar-link {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{route("roles.index")}}">
                             <i class="fa fa-key" style="color: #D4AF37;"></i>Roles y Permisos
+                        </a>
+                    @endif
+
+                    @if(Auth::user()->hasPermission('manage_general_settings'))
+                        <a class="sidebar-link {{ request()->routeIs('general.settings.index') ? 'active' : '' }}" href="{{route("general.settings.index")}}">
+                            <i class="fas fa-cogs" style="color: #D4AF37;"></i>
+                            <span>Configuración General</span>
                         </a>
                     @endif
 
@@ -465,6 +617,100 @@
             });
         }
     });
+
+    $(function(){
+        // Función para cargar notificaciones del sistema
+        function cargarNotificaciones() {
+            $.ajax({
+                url: "{{ route('notificaciones.api') }}",
+                type: "GET",
+                dataType: "json",
+                success: function(response) {
+                    if (response.lSuccess) {
+                        var notifications = response.notifications || [];
+                        var totalAlertas = notifications.length;
+
+                        // Actualizar badges
+                        if (totalAlertas > 0) {
+                            $('#notificationBadge, #notificationBadgeMobile')
+                                .text(totalAlertas)
+                                .removeClass('d-none');
+                        } else {
+                            $('#notificationBadge, #notificationBadgeMobile').addClass('d-none');
+                        }
+
+                        // Rellenar lista de notificaciones (compartida en el modal)
+                        var listHtml = '';
+                        if (totalAlertas > 0) {
+                            notifications.forEach(function(item) {
+                                listHtml += `
+                                    <a href="${item.url}" class="notification-item" data-type="${item.type}" data-id="${item.id}">
+                                        <div class="notification-icon-container">
+                                            <i class="${item.icon}"></i>
+                                        </div>
+                                        <div class="notification-content">
+                                            <div class="notification-title">
+                                                ${item.title}
+                                            </div>
+                                            <div class="notification-desc">
+                                                ${item.description}
+                                            </div>
+                                            <span class="notification-time">
+                                                <i class="far fa-clock mr-1"></i> ${item.time_ago}
+                                            </span>
+                                        </div>
+                                    </a>
+                                `;
+                            });
+                        } else {
+                            listHtml = `
+                                <div class="text-center p-5 text-muted">
+                                    <i class="fas fa-check-circle text-success mb-2" style="font-size: 2rem;"></i>
+                                    <p class="mb-0 small">No tienes notificaciones pendientes.</p>
+                                </div>
+                            `;
+                        }
+
+                        $('#notificationList').html(listHtml);
+                    }
+                },
+                error: function() {
+                    $('#notificationList').html(`
+                        <div class="text-center p-4 text-danger small">
+                            <i class="fas fa-exclamation-circle mr-1"></i> Error al cargar notificaciones
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        // Interceptar click en notificaciones para marcarlas como leídas
+        $(document).on('click', '.notification-item', function(e) {
+            e.preventDefault();
+            var href = $(this).attr('href');
+            var type = $(this).data('type');
+            var id = $(this).data('id');
+
+            $.ajax({
+                url: "{{ route('notificaciones.marcarLeida') }}",
+                type: "POST",
+                data: {
+                    type: type,
+                    id: id,
+                    _token: "{{ csrf_token() }}"
+                },
+                complete: function() {
+                    window.location.href = href;
+                }
+            });
+        });
+
+        // Cargar al iniciar y refrescar cada 5 minutos
+        @auth
+            cargarNotificaciones();
+            setInterval(cargarNotificaciones, 5 * 60 * 1000);
+        @endauth
+    });
 </script>
 
 <div class="main-wrapper">
@@ -472,5 +718,33 @@
         @yield("contenido")
     </main>
 </div>
+
+@auth
+<!-- Modal de Notificaciones (Estilo Facebook) -->
+<div class="modal fade" id="notificationsModal" tabindex="-1" role="dialog" aria-labelledby="notificationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: none; box-shadow: 0 15px 50px rgba(0,0,0,0.2);">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: none; padding: 1.25rem 1.5rem;">
+                <h5 class="modal-title font-weight-bold" id="notificationsModalLabel">
+                    <i class="fas fa-bell mr-2" style="color: #D4AF37;"></i> Notificaciones
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" style="opacity: 0.8;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0" style="background-color: #f8fafc;">
+                <div id="notificationList" class="notification-list-container">
+                    <div class="text-center p-4 text-muted">
+                        <i class="fas fa-spinner fa-spin mr-2"></i> Cargando notificaciones...
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center" style="border-top: 1px solid #e2e8f0; background: #fff; padding: 0.75rem;">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" style="border-radius: 20px; padding: 5px 20px;">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endauth
 </body>
 </html>

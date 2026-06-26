@@ -102,6 +102,7 @@ $(document).ready(function () {
         pagination: true,
         pageSize: 10,
         search: true,
+        searchText: new URLSearchParams(window.location.search).get('buscar') || '',
         exportDataType: 'all',
         exportTypes: ['excel', 'pdf'],
         exportOptions: {

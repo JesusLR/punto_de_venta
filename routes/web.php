@@ -67,6 +67,8 @@ Auth::routes([
                 Route::post("/gridApartados/gridApartados", "ApartadosController@gridApartados")->name("gridApartados");
                 Route::post("/apartados/cambiarNombre", "ApartadosController@cambiarNombre")->name("apartados.cambiarNombre");
                 Route::post("/apartados/openWA", "ApartadosController@openWA")->name("apartados.openWA");
+                Route::get("/api/notificaciones", "HomeController@obtenerNotificaciones")->name("notificaciones.api");
+                Route::post("/api/notificaciones/marcar-leida", "HomeController@marcarNotificacionLeida")->name("notificaciones.marcarLeida");
 
                 //Productos
                 Route::post("/gridProductos", "ProductosController@gridProductos")->name("gridProductos");
@@ -118,6 +120,12 @@ Auth::routes([
                 Route::middleware('permission:manage_homepage')->group(function() {
                     Route::get('/configuracion-portada', 'HomepageSettingController@index')->name('homepage.settings.index');
                     Route::post('/configuracion-portada/update', 'HomepageSettingController@update')->name('homepage.settings.update');
+                });
+
+                // Configuración General
+                Route::middleware('permission:manage_general_settings')->group(function() {
+                    Route::get('/configuracion-general', 'GeneralSettingController@index')->name('general.settings.index');
+                    Route::post('/configuracion-general/update', 'GeneralSettingController@update')->name('general.settings.update');
                 });
 
                 Route::post('/about/upload-image', [AboutController::class, 'uploadImage'])->name('about.upload.image');
