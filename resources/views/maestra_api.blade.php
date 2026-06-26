@@ -248,7 +248,7 @@
             </li>
             @guest
             @else
-            @if (Auth::user()->id == 1)
+            <!-- @if (Auth::user()->id == 1)
                 <li class="nav-item">
                     <a class="nav-link" href="{{route("home")}}"><i class="fa fa-home mr-1"></i>Inicio</a>
                 </li>
@@ -327,7 +327,7 @@
                         {{-- <a class="dropdown-item" href="{{route("finanzas.index")}}"><i class="fas fa-wallet mr-2" style="color: #2ECC71;"></i>Finanzas</a> --}}
                     </div>
                 </li>
-            @endif
+            @endif -->
 
             @endguest
         </ul>
