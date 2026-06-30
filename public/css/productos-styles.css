@@ -239,6 +239,30 @@
     color: white;
 }
 
+.btn-clear-filters {
+    background: linear-gradient(135deg, #475569 0%, #334155 100%);
+    color: white;
+    border: 1px solid #475569;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-clear-filters:hover {
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    border-color: #334155;
+    box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
+    transform: translateY(-1px);
+    text-decoration: none;
+    color: white;
+}
+
 /* Select y Form Controls Modernos */
 .form-control-modern {
     width: 100%;

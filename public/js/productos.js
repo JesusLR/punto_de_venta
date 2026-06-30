@@ -91,6 +91,11 @@ $(document).ready(function () {
         },
     });
 
+    // Initialize search text filter from URL query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const buscarQuery = urlParams.get('buscar') || '';
+    $("#txtBuscarProducto").val(buscarQuery);
+
     $("#gridProductos").bootstrapTable({
         url: "/gridProductos",
         classes: "table-striped",
@@ -101,8 +106,7 @@ $(document).ready(function () {
         sidePagination: "server",
         pagination: true,
         pageSize: 10,
-        search: true,
-        searchText: new URLSearchParams(window.location.search).get('buscar') || '',
+        search: false,
         exportDataType: 'all',
         exportTypes: ['excel', 'pdf'],
         exportOptions: {
@@ -118,6 +122,7 @@ $(document).ready(function () {
                 cTipoBusquedaProveedor: $("#cTipoBusquedaProveedor").val(),
                 cTipoBusquedaMaterial: $("#cTipoBusquedaMaterial").val(),
                 cTipoBusquedaCategoria: $("#cTipoBusquedaCategoria").val(),
+                search: $("#txtBuscarProducto").val(),
             };
         },
         columns: [{
@@ -351,6 +356,32 @@ function deleteProducto(id) {
         },
     });
 }
+
+var searchTimeout = null;
+$("#txtBuscarProducto").on("input", function () {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(function () {
+        $("#gridProductos").bootstrapTable('refresh');
+    }, 500); // 500ms debounce
+});
+
+$("#btnLimpiarFiltros").on("click", function () {
+    // Reset values to defaults
+    $("#txtBuscarProducto").val("");
+    $("#cTipoBusquedaProductos").val("T");
+    $("#cTipoBusquedaProveedor").val("T");
+    $("#cTipoBusquedaMaterial").val("T");
+    $("#cTipoBusquedaCategoria").val("T");
+
+    // Clean URL query parameters dynamically
+    if (window.history.pushState) {
+        var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.pushState({ path: cleanUrl }, '', cleanUrl);
+    }
+
+    // Refresh table with default values
+    $("#gridProductos").bootstrapTable('refresh');
+});
 
 $("#cTipoBusquedaProductos").on("change", function () {
     $("#gridProductos").bootstrapTable('refresh');
