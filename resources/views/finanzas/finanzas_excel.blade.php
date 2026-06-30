@@ -33,7 +33,7 @@
 <table>
     <thead>
         <tr>
-            <th colspan="6">INGRESOS AUTOMÁTICOS</th>
+            <th colspan="6">INGRESOS (AUTOMÁTICOS Y MANUALES)</th>
         </tr>
         <tr>
             <th>Fecha</th>
@@ -65,10 +65,11 @@
 <table>
     <thead>
         <tr>
-            <th colspan="5">EGRESOS CAPTURADOS</th>
+            <th colspan="6">EGRESOS CAPTURADOS</th>
         </tr>
         <tr>
             <th>Fecha</th>
+            <th>Tipo</th>
             <th>Concepto</th>
             <th>Usuario</th>
             <th>Observaciones</th>
@@ -79,6 +80,7 @@
         @forelse ($egresos as $egreso)
             <tr>
                 <td>{{ \Carbon\Carbon::parse($egreso->fecha)->format('d/m/Y') }}</td>
+                <td>{{ $egreso->id_egreso_automatico ? 'AUTOMÁTICO' : 'MANUAL' }}</td>
                 <td>{{ $egreso->concepto }}</td>
                 <td>{{ optional($egreso->usuario)->name }}</td>
                 <td>{{ $egreso->observaciones }}</td>
@@ -86,7 +88,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="5">Sin egresos en el rango seleccionado</td>
+                <td colspan="6">Sin egresos en el rango seleccionado</td>
             </tr>
         @endforelse
     </tbody>

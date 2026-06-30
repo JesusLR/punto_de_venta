@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Egreso;
+use App\Ingreso;
 use App\Exports\FinanzasExport;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -83,14 +84,20 @@ class FinanzasController extends Controller
             ->orderByDesc('fecha_movimiento')
             ->get();
 
+        $ingresosManuales = Ingreso::with('usuario')
+            ->whereBetween('fecha', [$fechaInicio->toDateString(), $fechaFin->toDateString()])
+            ->get();
+
         $totalVentas = (float) $ventasIngresos->sum('monto');
         $totalAbonos = (float) $abonosIngresos->sum('monto');
-        $totalIngresos = $totalVentas + $totalAbonos;
+        $totalIngresosManuales = (float) $ingresosManuales->sum('monto');
+        $totalIngresos = $totalVentas + $totalAbonos + $totalIngresosManuales;
 
         $movimientosIngresos = collect();
 
         foreach ($ventasIngresos as $venta) {
             $movimientosIngresos->push([
+                'id' => null,
                 'fecha' => Carbon::parse($venta->created_at),
                 'tipo' => 'VENTA',
                 'metodo' => $venta->tipo_pago ?: 'EFECTIVO',
@@ -102,12 +109,25 @@ class FinanzasController extends Controller
 
         foreach ($abonosIngresos as $abono) {
             $movimientosIngresos->push([
+                'id' => null,
                 'fecha' => Carbon::parse($abono->fecha_movimiento),
                 'tipo' => 'ABONO',
                 'metodo' => $abono->tipo_pago ?: 'EFECTIVO',
                 'referencia' => strlen($abono->nombre_apartado) == 0 ? 'Comprobante de apartado folio #' . $abono->apartado_id : $abono->nombre_apartado,
                 'detalle' => 'Cliente: ' . ($abono->cliente_nombre ?: 'N/A'),
                 'monto' => (float) $abono->monto,
+            ]);
+        }
+
+        foreach ($ingresosManuales as $ingreso) {
+            $movimientosIngresos->push([
+                'id' => $ingreso->id,
+                'fecha' => Carbon::parse($ingreso->fecha),
+                'tipo' => 'MANUAL',
+                'metodo' => 'EFECTIVO',
+                'referencia' => $ingreso->concepto,
+                'detalle' => 'Usuario: ' . (optional($ingreso->usuario)->name ?: 'N/A') . ($ingreso->observaciones ? ' | Obs: ' . $ingreso->observaciones : ''),
+                'monto' => (float) $ingreso->monto,
             ]);
         }
 
@@ -148,6 +168,7 @@ class FinanzasController extends Controller
             'egresos' => $egresos,
             'movimientosIngresos' => $movimientosIngresos,
             'totalIngresos' => $totalIngresos,
+            'totalIngresosManuales' => $totalIngresosManuales,
             'totalIngresoEfectivo' => $totalIngresoEfectivo,
             'totalIngresoMercadoPago' => $totalIngresoMercadoPago,
             'totalEgresos' => $totalEgresos,
@@ -283,14 +304,20 @@ class FinanzasController extends Controller
             ->orderByDesc('fecha_movimiento')
             ->get();
 
+        $ingresosManuales = Ingreso::with('usuario')
+            ->whereBetween('fecha', [$fechaInicio->toDateString(), $fechaFin->toDateString()])
+            ->get();
+
         $totalVentas = (float) $ventasIngresos->sum('monto');
         $totalAbonos = (float) $abonosIngresos->sum('monto');
-        $totalIngresos = $totalVentas + $totalAbonos;
+        $totalIngresosManuales = (float) $ingresosManuales->sum('monto');
+        $totalIngresos = $totalVentas + $totalAbonos + $totalIngresosManuales;
 
         $movimientosIngresos = collect();
 
         foreach ($ventasIngresos as $venta) {
             $movimientosIngresos->push([
+                'id' => null,
                 'fecha' => Carbon::parse($venta->created_at),
                 'tipo' => 'VENTA',
                 'metodo' => $venta->tipo_pago ?: 'EFECTIVO',
@@ -302,12 +329,25 @@ class FinanzasController extends Controller
 
         foreach ($abonosIngresos as $abono) {
             $movimientosIngresos->push([
+                'id' => null,
                 'fecha' => Carbon::parse($abono->fecha_movimiento),
                 'tipo' => 'ABONO',
                 'metodo' => $abono->tipo_pago ?: 'EFECTIVO',
                 'referencia' => strlen($abono->nombre_apartado) == 0 ? 'Comprobante de apartado folio #' . $abono->apartado_id : $abono->nombre_apartado,
                 'detalle' => 'Cliente: ' . ($abono->cliente_nombre ?: 'N/A'),
                 'monto' => (float) $abono->monto,
+            ]);
+        }
+
+        foreach ($ingresosManuales as $ingreso) {
+            $movimientosIngresos->push([
+                'id' => $ingreso->id,
+                'fecha' => Carbon::parse($ingreso->fecha),
+                'tipo' => 'MANUAL',
+                'metodo' => 'EFECTIVO',
+                'referencia' => $ingreso->concepto,
+                'detalle' => 'Usuario: ' . (optional($ingreso->usuario)->name ?: 'N/A') . ($ingreso->observaciones ? ' | Obs: ' . $ingreso->observaciones : ''),
+                'monto' => (float) $ingreso->monto,
             ]);
         }
 
@@ -328,5 +368,71 @@ class FinanzasController extends Controller
             $movimientosIngresos,
             $egresos
         ), $nombreArchivo);
+    }
+
+    public function storeIngreso(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'concepto' => 'required|string|max:150',
+            'monto' => 'required|numeric|min:0.01',
+            'fecha' => 'required|date',
+            'observaciones' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'lSuccess' => false,
+                    'cMensaje' => $validator->errors()->first(),
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        Ingreso::create([
+            'id_usuario' => auth()->id(),
+            'concepto' => strtoupper(trim($request->concepto)),
+            'monto' => $request->monto,
+            'fecha' => $request->fecha,
+            'observaciones' => $request->observaciones,
+        ]);
+
+        if ($request->ajax() || $request->expectsJson()) {
+            return response()->json([
+                'lSuccess' => true,
+                'cMensaje' => 'Ingreso guardado con éxito',
+            ]);
+        }
+
+        return redirect()->route('finanzas.index', [
+            'fecha_inicio' => $request->fecha_inicio,
+            'fecha_fin' => $request->fecha_fin,
+        ])->with([
+            'mensaje' => 'Ingreso guardado con éxito',
+            'tipo' => 'success',
+        ]);
+    }
+
+    public function destroyIngreso(Request $request, $id)
+    {
+        $ingreso = Ingreso::findOrFail($id);
+        $ingreso->delete();
+
+        if ($request->ajax() || $request->expectsJson()) {
+            return response()->json([
+                'lSuccess' => true,
+                'cMensaje' => 'Ingreso eliminado con éxito',
+            ]);
+        }
+
+        return redirect()->route('finanzas.index', [
+            'fecha_inicio' => $request->fecha_inicio,
+            'fecha_fin' => $request->fecha_fin,
+        ])->with([
+            'mensaje' => 'Ingreso eliminado con éxito',
+            'tipo' => 'success',
+        ]);
     }
 }

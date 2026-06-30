@@ -67,12 +67,20 @@
             <div class="col-lg-4 mb-3">
                 <div class="table-container">
                     <div class="table-wrapper">
-                        <h5 class="mb-3"><i class="fas fa-minus-circle text-danger"></i> Capturar egreso</h5>
+                        <h5 class="mb-3" id="finanzas-form-title"><i class="fas fa-minus-circle text-danger"></i> Capturar egreso</h5>
 
                         <form method="POST" action="{{ route('finanzas.store') }}" id="finanzas-egreso-form">
                             @csrf
                             <input type="hidden" name="fecha_inicio" value="{{ $fechaInicio }}">
                             <input type="hidden" name="fecha_fin" value="{{ $fechaFin }}">
+
+                            <div class="form-group">
+                                <label for="tipo_movimiento"><i class="fas fa-exchange-alt"></i> Tipo de movimiento</label>
+                                <select class="form-control-modern" id="tipo_movimiento" name="tipo_movimiento">
+                                    <option value="egreso">Egreso (Gasto)</option>
+                                    <option value="ingreso">Ingreso Manual</option>
+                                </select>
+                            </div>
 
                             <div class="form-group">
                                 <label for="concepto">Concepto</label>
@@ -106,21 +114,29 @@
                 <div id="finanzas-ingresos-section">
                 <div class="table-container mb-3">
                     <div class="table-wrapper">
-                        <h5 class="mb-3"><i class="fas fa-plus-circle text-success"></i> Ingresos automáticos</h5>
+                        <h5 class="mb-3"><i class="fas fa-plus-circle text-success"></i> Ingresos (Automáticos y Manuales)</h5>
                         <div class="row mb-3">
-                            <div class="col-md-6 mb-2">
+                            <div class="col-md-4 mb-2">
                                 <div class="card border-0 shadow-sm h-100">
-                                    <div class="card-body py-2">
-                                        <small class="text-muted d-block mb-1">Total en efectivo</small>
+                                    <div class="card-body py-2 text-center">
+                                        <small class="text-muted d-block mb-1">Total efectivo (auto)</small>
                                         <strong class="text-success">${{ number_format($totalIngresoEfectivo, 2) }}</strong>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-2">
+                            <div class="col-md-4 mb-2">
                                 <div class="card border-0 shadow-sm h-100">
-                                    <div class="card-body py-2">
-                                        <small class="text-muted d-block mb-1">Total en mercado pago</small>
+                                    <div class="card-body py-2 text-center">
+                                        <small class="text-muted d-block mb-1">Total mercado pago (auto)</small>
                                         <strong class="text-primary">${{ number_format($totalIngresoMercadoPago, 2) }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body py-2 text-center">
+                                        <small class="text-muted d-block mb-1">Total ingresos manuales</small>
+                                        <strong class="text-success" style="color: #059669 !important;">${{ number_format($totalIngresosManuales, 2) }}</strong>
                                     </div>
                                 </div>
                             </div>
@@ -135,21 +151,45 @@
                                         <th>Método</th>
                                         <th>Detalle</th>
                                         <th class="text-right">Monto</th>
+                                        <th class="text-center">Acción</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse ($movimientosIngresos as $movimiento)
                                         <tr>
                                             <td>{{ $movimiento['fecha']->format('d/m/Y') }}</td>
-                                            <td>{{ $movimiento['tipo'] }}</td>
+                                            <td>
+                                                @if($movimiento['tipo'] == 'MANUAL')
+                                                    <span class="badge badge-primary px-2 py-1">MANUAL</span>
+                                                @elseif ($movimiento['tipo'] == 'ABONO')
+                                                    <span class="badge badge-info px-2 py-1">ABONO</span>
+                                                @else
+                                                    <span class="badge badge-success px-2 py-1">{{ $movimiento['tipo'] }}</span>
+                                                @endif
+                                            </td>
                                             <td>{{ $movimiento['referencia'] }}</td>
                                             <td>{{ str_replace('_', ' ', $movimiento['metodo']) }}</td>
                                             <td>{{ $movimiento['detalle'] }}</td>
                                             <td class="text-right text-success">${{ number_format($movimiento['monto'], 2) }}</td>
+                                            <td class="text-center">
+                                                @if ($movimiento['tipo'] == 'MANUAL')
+                                                    <form method="POST" action="{{ route('finanzas.destroyIngreso', $movimiento['id']) }}" class="finanzas-ingreso-delete-form" style="display:inline-block;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <input type="hidden" name="fecha_inicio" value="{{ $fechaInicio }}">
+                                                        <input type="hidden" name="fecha_fin" value="{{ $fechaFin }}">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar ingreso manual">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center text-muted">Sin ingresos en el rango seleccionado</td>
+                                            <td colspan="7" class="text-center text-muted">Sin ingresos en el rango seleccionado</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -171,6 +211,7 @@
                                 <thead>
                                     <tr>
                                         <th>Fecha</th>
+                                        <th>Tipo</th>
                                         <th>Concepto</th>
                                         <th>Usuario</th>
                                         <th>Observaciones</th>
@@ -182,6 +223,13 @@
                                     @forelse ($egresos as $egreso)
                                         <tr>
                                             <td>{{ \Carbon\Carbon::parse($egreso->fecha)->format('d/m/Y') }}</td>
+                                            <td>
+                                                @if($egreso->id_egreso_automatico)
+                                                    <span class="badge badge-warning px-2 py-1">AUTOMÁTICO</span>
+                                                @else
+                                                    <span class="badge badge-danger px-2 py-1">MANUAL</span>
+                                                @endif
+                                            </td>
                                             <td>{{ $egreso->concepto }}</td>
                                             <td>{{ optional($egreso->usuario)->name }}</td>
                                             <td>{{ $egreso->observaciones }}</td>
@@ -200,7 +248,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center text-muted">Sin egresos en el rango seleccionado</td>
+                                            <td colspan="7" class="text-center text-muted">Sin egresos en el rango seleccionado</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -217,14 +265,9 @@
         </div>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(function () {
-        function mostrarAlertaAjax(mensaje, tipo) {
-            const clase = tipo === 'success' ? 'alert-success' : 'alert-danger';
-            $('#finanzas-ajax-alert').html('<div class="alert ' + clase + '">' + mensaje + '</div>');
-        }
-
         function obtenerUrlConFiltros() {
             return $('#finanzas-filtros-form').attr('action') + '?' + $('#finanzas-filtros-form').serialize();
         }
@@ -263,12 +306,30 @@
             recargarDashboard(obtenerUrlConFiltros());
         });
 
+        $(document).on('change', '#tipo_movimiento', function () {
+            const tipo = $(this).val();
+            const $form = $('#finanzas-egreso-form');
+            const $title = $('#finanzas-form-title');
+            const $btn = $form.find('button[type="submit"]');
+
+            if (tipo === 'egreso') {
+                $title.html('<i class="fas fa-minus-circle text-danger"></i> Capturar egreso');
+                $form.attr('action', '{{ route("finanzas.store") }}');
+                $btn.removeClass('btn-success').addClass('btn-danger').html('<i class="fas fa-save mr-1"></i> Guardar egreso');
+            } else {
+                $title.html('<i class="fas fa-plus-circle text-success"></i> Capturar ingreso');
+                $form.attr('action', '{{ route("finanzas.storeIngreso") }}');
+                $btn.removeClass('btn-danger').addClass('btn-success').html('<i class="fas fa-save mr-1"></i> Guardar ingreso');
+            }
+        });
+
         $(document).on('submit', '#finanzas-egreso-form', function (e) {
             e.preventDefault();
 
             const $form = $(this);
             const $monto = $form.find('#monto');
             $monto.val(String($monto.val()).replace(',', '.'));
+            const tipo = $('#tipo_movimiento').val();
 
             $.ajax({
                 url: $form.attr('action'),
@@ -278,47 +339,84 @@
                     'Accept': 'application/json'
                 }
             }).done(function (response) {
-                const mensaje = response && response.cMensaje ? response.cMensaje : 'Egreso guardado con éxito';
+                const defaultMsg = tipo === 'egreso' ? 'Egreso guardado con éxito' : 'Ingreso guardado con éxito';
+                const mensaje = response && response.cMensaje ? response.cMensaje : defaultMsg;
                 actualizarLinkExcel();
                 recargarDashboard(obtenerUrlConFiltros(), function () {
-                    mostrarAlertaAjax(mensaje, 'success');
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Guardado!',
+                        text: mensaje,
+                        confirmButtonColor: '#D4AF37',
+                        timer: 3000
+                    });
                     const $formNuevo = $('#finanzas-egreso-form');
                     $formNuevo.find('#concepto').val('');
                     $formNuevo.find('#monto').val('');
                     $formNuevo.find('#observaciones').val('');
                 });
             }).fail(function (xhr) {
+                const defaultError = tipo === 'egreso' ? 'No se pudo guardar el egreso' : 'No se pudo guardar el ingreso';
                 const mensaje = xhr.responseJSON && xhr.responseJSON.cMensaje
                     ? xhr.responseJSON.cMensaje
-                    : 'No se pudo guardar el egreso';
-                mostrarAlertaAjax(mensaje, 'error');
+                    : defaultError;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: mensaje,
+                    confirmButtonColor: '#D4AF37'
+                });
             });
         });
 
-        $(document).on('submit', '.finanzas-egreso-delete-form', function (e) {
+        $(document).on('submit', '.finanzas-egreso-delete-form, .finanzas-ingreso-delete-form', function (e) {
             e.preventDefault();
 
-            if (!confirm('¿Eliminar este egreso?')) {
-                return;
-            }
-
             const $form = $(this);
+            const esEgreso = $form.hasClass('finanzas-egreso-delete-form');
+            const mensajeConfirm = esEgreso ? '¿Eliminar este egreso?' : '¿Eliminar este ingreso?';
+            const confirmTitle = esEgreso ? '¿Eliminar egreso?' : '¿Eliminar ingreso?';
 
-            $.ajax({
-                url: $form.attr('action'),
-                method: 'POST',
-                data: $form.serialize(),
-                headers: {
-                    'Accept': 'application/json'
+            Swal.fire({
+                title: confirmTitle,
+                text: mensajeConfirm,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: $form.attr('action'),
+                        method: 'POST',
+                        data: $form.serialize(),
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    }).done(function (response) {
+                        const defaultMsg = esEgreso ? 'Egreso eliminado con éxito' : 'Ingreso eliminado con éxito';
+                        const mensaje = response && response.cMensaje ? response.cMensaje : defaultMsg;
+                        actualizarLinkExcel();
+                        recargarDashboard(obtenerUrlConFiltros(), function () {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Eliminado!',
+                                text: mensaje,
+                                confirmButtonColor: '#D4AF37',
+                                timer: 3000
+                            });
+                        });
+                    }).fail(function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: esEgreso ? 'No se pudo eliminar el egreso' : 'No se pudo eliminar el ingreso',
+                            confirmButtonColor: '#D4AF37'
+                        });
+                    });
                 }
-            }).done(function (response) {
-                const mensaje = response && response.cMensaje ? response.cMensaje : 'Egreso eliminado con éxito';
-                actualizarLinkExcel();
-                recargarDashboard(obtenerUrlConFiltros(), function () {
-                    mostrarAlertaAjax(mensaje, 'success');
-                });
-            }).fail(function () {
-                mostrarAlertaAjax('No se pudo eliminar el egreso', 'error');
             });
         });
 

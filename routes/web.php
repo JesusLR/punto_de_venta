@@ -51,6 +51,8 @@ Auth::routes([
                 Route::get('/finanzas/excel', 'FinanzasController@exportExcel')->name('finanzas.excel');
                 Route::post('/finanzas/egresos', 'FinanzasController@store')->name('finanzas.store');
                 Route::delete('/finanzas/egresos/{id}', 'FinanzasController@destroy')->name('finanzas.destroy');
+                Route::post('/finanzas/ingresos', 'FinanzasController@storeIngreso')->name('finanzas.storeIngreso');
+                Route::delete('/finanzas/ingresos/{id}', 'FinanzasController@destroyIngreso')->name('finanzas.destroyIngreso');
 
                 // Apartados
                 Route::get("/apartados", "ApartadosController@index")->name("apartados.index");
@@ -126,6 +128,8 @@ Auth::routes([
                 Route::middleware('permission:manage_general_settings')->group(function() {
                     Route::get('/configuracion-general', 'GeneralSettingController@index')->name('general.settings.index');
                     Route::post('/configuracion-general/update', 'GeneralSettingController@update')->name('general.settings.update');
+                    Route::post('/configuracion-general/egresos-automaticos', 'GeneralSettingController@storeEgresoAutomatico')->name('general.egresos_automaticos.store');
+                    Route::delete('/configuracion-general/egresos-automaticos/{id}', 'GeneralSettingController@destroyEgresoAutomatico')->name('general.egresos_automaticos.destroy');
                 });
 
                 Route::post('/about/upload-image', [AboutController::class, 'uploadImage'])->name('about.upload.image');

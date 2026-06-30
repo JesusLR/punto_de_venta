@@ -4,13 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Egreso extends Model
+class Ingreso extends Model
 {
-    protected $table = 'egresos';
+    protected $table = 'ingresos';
 
     protected $fillable = [
         'id_usuario',
-        'id_egreso_automatico',
         'concepto',
         'monto',
         'fecha',

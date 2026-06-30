@@ -32,6 +32,7 @@ class HomeController extends Controller
     public function index()
     {
         $this->precio_materiales_dia();
+        $this->procesarEgresosAutomaticos();
 
         $inicioMes = Carbon::now()->startOfMonth();
         $finMes = Carbon::now()->endOfMonth();
@@ -123,7 +124,11 @@ class HomeController extends Controller
             )
             ->sum('apartado_abonos.monto');
 
-        $ingresosAutomaticosMes = $totalVentasMes + $totalAbonosMes;
+        $ingresosManualesMes = (float) DB::table('ingresos')
+            ->whereBetween('fecha', [$inicioMes->toDateString(), $finMes->toDateString()])
+            ->sum('monto');
+
+        $ingresosAutomaticosMes = $totalVentasMes + $totalAbonosMes + $ingresosManualesMes;
 
         $egresosCapturadosMes = (float) Egreso::whereBetween('fecha', [$inicioMes->toDateString(), $finMes->toDateString()])
             ->sum('monto');
@@ -172,6 +177,12 @@ class HomeController extends Controller
             ->groupBy('fecha')
             ->get();
 
+        $ingresosManualesDias = DB::table('ingresos')
+            ->select('fecha', DB::raw('SUM(monto) as total'))
+            ->where('fecha', '>=', Carbon::now()->subDays(15)->toDateString())
+            ->groupBy('fecha')
+            ->get();
+
         $chartData = [];
         for ($i = 14; $i >= 0; $i--) {
             $dateStr = Carbon::now()->subDays($i)->toDateString();
@@ -193,6 +204,12 @@ class HomeController extends Controller
             $f = Carbon::parse($a->fecha)->toDateString();
             if (isset($chartData[$f])) {
                 $chartData[$f]['ingresos'] += (float) $a->total;
+            }
+        }
+        foreach ($ingresosManualesDias as $ing) {
+            $f = Carbon::parse($ing->fecha)->toDateString();
+            if (isset($chartData[$f])) {
+                $chartData[$f]['ingresos'] += (float) $ing->total;
             }
         }
         foreach ($egresosDias as $e) {
@@ -279,6 +296,67 @@ class HomeController extends Controller
             'ventasRecientes',
             'oroHistorico'
         ));
+    }
+
+    private function procesarEgresosAutomaticos()
+    {
+        try {
+            $hoy = Carbon::now();
+            $diaHoy = $hoy->day;
+            $mesHoy = $hoy->month;
+            $anioHoy = $hoy->year;
+            $diaSemanaHoy = $hoy->dayOfWeekIso; // 1 = Monday, 7 = Sunday
+
+            $egresosAuto = \App\EgresoAutomatico::all();
+
+            foreach ($egresosAuto as $auto) {
+                if ($auto->frecuencia === 'MENSUAL') {
+                    if ($auto->dia_mes <= $diaHoy) {
+                        // Verificar si ya se registró para este mes y año
+                        $yaExiste = \App\Egreso::where('id_egreso_automatico', $auto->id)
+                            ->whereYear('fecha', $anioHoy)
+                            ->whereMonth('fecha', $mesHoy)
+                            ->exists();
+
+                        if (!$yaExiste) {
+                            $fechaEgreso = Carbon::createFromDate($anioHoy, $mesHoy, $auto->dia_mes)->toDateString();
+                            \App\Egreso::create([
+                                'id_usuario' => auth()->id() ?: 1,
+                                'id_egreso_automatico' => $auto->id,
+                                'concepto' => $auto->concepto . ' (AUTOMÁTICO)',
+                                'monto' => $auto->monto,
+                                'fecha' => $fechaEgreso,
+                                'observaciones' => $auto->observaciones ?: 'Generado automáticamente por el sistema (Mensual).',
+                            ]);
+                        }
+                    }
+                } elseif ($auto->frecuencia === 'SEMANAL') {
+                    if ($auto->dia_semana <= $diaSemanaHoy) {
+                        // Verificar si ya se registró para esta semana
+                        $inicioSemana = Carbon::now()->startOfWeek();
+                        $finSemana = Carbon::now()->endOfWeek();
+
+                        $yaExiste = \App\Egreso::where('id_egreso_automatico', $auto->id)
+                            ->whereBetween('fecha', [$inicioSemana->toDateString(), $finSemana->toDateString()])
+                            ->exists();
+
+                        if (!$yaExiste) {
+                            $fechaEgreso = Carbon::now()->startOfWeek()->addDays($auto->dia_semana - 1)->toDateString();
+                            \App\Egreso::create([
+                                'id_usuario' => auth()->id() ?: 1,
+                                'id_egreso_automatico' => $auto->id,
+                                'concepto' => $auto->concepto . ' (AUTOMÁTICO SEMANAL)',
+                                'monto' => $auto->monto,
+                                'fecha' => $fechaEgreso,
+                                'observaciones' => $auto->observaciones ?: 'Generado automáticamente por el sistema (Semanal).',
+                            ]);
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error al procesar egresos automáticos: ' . $e->getMessage());
+        }
     }
 
     public function precio_materiales_dia()

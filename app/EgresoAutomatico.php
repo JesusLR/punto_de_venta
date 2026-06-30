@@ -4,27 +4,26 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Egreso extends Model
+class EgresoAutomatico extends Model
 {
-    protected $table = 'egresos';
+    protected $table = 'egresos_automaticos';
 
     protected $fillable = [
-        'id_usuario',
-        'id_egreso_automatico',
         'concepto',
         'monto',
-        'fecha',
+        'frecuencia',
+        'dia_mes',
+        'dia_semana',
         'observaciones',
     ];
 
     protected $dates = [
-        'fecha',
         'created_at',
         'updated_at',
     ];
 
-    public function usuario()
+    public function egresos()
     {
-        return $this->belongsTo(User::class, 'id_usuario');
+        return $this->hasMany(Egreso::class, 'id_egreso_automatico');
     }
 }

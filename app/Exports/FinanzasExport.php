@@ -101,7 +101,7 @@ class FinanzasExport implements FromView, WithEvents, ShouldAutoSize, WithDrawin
                 $sheet->mergeCells('A2:F2');
                 $sheet->mergeCells('A3:F3');
                 $sheet->mergeCells('A5:F5');
-                $sheet->mergeCells("A{$filaTituloEgresos}:E{$filaTituloEgresos}");
+                $sheet->mergeCells("A{$filaTituloEgresos}:F{$filaTituloEgresos}");
 
                 $sheet->getRowDimension(1)->setRowHeight(38);
 
@@ -154,7 +154,7 @@ class FinanzasExport implements FromView, WithEvents, ShouldAutoSize, WithDrawin
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
                 ]);
 
-                $sheet->getStyle('B7:D7')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $sheet->getStyle('A7:C7')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
 
                 $sheet->getStyle('A9:F9')->applyFromArray([
                     'font' => [
@@ -177,7 +177,7 @@ class FinanzasExport implements FromView, WithEvents, ShouldAutoSize, WithDrawin
                     ],
                 ]);
 
-                $sheet->getStyle("A{$filaTituloEgresos}:E{$filaTituloEgresos}")->applyFromArray([
+                $sheet->getStyle("A{$filaTituloEgresos}:F{$filaTituloEgresos}")->applyFromArray([
                     'font' => [
                         'bold' => true,
                         'color' => ['rgb' => 'FFFFFF'],
@@ -189,7 +189,7 @@ class FinanzasExport implements FromView, WithEvents, ShouldAutoSize, WithDrawin
                     ],
                 ]);
 
-                $sheet->getStyle("A{$filaHeaderEgresos}:E{$filaHeaderEgresos}")->applyFromArray([
+                $sheet->getStyle("A{$filaHeaderEgresos}:F{$filaHeaderEgresos}")->applyFromArray([
                     'font' => ['bold' => true],
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                     'fill' => [
@@ -207,7 +207,7 @@ class FinanzasExport implements FromView, WithEvents, ShouldAutoSize, WithDrawin
                     ],
                 ]);
 
-                $sheet->getStyle("A{$filaHeaderEgresos}:E{$filaFinEgresos}")->applyFromArray([
+                $sheet->getStyle("A{$filaHeaderEgresos}:F{$filaFinEgresos}")->applyFromArray([
                     'borders' => [
                         'allBorders' => [
                             'borderStyle' => Border::BORDER_THIN,
@@ -218,17 +218,17 @@ class FinanzasExport implements FromView, WithEvents, ShouldAutoSize, WithDrawin
 
                 $sheet->getStyle("F{$filaInicioIngresos}:F{$filaFinIngresos}")
                     ->getNumberFormat()
-                    ->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                    ->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
 
-                $sheet->getStyle("E{$filaInicioEgresos}:E{$filaFinEgresos}")
+                $sheet->getStyle("F{$filaInicioEgresos}:F{$filaFinEgresos}")
                     ->getNumberFormat()
-                    ->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                    ->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
 
                 $sheet->getStyle("F{$filaInicioIngresos}:F{$filaFinIngresos}")
                     ->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-                $sheet->getStyle("E{$filaInicioEgresos}:E{$filaFinEgresos}")
+                $sheet->getStyle("F{$filaInicioEgresos}:F{$filaFinEgresos}")
                     ->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
