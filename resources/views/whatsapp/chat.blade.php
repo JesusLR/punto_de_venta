@@ -327,6 +327,66 @@
         70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
         100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
+
+    /* Responsivo para Celulares y Tablets (< 768px) */
+    @media (max-width: 768px) {
+        .chat-wrapper {
+            height: calc(100vh - 90px);
+            border-radius: 8px;
+            border: none;
+            position: relative;
+        }
+
+        .chat-sidebar {
+            width: 100%;
+            display: flex;
+        }
+
+        .chat-main {
+            display: none;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            z-index: 100;
+            background: #ffffff;
+        }
+
+        .chat-wrapper.mobile-active .chat-sidebar {
+            display: none !important;
+        }
+
+        .chat-wrapper.mobile-active .chat-main {
+            display: flex !important;
+        }
+
+        .message-bubble {
+            max-width: 88%;
+            font-size: 0.85rem;
+        }
+
+        .chat-header {
+            padding: 0.75rem 1rem;
+        }
+
+        .chat-footer {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .chat-sidebar-header {
+            padding: 1rem;
+        }
+
+        .quick-replies-bar {
+            padding: 6px 10px;
+        }
+
+        .quick-reply-chip {
+            font-size: 0.72rem;
+            padding: 3px 10px;
+        }
+    }
 </style>
 
 <div class="container-fluid px-0 px-md-3">
@@ -943,10 +1003,10 @@
         }
     }, 4000);
 
-    // Cargar automáticamente el primer chat al abrir la pantalla
+    // Cargar automáticamente el primer chat solo en pantallas de escritorio
     document.addEventListener("DOMContentLoaded", () => {
         const firstChat = document.querySelector(".chat-item");
-        if (firstChat) {
+        if (firstChat && window.innerWidth > 768) {
             const id = firstChat.dataset.id;
             if (id) {
                 loadConversation(id);
