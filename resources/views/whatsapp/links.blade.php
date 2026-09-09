@@ -114,11 +114,12 @@
                             <th>Estado Bot</th>
                             <th>Última Palabra Clave</th>
                             <th>Última Interacción</th>
+                            <th class="text-right">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($conversaciones as $conv)
-                            <tr>
+                            <tr id="row-conv-{{ $conv->id }}">
                                 <td class="font-weight-bold text-dark">
                                     <i class="fas fa-user-circle text-muted mr-1"></i>
                                     {{ $conv->cliente ? $conv->cliente->nombre : 'Lead Anónimo' }}
@@ -133,10 +134,15 @@
                                 </td>
                                 <td><code>{{ $conv->last_keyword ?: 'INICIO' }}</code></td>
                                 <td class="small text-muted">{{ $conv->updated_at->diffForHumans() }}</td>
+                                <td class="text-right">
+                                    <button type="button" class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteConversationTable({{ $conv->id }})" title="Eliminar conversación">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center py-4 text-muted">
+                                <td colspan="6" class="text-center py-4 text-muted">
                                     No hay conversaciones registradas aún. Al recibir el primer mensaje vía WhatsApp se registrará aquí.
                                 </td>
                             </tr>
@@ -199,6 +205,44 @@
 
         updateLink();
     });
+
+    function deleteConversationTable(id) {
+        Swal.fire({
+            title: '¿Eliminar conversación?',
+            text: "Se borrará permanentemente la conversación y su historial de mensajes.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/whatsapp/chat/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const row = document.getElementById(`row-conv-${id}`);
+                        if (row) row.remove();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Eliminado',
+                            text: data.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire('Error', data.message || 'No se pudo eliminar', 'error');
+                    }
+                });
+            }
+        });
+    }
 </script>
 
 @endsection

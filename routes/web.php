@@ -138,6 +138,7 @@ Auth::routes([
                 Route::get('/whatsapp/chat/{id}/messages', 'WhatsAppSettingController@getMessages')->name('whatsapp.chat.messages');
                 Route::post('/whatsapp/chat/send', 'WhatsAppSettingController@sendMessage')->name('whatsapp.chat.send');
                 Route::post('/whatsapp/chat/toggle-bot', 'WhatsAppSettingController@toggleBotStatus')->name('whatsapp.chat.toggleBot');
+                Route::delete('/whatsapp/chat/{id}', 'WhatsAppSettingController@deleteConversation')->name('whatsapp.chat.delete');
                 Route::get('/whatsapp/links', 'WhatsAppSettingController@indexLinks')->name('whatsapp.links.index');
                 Route::get('/whatsapp/settings', 'WhatsAppSettingController@indexSettings')->name('whatsapp.settings.index');
                 Route::post('/whatsapp/settings', 'WhatsAppSettingController@updateSettings')->name('whatsapp.settings.update');

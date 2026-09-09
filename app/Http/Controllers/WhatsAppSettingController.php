@@ -213,4 +213,26 @@ class WhatsAppSettingController extends Controller
             'new_step' => $newStep
         ]);
     }
+
+    /**
+     * Eliminar una conversación y todo su historial de mensajes
+     */
+    public function deleteConversation(Request $request, $id)
+    {
+        try {
+            $conversation = WhatsAppConversation::findOrFail($id);
+            $conversation->messages()->delete();
+            $conversation->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Conversación eliminada correctamente.'
+            ]);
+        } catch (Exception $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar la conversación: ' . $ex->getMessage()
+            ], 500);
+        }
+    }
 }

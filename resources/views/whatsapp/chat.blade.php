@@ -216,7 +216,10 @@
                         <small class="text-muted" id="activePhone"></small>
                     </div>
                 </div>
-                <div>
+                <div class="d-flex align-items-center">
+                    <button type="button" class="btn btn-sm btn-outline-danger shadow-sm mr-2" id="btnDeleteChat" onclick="deleteActiveConversation()">
+                        <i class="fas fa-trash-alt mr-1"></i> Eliminar Chat
+                    </button>
                     <button type="button" class="btn btn-sm shadow-sm" id="btnToggleBot" onclick="toggleBot()">
                         <i class="fas fa-robot mr-1"></i> <span id="botBtnText">Pausar Bot</span>
                     </button>
@@ -382,6 +385,40 @@
                 loadConversation(activeConversationId);
             } else {
                 Swal.fire('Error', data.message || 'No se pudo enviar el mensaje', 'error');
+            }
+        });
+    }
+
+    function deleteActiveConversation() {
+        if (!activeConversationId) return;
+
+        Swal.fire({
+            title: '¿Eliminar esta conversación?',
+            text: "Se borrará permanentemente la conversación y todo el historial de mensajes.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/whatsapp/chat/${activeConversationId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Eliminado', data.message, 'success').then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', data.message || 'No se pudo eliminar', 'error');
+                    }
+                });
             }
         });
     }
