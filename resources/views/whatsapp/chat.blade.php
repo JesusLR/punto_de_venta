@@ -465,7 +465,7 @@
                     </label>
 
                     <!-- Botón Modal Productos POS -->
-                    <button type="button" class="btn btn-light rounded-circle shadow-sm mb-0 mr-2 flex-shrink-0" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;" data-toggle="modal" data-target="#modalProductos" title="Ver Inventario de Productos">
+                    <button type="button" class="btn btn-light rounded-circle shadow-sm mb-0 mr-2 flex-shrink-0" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;" onclick="openProductsModal()" title="Ver Inventario de Productos">
                         <i class="fas fa-gem text-warning" style="font-size: 1.15rem;"></i>
                     </button>
 
@@ -480,7 +480,7 @@
     </div>
 </div>
 
-<!-- Modal Inventario de Productos del POS -->
+<!-- Modal Inventario de Productos del POS (Carga por Bloques AJAX) -->
 <div class="modal fade" id="modalProductos" tabindex="-1" role="dialog" aria-labelledby="modalProductosLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
@@ -497,7 +497,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text bg-light border-right-0"><i class="fas fa-search"></i></span>
                     </div>
-                    <input type="text" id="searchProductModal" class="form-control border-left-0" placeholder="Buscar por código de barras o descripción..." onkeyup="filterModalProducts()">
+                    <input type="text" id="searchProductModal" class="form-control border-left-0" placeholder="Buscar por código de barras o descripción..." onkeyup="debounceProductSearch()">
                 </div>
                 <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
                     <table class="table table-hover table-sm text-center mb-0">
@@ -512,36 +512,13 @@
                             </tr>
                         </thead>
                         <tbody id="modalProductList">
-                            @forelse($productos ?? [] as $prod)
-                                @php
-                                    $imgSrc = $prod->img ? asset('img/productos/' . $prod->img) : null;
-                                @endphp
-                                <tr data-search="{{ strtolower($prod->codigo_barras . ' ' . $prod->descripcion) }}">
-                                    <td>
-                                        @if($imgSrc)
-                                            <img src="{{ $imgSrc }}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover; border: 1px solid #cbd5e1;" alt="Producto">
-                                        @else
-                                            <span class="badge badge-light text-muted p-2" style="font-size: 0.7rem;"><i class="fas fa-image mr-1"></i> Sin foto</span>
-                                        @endif
-                                    </td>
-                                    <td><code>{{ $prod->codigo_barras }}</code></td>
-                                    <td class="text-left font-weight-bold">{{ $prod->descripcion }}</td>
-                                    <td class="text-success font-weight-bold">${{ number_format($prod->precio_venta, 2) }}</td>
-                                    <td><span class="badge {{ $prod->existencia > 0 ? 'badge-success' : 'badge-danger' }}">{{ $prod->existencia }}</span></td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-outline-success font-weight-bold px-2 py-1" onclick="attachProductInfo('{{ addslashes($prod->descripcion) }}', '{{ number_format($prod->precio_venta, 2) }}', '{{ $prod->codigo_barras }}', '{{ $imgSrc }}')">
-                                            <i class="fas fa-plus mr-1"></i> {{ $imgSrc ? 'Insertar con Foto' : 'Insertar Datos' }}
-                                        </button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="py-3 text-muted">No hay productos registrados en el inventario.</td>
-                                </tr>
-                            @endforelse
+                            <!-- Productos cargados dinámicamente por AJAX en bloques -->
                         </tbody>
                     </table>
                 </div>
+                <button id="btnLoadMoreProducts" type="button" class="btn btn-sm btn-block btn-light font-weight-bold py-2 my-2 text-primary shadow-sm" onclick="loadMoreProducts()" style="display:none; border-radius: 8px;">
+                    <i class="fas fa-sync-alt mr-1"></i> Cargar más productos...
+                </button>
             </div>
         </div>
     </div>
@@ -552,6 +529,85 @@
     let activeConversationStep = null;
     let currentFilter = 'all';
     let selectedProductImageUrl = null;
+
+    let currentProductPage = 1;
+    let productSearchQuery = '';
+    let searchDebounceTimer = null;
+    let hasMoreProducts = false;
+
+    function openProductsModal() {
+        currentProductPage = 1;
+        productSearchQuery = '';
+        document.getElementById("searchProductModal").value = '';
+        document.getElementById("modalProductList").innerHTML = `<tr><td colspan="6" class="py-4 text-center text-muted"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando productos...</td></tr>`;
+        fetchProductsBlock(1, true);
+        $('#modalProductos').modal('show');
+    }
+
+    function debounceProductSearch() {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => {
+            productSearchQuery = document.getElementById("searchProductModal").value.trim();
+            currentProductPage = 1;
+            fetchProductsBlock(1, true);
+        }, 300);
+    }
+
+    function loadMoreProducts() {
+        if (!hasMoreProducts) return;
+        currentProductPage++;
+        fetchProductsBlock(currentProductPage, false);
+    }
+
+    function fetchProductsBlock(page, replace) {
+        const url = `/whatsapp/chat/productos?search=${encodeURIComponent(productSearchQuery)}&page=${page}`;
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) return;
+                const list = document.getElementById("modalProductList");
+                if (replace) list.innerHTML = '';
+
+                hasMoreProducts = data.has_more;
+                const loadBtn = document.getElementById("btnLoadMoreProducts");
+                if (loadBtn) loadBtn.style.display = hasMoreProducts ? 'block' : 'none';
+
+                if (data.products.length === 0 && replace) {
+                    list.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-muted">No se encontraron productos en el inventario.</td></tr>`;
+                    return;
+                }
+
+                data.products.forEach(prod => {
+                    const tr = document.createElement("tr");
+                    const imgSrc = prod.img_url;
+                    const photoHtml = imgSrc 
+                        ? `<img src="${imgSrc}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover; border: 1px solid #cbd5e1;" alt="Producto">`
+                        : `<span class="badge badge-light text-muted p-2" style="font-size: 0.7rem;"><i class="fas fa-image mr-1"></i> Sin foto</span>`;
+
+                    const btnText = imgSrc ? 'Insertar con Foto' : 'Insertar Datos';
+                    const safeName = escapeHtml(prod.descripcion).replace(/'/g, "\\'");
+                    const safeCode = escapeHtml(prod.codigo_barras).replace(/'/g, "\\'");
+                    const safeImg = imgSrc ? imgSrc.replace(/'/g, "\\'") : '';
+
+                    tr.innerHTML = `
+                        <td>${photoHtml}</td>
+                        <td><code>${safeCode}</code></td>
+                        <td class="text-left font-weight-bold">${escapeHtml(prod.descripcion)}</td>
+                        <td class="text-success font-weight-bold">$${prod.precio_venta}</td>
+                        <td><span class="badge ${prod.existencia > 0 ? 'badge-success' : 'badge-danger'}">${prod.existencia}</span></td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-success font-weight-bold px-2 py-1" onclick="attachProductInfo('${safeName}', '${prod.precio_venta}', '${safeCode}', '${safeImg}')">
+                                <i class="fas fa-plus mr-1"></i> ${btnText}
+                            </button>
+                        </td>
+                    `;
+                    list.appendChild(tr);
+                });
+            })
+            .catch(err => {
+                console.error("Error al cargar productos", err);
+            });
+    }
 
     function loadConversation(id) {
         activeConversationId = id;

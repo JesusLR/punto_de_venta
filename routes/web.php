@@ -135,6 +135,7 @@ Auth::routes([
                 // WhatsApp Chatbot & Live Chat
                 Route::get('/whatsapp/chat', 'WhatsAppSettingController@indexChat')->name('whatsapp.chat.index');
                 Route::get('/whatsapp/chat/conversations', 'WhatsAppSettingController@getConversations')->name('whatsapp.chat.conversations');
+                Route::get('/whatsapp/chat/productos', 'WhatsAppSettingController@getProductsAjax')->name('whatsapp.chat.products');
                 Route::get('/whatsapp/chat/{id}/messages', 'WhatsAppSettingController@getMessages')->name('whatsapp.chat.messages');
                 Route::post('/whatsapp/chat/send', 'WhatsAppSettingController@sendMessage')->name('whatsapp.chat.send');
                 Route::post('/whatsapp/chat/toggle-bot', 'WhatsAppSettingController@toggleBotStatus')->name('whatsapp.chat.toggleBot');

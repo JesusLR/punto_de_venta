@@ -81,9 +81,64 @@ class WhatsAppSettingController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        $productos = Producto::orderBy('descripcion', 'asc')->get();
+        return view('whatsapp.chat', compact('conversaciones'));
+    }
 
-        return view('whatsapp.chat', compact('conversaciones', 'productos'));
+    /**
+     * Obtener productos en bloques paginados por AJAX para el modal de WhatsApp
+     */
+    public function getProductsAjax(Request $request)
+    {
+        try {
+            $search = trim((string) $request->input('search', ''));
+            $page = (int) $request->input('page', 1);
+            if ($page < 1) $page = 1;
+            $limit = 15;
+            $offset = ($page - 1) * $limit;
+
+            $query = Producto::query();
+
+            if (\Schema::hasColumn('productos', 'lActivo')) {
+                $query->where('lActivo', 1);
+            }
+
+            if ($search !== '') {
+                $query->where(function ($q) use ($search) {
+                    $q->where('codigo_barras', 'like', '%' . $search . '%')
+                      ->orWhere('descripcion', 'like', '%' . $search . '%');
+                });
+            }
+
+            $total = (clone $query)->count();
+
+            $productos = $query->orderBy('id', 'desc')
+                ->offset($offset)
+                ->limit($limit)
+                ->get()
+                ->map(function ($prod) {
+                    return [
+                        'id' => $prod->id,
+                        'codigo_barras' => $prod->codigo_barras,
+                        'descripcion' => $prod->descripcion,
+                        'precio_venta' => number_format($prod->precio_venta, 2),
+                        'existencia' => $prod->existencia,
+                        'img_url' => $prod->img ? asset('img/productos/' . $prod->img) : null,
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'products' => $productos,
+                'page' => $page,
+                'has_more' => ($offset + $productos->count()) < $total,
+                'total' => $total,
+            ]);
+        } catch (Exception $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al cargar productos: ' . $ex->getMessage()
+            ], 500);
+        }
     }
 
     /**
