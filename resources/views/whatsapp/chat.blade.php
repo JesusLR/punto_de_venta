@@ -3,13 +3,49 @@
 @section("contenido")
 
 <style>
+    /* Ajuste de contenedor principal para que la interfaz ocupe el 100% de la ventana sin scroll del navegador */
+    body.authenticated .main-wrapper {
+        min-height: 100vh;
+    }
+    
+    @media (min-width: 992px) {
+        body.authenticated .main-wrapper main {
+            padding: 0.75rem 1rem !important;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+    }
+
+    @media (max-width: 991.98px) {
+        body.authenticated .main-wrapper main {
+            padding: 0.35rem 0.5rem !important;
+            height: calc(100vh - 60px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+    }
+
+    .chat-page-container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        flex: 1 1 auto;
+    }
+
     /* Estilos Principales del Módulo de Mensajería */
     .chat-wrapper {
-        height: calc(100vh - 130px);
+        flex: 1 1 auto;
+        height: 100%;
+        min-height: 0;
+        max-height: 100%;
         background: #ffffff;
-        border-radius: 16px;
+        border-radius: 14px;
         overflow: hidden;
-        box-shadow: 0 15px 35px rgba(15, 23, 42, 0.1);
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
         display: flex;
         border: 1px solid #e2e8f0;
     }
@@ -22,13 +58,16 @@
         display: flex;
         flex-direction: column;
         flex-shrink: 0;
+        height: 100%;
+        min-height: 0;
     }
 
     .chat-sidebar-header {
-        padding: 1.25rem;
+        padding: 1rem 1.25rem;
         background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         color: white;
         border-bottom: 2px solid #D4AF37;
+        flex-shrink: 0;
     }
 
     .chat-search-box {
@@ -71,6 +110,7 @@
         padding: 6px;
         border-bottom: 1px solid #e2e8f0;
         gap: 4px;
+        flex-shrink: 0;
     }
 
     .chat-filter-btn {
@@ -80,10 +120,11 @@
         font-size: 0.75rem;
         font-weight: 700;
         color: #64748b;
-        padding: 6px 10px;
+        padding: 6px 8px;
         border-radius: 8px;
         transition: all 0.2s ease;
         cursor: pointer;
+        white-space: nowrap;
     }
 
     .chat-filter-btn.active {
@@ -93,12 +134,13 @@
     }
 
     .chat-list {
-        flex-grow: 1;
+        flex: 1 1 auto;
+        min-height: 0;
         overflow-y: auto;
     }
 
     .chat-item {
-        padding: 14px 16px;
+        padding: 12px 14px;
         border-bottom: 1px solid #f1f5f9;
         cursor: pointer;
         transition: all 0.2s ease;
@@ -122,8 +164,8 @@
     }
 
     .chat-avatar {
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
@@ -131,9 +173,9 @@
         align-items: center;
         justify-content: center;
         font-weight: 800;
-        font-size: 1.15rem;
+        font-size: 1.1rem;
         flex-shrink: 0;
-        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+        box-shadow: 0 3px 8px rgba(16, 185, 129, 0.2);
     }
 
     .status-indicator {
@@ -162,7 +204,7 @@
     .chat-name {
         font-weight: 700;
         color: #0f172a;
-        font-size: 0.92rem;
+        font-size: 0.9rem;
         margin-bottom: 2px;
         white-space: nowrap;
         overflow: hidden;
@@ -170,7 +212,7 @@
     }
 
     .chat-last-msg {
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         color: #64748b;
         white-space: nowrap;
         overflow: hidden;
@@ -179,14 +221,17 @@
 
     /* Columna Derecha: Hilo Principal */
     .chat-main {
-        flex-grow: 1;
+        flex: 1 1 auto;
         display: flex;
         flex-direction: column;
         background: #f8fafc;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
     }
 
     .chat-header {
-        padding: 1rem 1.5rem;
+        padding: 0.75rem 1.25rem;
         background: #ffffff;
         border-bottom: 1px solid #e2e8f0;
         display: flex;
@@ -194,11 +239,13 @@
         justify-content: space-between;
         box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         z-index: 10;
+        flex-shrink: 0;
     }
 
     .chat-thread {
-        flex-grow: 1;
-        padding: 1.5rem;
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 1.25rem;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
@@ -213,7 +260,7 @@
     }
 
     .message-bubble {
-        max-width: 68%;
+        max-width: 72%;
         padding: 10px 14px;
         border-radius: 14px;
         font-size: 0.88rem;
@@ -255,22 +302,23 @@
 
     /* Barra de Respuestas Rápidas */
     .quick-replies-bar {
-        padding: 8px 16px;
+        padding: 6px 14px;
         background: #ffffff;
         border-top: 1px solid #e2e8f0;
         display: flex;
         gap: 8px;
         overflow-x: auto;
         white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .quick-reply-chip {
         background: #f1f5f9;
         border: 1px solid #cbd5e1;
         color: #334155;
-        font-size: 0.78rem;
+        font-size: 0.75rem;
         font-weight: 600;
-        padding: 4px 12px;
+        padding: 4px 10px;
         border-radius: 16px;
         cursor: pointer;
         transition: all 0.2s ease;
@@ -286,9 +334,10 @@
     }
 
     .chat-footer {
-        padding: 1rem 1.25rem;
+        padding: 0.75rem 1rem;
         background: #ffffff;
         border-top: 1px solid #e2e8f0;
+        flex-shrink: 0;
     }
 
     .send-btn {
@@ -296,8 +345,8 @@
         border: none;
         color: white;
         border-radius: 50%;
-        width: 44px;
-        height: 44px;
+        width: 42px;
+        height: 42px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -331,7 +380,6 @@
     /* Responsivo para Celulares y Tablets (< 768px) */
     @media (max-width: 768px) {
         .chat-wrapper {
-            height: calc(100vh - 90px);
             border-radius: 8px;
             border: none;
             position: relative;
@@ -340,6 +388,7 @@
         .chat-sidebar {
             width: 100%;
             display: flex;
+            height: 100%;
         }
 
         .chat-main {
@@ -351,6 +400,7 @@
             height: 100%;
             z-index: 100;
             background: #ffffff;
+            overflow: hidden;
         }
 
         .chat-wrapper.mobile-active .chat-sidebar {
@@ -361,44 +411,50 @@
             display: flex !important;
         }
 
+        .chat-header {
+            padding: 0.5rem 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .chat-thread {
+            flex: 1 1 auto;
+            min-height: 0;
+            padding: 0.75rem;
+        }
+
+        .chat-footer {
+            padding: 0.5rem 0.5rem;
+            flex-shrink: 0;
+            background: #ffffff;
+        }
+
         .message-bubble {
             max-width: 88%;
             font-size: 0.85rem;
         }
 
-        .chat-header {
-            padding: 0.75rem 1rem;
-        }
-
-        .chat-footer {
-            padding: 0.75rem 0.5rem;
-        }
-
-        .chat-sidebar-header {
-            padding: 1rem;
-        }
-
         .quick-replies-bar {
-            padding: 6px 10px;
+            padding: 4px 8px;
+            flex-shrink: 0;
         }
 
         .quick-reply-chip {
             font-size: 0.72rem;
-            padding: 3px 10px;
+            padding: 3px 8px;
         }
     }
 </style>
 
-<div class="container-fluid px-0 px-md-3">
+<div class="container-fluid px-0 px-md-2 chat-page-container">
     <div class="chat-wrapper" id="chatWrapper">
         <!-- Columna Izquierda: Lista de Conversaciones -->
         <div class="chat-sidebar">
             <div class="chat-sidebar-header">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="font-weight-bold text-white mb-0">
-                        <i class="fab fa-whatsapp text-success mr-2"></i> Centro de Mensajes
+                    <h5 class="font-weight-bold text-white mb-0" style="font-size: 1.05rem;">
+                        <i class="fab fa-whatsapp text-success mr-1"></i> Mensajería
                     </h5>
-                    <span class="badge badge-success px-2 py-1" style="border-radius: 10px; font-size: 0.7rem;">
+                    <span class="badge badge-success px-2 py-1" style="border-radius: 10px; font-size: 0.68rem;">
                         <span class="pulse-green mr-1"></span> En Vivo
                     </span>
                 </div>
@@ -411,7 +467,7 @@
             <!-- Filtros de Estado -->
             <div class="chat-filter-tabs">
                 <button class="chat-filter-btn active" onclick="setFilter('all', this)">Todos (<span id="countAll">{{ count($conversaciones) }}</span>)</button>
-                <button class="chat-filter-btn" onclick="setFilter('bot', this)">🤖 Bot Activo</button>
+                <button class="chat-filter-btn" onclick="setFilter('bot', this)">🤖 Bot</button>
                 <button class="chat-filter-btn" onclick="setFilter('agent', this)">👩‍💻 Agente</button>
             </div>
 
@@ -447,26 +503,28 @@
         <div class="chat-main">
             <!-- Header del Chat Abierto -->
             <div class="chat-header" id="chatHeader" style="display: none;">
-                <div class="d-flex align-items-center">
-                    <button class="btn btn-sm btn-light d-md-none mr-2" onclick="closeMobileChat()">
+                <div class="d-flex align-items-center" style="min-width: 0; flex: 1 1 auto;">
+                    <button class="btn btn-sm btn-light d-md-none mr-2 flex-shrink-0" onclick="closeMobileChat()" title="Volver a chats">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <div class="chat-avatar mr-3" id="activeAvatar">A</div>
-                    <div>
-                        <div class="d-flex align-items-center gap-2">
-                            <h6 class="font-weight-bold text-dark mb-0 mr-2" id="activeName">Selecciona un chat</h6>
-                            <span id="activeStatusBadge" class="badge"></span>
+                    <div class="chat-avatar mr-2 mr-sm-3 flex-shrink-0" id="activeAvatar">A</div>
+                    <div style="min-width: 0; flex: 1 1 auto;">
+                        <div class="d-flex align-items-center flex-wrap" style="gap: 4px;">
+                            <h6 class="font-weight-bold text-dark mb-0 mr-1 text-truncate" id="activeName" style="max-width: 100%; font-size: 0.95rem;">Selecciona un chat</h6>
+                            <span id="activeStatusBadge" class="badge flex-shrink-0" style="font-size: 0.65rem;"></span>
                         </div>
-                        <small class="text-muted"><i class="fas fa-phone-alt mr-1 text-success"></i> <span id="activePhone"></span></small>
+                        <small class="text-muted d-block text-truncate" style="font-size: 0.72rem;">
+                            <i class="fas fa-phone-alt mr-1 text-success"></i><span id="activePhone"></span>
+                        </small>
                     </div>
                 </div>
 
-                <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-sm shadow-sm font-weight-bold" id="btnToggleBot" onclick="toggleBot()" style="border-radius: 8px;">
-                        <i class="fas fa-robot mr-1"></i> <span id="botBtnText">Pausar Bot</span>
+                <div class="d-flex align-items-center flex-shrink-0 ml-2">
+                    <button type="button" class="btn btn-sm shadow-sm font-weight-bold px-2 px-sm-3" id="btnToggleBot" onclick="toggleBot()" style="border-radius: 8px;">
+                        <i class="fas fa-robot"></i> <span id="botBtnText" class="d-none d-sm-inline ml-1">Pausar Bot</span>
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger shadow-sm font-weight-bold ml-2" onclick="deleteActiveConversation()" style="border-radius: 8px;" title="Eliminar conversación">
-                        <i class="fas fa-trash-alt mr-1"></i> Eliminar
+                    <button type="button" class="btn btn-sm btn-outline-danger shadow-sm font-weight-bold ml-1 px-2 px-sm-3" onclick="deleteActiveConversation()" style="border-radius: 8px;" title="Eliminar conversación">
+                        <i class="fas fa-trash-alt"></i> <span class="d-none d-sm-inline ml-1">Eliminar</span>
                     </button>
                 </div>
             </div>
