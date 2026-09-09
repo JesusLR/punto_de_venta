@@ -490,15 +490,15 @@
             @endif
                         {{-- Configuracion --}}
             @if (Auth::user()->hasPermission('manage_roles') || Auth::user()->hasPermission('manage_homepage') || Auth::user()->hasPermission('manage_general_settings'))
-                <a class="sidebar-link {{ request()->routeIs(['roles.*', 'homepage.settings.*', 'general.settings.*']) ? '' : 'collapsed' }}" 
+                <a class="sidebar-link {{ request()->routeIs(['roles.*', 'homepage.settings.*', 'general.settings.*', 'whatsapp.*']) ? '' : 'collapsed' }}" 
                    data-toggle="collapse" href="#configuracionesCollapse" role="button" 
-                   aria-expanded="{{ request()->routeIs(['roles.*', 'homepage.settings.*', 'general.settings.*']) ? 'true' : 'false' }}" 
+                   aria-expanded="{{ request()->routeIs(['roles.*', 'homepage.settings.*', 'general.settings.*', 'whatsapp.*']) ? 'true' : 'false' }}" 
                    aria-controls="configuracionesCollapse">
                     <i class="fas fa-cog"></i>
                     <span>Configuraciones</span>
                     <i class="fas fa-chevron-down ml-auto submenu-arrow"></i>
                 </a>
-                <div class="collapse sidebar-submenu {{ request()->routeIs(['roles.*', 'homepage.settings.*', 'general.settings.*']) ? 'show' : '' }}" id="configuracionesCollapse">
+                <div class="collapse sidebar-submenu {{ request()->routeIs(['roles.*', 'homepage.settings.*', 'general.settings.*', 'whatsapp.*']) ? 'show' : '' }}" id="configuracionesCollapse">
  
                     @if(Auth::user()->hasPermission('manage_roles'))
                         <a class="sidebar-link {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{route("roles.index")}}">
@@ -519,6 +519,15 @@
                             <span>Configuración Portada</span>
                         </a>
                     @endif
+
+                    <a class="sidebar-link {{ request()->routeIs('whatsapp.links.index') ? 'active' : '' }}" href="{{route("whatsapp.links.index")}}">
+                        <i class="fab fa-whatsapp" style="color: #25D366;"></i>
+                        <span>WhatsApp Enlaces / QR</span>
+                    </a>
+                    <a class="sidebar-link {{ request()->routeIs('whatsapp.settings.index') ? 'active' : '' }}" href="{{route("whatsapp.settings.index")}}">
+                        <i class="fas fa-robot" style="color: #25D366;"></i>
+                        <span>WhatsApp Chatbot</span>
+                    </a>
                 </div>
             @endif
 

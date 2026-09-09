@@ -111,3 +111,4 @@ Route::get("/verCategoria/{id_categoria}/{id_material}", "CatalogoController@ver
 //OpenWA
 Route::post('/openwa/send-text', [OpenWaController::class, 'sendText']);
 Route::post('/openwa/send-document', [OpenWaController::class, 'sendDocument']);
+Route::post('/whatsapp/webhook', 'WhatsAppWebhookController@handle');

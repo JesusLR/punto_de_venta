@@ -12,8 +12,8 @@ class OpenWaService
 
     public function __construct()
     {
-        $this->baseUrl = rtrim('http://74.208.53.13:2785', '/'); //Guardar en variable de configuracion
-        $this->apiKey = "owa_k1_4c2631a0321cb61e1d266787912fe331eef088fd850cfff50326b63cad9d9585"; //Guardar en variable de configuracion
+        $this->baseUrl = rtrim(config('services.openwa.url', 'http://74.208.53.13:2785'), '/');
+        $this->apiKey = config('services.openwa.key', 'owa_k1_4c2631a0321cb61e1d266787912fe331eef088fd850cfff50326b63cad9d9585');
     }
 
     private function client()
@@ -24,23 +24,31 @@ class OpenWaService
         ]);
     }
 
-    public function sendText(string $sessionId, string $chatId, string $text): Response
+    public function sendText(string $sessionId, string $chatId, string $text): ?Response
     {
-        // dd("{$this->baseUrl}/api/sessions/{$sessionId}/messages/send-text",$this->baseUrl,$this->apiKey, $sessionId,  $chatId,  $text);
-         return $this->client()->post("{$this->baseUrl}/api/sessions/{$sessionId}/messages/send-text", [
-            'chatId' => $chatId,
-            'text' => $text,
-        ]);
-        // dd('hola',$a);
+        try {
+            return $this->client()->post("{$this->baseUrl}/api/sessions/{$sessionId}/messages/send-text", [
+                'chatId' => $chatId,
+                'text' => $text,
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error en OpenWaService sendText: ' . $e->getMessage());
+            return null;
+        }
     }
 
-    public function sendDocument(string $sessionId, string $chatId, string $base64, string $mimetype, string $filename): Response
+    public function sendDocument(string $sessionId, string $chatId, string $base64, string $mimetype, string $filename): ?Response
     {
-        return $this->client()->post("{$this->baseUrl}/api/sessions/{$sessionId}/messages/send-document", [
-            'chatId' => $chatId,
-            'base64' => $base64,
-            'mimetype' => $mimetype,
-            'filename' => $filename,
-        ]);
+        try {
+            return $this->client()->post("{$this->baseUrl}/api/sessions/{$sessionId}/messages/send-document", [
+                'chatId' => $chatId,
+                'base64' => $base64,
+                'mimetype' => $mimetype,
+                'filename' => $filename,
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error en OpenWaService sendDocument: ' . $e->getMessage());
+            return null;
+        }
     }
 }

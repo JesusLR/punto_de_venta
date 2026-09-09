@@ -30,8 +30,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
     'openwa' => [
-        'url' => env('OPENWA_API_URL', 'http://127.0.0.1:2785'),
-        'key' => env('OPENWA_API_KEY'),
+        'url' => env('OPENWA_API_URL', 'http://74.208.53.13:2785'),
+        'key' => env('OPENWA_API_KEY', 'owa_k1_4c2631a0321cb61e1d266787912fe331eef088fd850cfff50326b63cad9d9585'),
+        'session_id' => env('OPENWA_SESSION_ID', '581655e7-d546-4e9c-88da-f1f8843bc8f6'),
     ],
     'google' => [
         'analytics_id' => env('GOOGLE_ANALYTICS_ID'),

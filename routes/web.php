@@ -132,6 +132,11 @@ Auth::routes([
                     Route::delete('/configuracion-general/egresos-automaticos/{id}', 'GeneralSettingController@destroyEgresoAutomatico')->name('general.egresos_automaticos.destroy');
                 });
 
+                // WhatsApp Chatbot
+                Route::get('/whatsapp/links', 'WhatsAppSettingController@indexLinks')->name('whatsapp.links.index');
+                Route::get('/whatsapp/settings', 'WhatsAppSettingController@indexSettings')->name('whatsapp.settings.index');
+                Route::post('/whatsapp/settings', 'WhatsAppSettingController@updateSettings')->name('whatsapp.settings.update');
+
                 Route::post('/about/upload-image', [AboutController::class, 'uploadImage'])->name('about.upload.image');
                 Route::get('/gold-price', [HomeController::class, 'goldPrice'])->name('gold.price');
             });
