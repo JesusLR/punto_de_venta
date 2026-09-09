@@ -436,22 +436,101 @@
                 <span class="quick-reply-chip" onclick="insertQuickReply('💍 El precio del oro del día está actualizado en nuestro sistema.')">
                     💍 Cotización Oro
                 </span>
-                <span class="quick-reply-chip" onclick="insertQuickReply('📋 Por favor proporciónanos tu folio o nombre completo para consultar tu apartado.')">
-                    📋 Consultar Apartado
-                </span>
                 <span class="quick-reply-chip" onclick="insertQuickReply('📍 Nos encontramos en Calle 27 s/n Centro, Progreso, Yucatán. ¡Te esperamos!')">
                     📍 Ubicación
                 </span>
             </div>
 
+            <!-- Previsualización de Imagen Adjunta -->
+            <div id="imagePreviewBar" class="px-3 py-2 bg-light border-top border-bottom justify-content-between align-items-center" style="display: none !important;">
+                <div class="d-flex align-items-center">
+                    <img id="imagePreviewThumb" src="" class="rounded shadow-sm mr-2" style="width: 48px; height: 48px; object-fit: cover; border: 1px solid #cbd5e1;">
+                    <div>
+                        <small class="font-weight-bold text-dark d-block" id="imagePreviewName">imagen.jpg</small>
+                        <small class="text-success" style="font-size: 0.72rem;"><i class="fas fa-check-circle mr-1"></i> Imagen lista para enviar</small>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger rounded-circle font-weight-bold ml-auto" onclick="clearSelectedImage()" title="Quitar Imagen">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
             <!-- Formulario de Respuesta -->
             <div class="chat-footer" id="chatFooter" style="display: none;">
-                <form id="sendForm" onsubmit="submitMessage(event)" class="d-flex align-items-center gap-2">
-                    <input type="text" id="messageInput" class="form-control py-3" placeholder="Escribe un mensaje..." autocomplete="off" required style="border-radius: 24px; background: #f8fafc; border: 1px solid #cbd5e1;">
+                <form id="sendForm" onsubmit="submitMessage(event)" class="d-flex align-items-center gap-2" enctype="multipart/form-data">
+                    <!-- Botón Seleccionar Imagen de Producto -->
+                    <label for="imageInputFile" class="btn btn-light rounded-circle shadow-sm mb-0 mr-2 flex-shrink-0" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Adjuntar Imagen de Producto">
+                        <i class="fas fa-camera text-primary" style="font-size: 1.15rem;"></i>
+                        <input type="file" id="imageInputFile" name="image" accept="image/*" style="display:none;" onchange="handleImageSelected(this)">
+                    </label>
+
+                    <!-- Botón Modal Productos POS -->
+                    <button type="button" class="btn btn-light rounded-circle shadow-sm mb-0 mr-2 flex-shrink-0" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;" data-toggle="modal" data-target="#modalProductos" title="Ver Inventario de Productos">
+                        <i class="fas fa-gem text-warning" style="font-size: 1.15rem;"></i>
+                    </button>
+
+                    <input type="text" id="messageInput" class="form-control py-3" placeholder="Escribe un mensaje o descripción del producto..." autocomplete="off" style="border-radius: 24px; background: #f8fafc; border: 1px solid #cbd5e1;">
+                    
                     <button type="submit" class="send-btn ml-2" title="Enviar Mensaje">
                         <i class="fas fa-paper-plane" style="font-size: 1.1rem;"></i>
                     </button>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Inventario de Productos del POS -->
+<div class="modal fade" id="modalProductos" tabindex="-1" role="dialog" aria-labelledby="modalProductosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header bg-dark text-white" style="border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom: 2px solid #D4AF37;">
+                <h5 class="modal-title font-weight-bold" id="modalProductosLabel">
+                    <i class="fas fa-gem text-warning mr-2"></i> Seleccionar Producto del Inventario
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-3">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text bg-light border-right-0"><i class="fas fa-search"></i></span>
+                    </div>
+                    <input type="text" id="searchProductModal" class="form-control border-left-0" placeholder="Buscar por código de barras o descripción..." onkeyup="filterModalProducts()">
+                </div>
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="table table-hover table-sm text-center mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Precio Venta</th>
+                                <th>Stock</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalProductList">
+                            @forelse($productos ?? [] as $prod)
+                                <tr data-search="{{ strtolower($prod->codigo_barras . ' ' . $prod->descripcion) }}">
+                                    <td><code>{{ $prod->codigo_barras }}</code></td>
+                                    <td class="text-left font-weight-bold">{{ $prod->descripcion }}</td>
+                                    <td class="text-success font-weight-bold">${{ number_format($prod->precio_venta, 2) }}</td>
+                                    <td><span class="badge {{ $prod->existencia > 0 ? 'badge-success' : 'badge-danger' }}">{{ $prod->existencia }}</span></td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-outline-success font-weight-bold px-3" onclick="attachProductInfo('{{ addslashes($prod->descripcion) }}', '{{ number_format($prod->precio_venta, 2) }}', '{{ $prod->codigo_barras }}')">
+                                            <i class="fas fa-plus mr-1"></i> Insertar
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="py-3 text-muted">No hay productos registrados en el inventario.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -509,9 +588,21 @@
                         const isOutbound = msg.direction === 'outbound';
                         const bubble = document.createElement("div");
                         bubble.className = `message-bubble ${isOutbound ? 'message-outbound' : 'message-inbound'}`;
+
+                        let mediaHtml = '';
+                        if (msg.media_url || msg.type === 'image') {
+                            const imgUrl = msg.media_url || '';
+                            mediaHtml = `
+                                <div class="mb-2 text-center">
+                                    <img src="${imgUrl}" class="img-fluid rounded shadow-sm" style="max-height: 250px; cursor: pointer; object-fit: cover; border: 1px solid rgba(0,0,0,0.1);" onclick="zoomImage('${imgUrl}')" alt="Imagen del producto">
+                                </div>
+                            `;
+                        }
+
                         bubble.innerHTML = `
                             <div class="message-sender ${isOutbound ? 'text-success' : 'text-primary'}">${escapeHtml(msg.sender_name)}</div>
-                            <div>${escapeHtml(msg.body)}</div>
+                            ${mediaHtml}
+                            ${msg.body ? `<div>${escapeHtml(msg.body)}</div>` : ''}
                             <span class="message-time"><i class="far fa-clock mr-1"></i> ${msg.time}</span>
                         `;
                         thread.appendChild(bubble);
@@ -538,6 +629,57 @@
             badge.className = "badge badge-success";
             badge.innerText = "🤖 Bot Automático Activo";
         }
+    }
+
+    function handleImageSelected(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById("imagePreviewThumb").src = e.target.result;
+                document.getElementById("imagePreviewName").innerText = file.name;
+                const bar = document.getElementById("imagePreviewBar");
+                bar.style.setProperty("display", "flex", "important");
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearSelectedImage() {
+        const fileInput = document.getElementById("imageInputFile");
+        if (fileInput) fileInput.value = "";
+        const bar = document.getElementById("imagePreviewBar");
+        if (bar) bar.style.setProperty("display", "none", "important");
+        document.getElementById("imagePreviewThumb").src = "";
+    }
+
+    function attachProductInfo(name, price, barcode) {
+        const input = document.getElementById("messageInput");
+        input.value = `🛍️ Producto: ${name} | 💰 Precio: $${price} | 🏷️ Cód: ${barcode}`;
+        $('#modalProductos').modal('hide');
+        input.focus();
+    }
+
+    function filterModalProducts() {
+        const query = document.getElementById("searchProductModal").value.toLowerCase();
+        document.querySelectorAll("#modalProductList tr").forEach(row => {
+            const search = row.dataset.search || "";
+            row.style.display = search.includes(query) ? "" : "none";
+        });
+    }
+
+    function zoomImage(url) {
+        if (!url) return;
+        Swal.fire({
+            imageUrl: url,
+            imageAlt: 'Foto de Producto',
+            showCloseButton: true,
+            showConfirmButton: false,
+            background: '#0f172a',
+            customClass: {
+                image: 'rounded shadow-lg'
+            }
+        });
     }
 
     function toggleBot() {

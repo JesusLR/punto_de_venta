@@ -81,7 +81,9 @@ class WhatsAppSettingController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        return view('whatsapp.chat', compact('conversaciones'));
+        $productos = Producto::orderBy('descripcion', 'asc')->get();
+
+        return view('whatsapp.chat', compact('conversaciones', 'productos'));
     }
 
     /**
@@ -135,6 +137,7 @@ class WhatsAppSettingController extends Controller
                     'direction' => $msg->direction,
                     'sender_name' => $msg->sender_name ?: ($msg->direction === 'outbound' ? 'Tienda' : 'Cliente'),
                     'body' => $msg->body,
+                    'media_url' => $msg->media_url ? asset($msg->media_url) : null,
                     'type' => $msg->type,
                     'time' => $msg->created_at->format('H:i d/m/Y'),
                 ];
@@ -143,21 +146,52 @@ class WhatsAppSettingController extends Controller
     }
 
     /**
-     * Enviar respuesta manual como agente humano
+     * Enviar respuesta manual como agente humano (Texto e Imágenes)
      */
     public function sendMessage(Request $request, \App\Services\OpenWaService $openWaService)
     {
         $request->validate([
             'conversation_id' => 'required|exists:whatsapp_conversations,id',
-            'body' => 'required|string|max:2000',
+            'body' => 'nullable|string|max:2000',
+            'image' => 'nullable|image|max:10240', // max 10MB
         ]);
 
         try {
             $conversation = WhatsAppConversation::findOrFail($request->conversation_id);
             $sessionId = config('services.openwa.session_id') ?: '581655e7-d546-4e9c-88da-f1f8843bc8f6';
+            $bodyText = $request->body ?: '';
+            $mediaUrl = null;
+            $msgType = 'text';
 
-            // Enviar mensaje por WhatsApp vía OpenWA
-            $openWaService->sendText($sessionId, $conversation->chat_id, $request->body);
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $file = $request->file('image');
+                $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file->getClientOriginalName());
+
+                $destinationPath = public_path('uploads/whatsapp');
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0755, true);
+                }
+                $file->move($destinationPath, $filename);
+                $mediaUrl = 'uploads/whatsapp/' . $filename;
+                $msgType = 'image';
+
+                // Convertir a Data URL para envío por OpenWA
+                $fullPath = $destinationPath . '/' . $filename;
+                $mimeType = function_exists('mime_content_type') ? mime_content_type($fullPath) : 'image/jpeg';
+                $base64Data = 'data:' . $mimeType . ';base64,' . base64_encode(file_get_contents($fullPath));
+
+                // Enviar imagen por WhatsApp vía OpenWA
+                $openWaService->sendImage($sessionId, $conversation->chat_id, $base64Data, $filename, $bodyText);
+            } else {
+                if (empty($bodyText)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Por favor escribe un mensaje o selecciona una imagen.'
+                    ], 422);
+                }
+                // Enviar texto por OpenWA
+                $openWaService->sendText($sessionId, $conversation->chat_id, $bodyText);
+            }
 
             // Registrar mensaje saliente
             $message = \App\WhatsAppMessage::create([
@@ -165,8 +199,9 @@ class WhatsAppSettingController extends Controller
                 'chat_id' => $conversation->chat_id,
                 'direction' => 'outbound',
                 'sender_name' => auth()->user() ? auth()->user()->name : 'Asesor Joyería Colibrí',
-                'body' => $request->body,
-                'type' => 'text'
+                'body' => $bodyText,
+                'media_url' => $mediaUrl,
+                'type' => $msgType,
             ]);
 
             // Pausar el bot y poner la conversación en modo 'agent_active'
@@ -182,6 +217,8 @@ class WhatsAppSettingController extends Controller
                     'direction' => $message->direction,
                     'sender_name' => $message->sender_name,
                     'body' => $message->body,
+                    'media_url' => $message->media_url ? asset($message->media_url) : null,
+                    'type' => $message->type,
                     'time' => $message->created_at->format('H:i d/m/Y'),
                 ]
             ]);

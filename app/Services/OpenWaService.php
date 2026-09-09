@@ -51,4 +51,29 @@ class OpenWaService
             return null;
         }
     }
+
+    public function sendImage(string $sessionId, string $chatId, string $base64OrUrl, string $filename = 'producto.jpg', string $caption = ''): ?Response
+    {
+        try {
+            $payload = [
+                'chatId' => $chatId,
+                'base64' => $base64OrUrl,
+                'file' => $base64OrUrl,
+                'mimetype' => 'image/jpeg',
+                'filename' => $filename,
+                'caption' => $caption,
+            ];
+
+            $res = $this->client()->post("{$this->baseUrl}/api/sessions/{$sessionId}/messages/send-image", $payload);
+            if ($res && $res->successful()) {
+                return $res;
+            }
+
+            // Fallback a send-document
+            return $this->sendDocument($sessionId, $chatId, $base64OrUrl, 'image/jpeg', $filename);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error en OpenWaService sendImage: ' . $e->getMessage());
+            return null;
+        }
+    }
 }

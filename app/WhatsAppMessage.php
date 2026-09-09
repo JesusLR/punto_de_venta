@@ -14,6 +14,7 @@ class WhatsAppMessage extends Model
         'direction',
         'sender_name',
         'body',
+        'media_url',
         'type',
         'status'
     ];
