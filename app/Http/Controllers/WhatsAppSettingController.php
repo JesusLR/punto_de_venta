@@ -323,7 +323,6 @@ class WhatsAppSettingController extends Controller
             ], 500);
         }
     }
-    }
 
     /**
      * Alternar estado del bot para una conversación (Pausar / Reactivar)
