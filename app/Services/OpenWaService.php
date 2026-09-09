@@ -55,10 +55,14 @@ class OpenWaService
     public function sendImage(string $sessionId, string $chatId, string $base64OrUrl, string $filename = 'producto.jpg', string $caption = ''): ?Response
     {
         try {
+            $base64Data = $base64OrUrl;
+            if (strpos($base64Data, 'data:image') === false && !filter_var($base64Data, FILTER_VALIDATE_URL)) {
+                $base64Data = 'data:image/jpeg;base64,' . $base64Data;
+            }
+
             $payload = [
                 'chatId' => $chatId,
-                'base64' => $base64OrUrl,
-                'file' => $base64OrUrl,
+                'base64' => $base64Data,
                 'mimetype' => 'image/jpeg',
                 'filename' => $filename,
                 'caption' => $caption,
@@ -69,8 +73,8 @@ class OpenWaService
                 return $res;
             }
 
-            // Fallback a send-document
-            return $this->sendDocument($sessionId, $chatId, $base64OrUrl, 'image/jpeg', $filename);
+            // Fallback a sendDocument
+            return $this->sendDocument($sessionId, $chatId, $base64Data, 'image/jpeg', $filename);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en OpenWaService sendImage: ' . $e->getMessage());
             return null;

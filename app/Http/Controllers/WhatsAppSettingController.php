@@ -154,6 +154,7 @@ class WhatsAppSettingController extends Controller
             'conversation_id' => 'required|exists:whatsapp_conversations,id',
             'body' => 'nullable|string|max:2000',
             'image' => 'nullable|image|max:10240', // max 10MB
+            'product_image_url' => 'nullable|string',
         ]);
 
         try {
@@ -182,6 +183,23 @@ class WhatsAppSettingController extends Controller
 
                 // Enviar imagen por WhatsApp vía OpenWA
                 $openWaService->sendImage($sessionId, $conversation->chat_id, $base64Data, $filename, $bodyText);
+            } elseif ($request->filled('product_image_url')) {
+                $pathOnly = parse_url($request->product_image_url, PHP_URL_PATH);
+                $relPath = ltrim($pathOnly, '/');
+                $fullPath = public_path($relPath);
+
+                if (file_exists($fullPath)) {
+                    $mediaUrl = $relPath;
+                    $msgType = 'image';
+                    $filename = basename($fullPath);
+                    $mimeType = function_exists('mime_content_type') ? mime_content_type($fullPath) : 'image/jpeg';
+                    $base64Data = 'data:' . $mimeType . ';base64,' . base64_encode(file_get_contents($fullPath));
+
+                    $openWaService->sendImage($sessionId, $conversation->chat_id, $base64Data, $filename, $bodyText);
+                } else {
+                    // Si no existe físicamente en servidor, enviar texto
+                    $openWaService->sendText($sessionId, $conversation->chat_id, $bodyText);
+                }
             } else {
                 if (empty($bodyText)) {
                     return response()->json([

@@ -503,6 +503,7 @@
                     <table class="table table-hover table-sm text-center mb-0">
                         <thead class="bg-light">
                             <tr>
+                                <th>Foto</th>
                                 <th>Código</th>
                                 <th>Descripción</th>
                                 <th>Precio Venta</th>
@@ -512,20 +513,30 @@
                         </thead>
                         <tbody id="modalProductList">
                             @forelse($productos ?? [] as $prod)
+                                @php
+                                    $imgSrc = $prod->img ? asset('img/productos/' . $prod->img) : null;
+                                @endphp
                                 <tr data-search="{{ strtolower($prod->codigo_barras . ' ' . $prod->descripcion) }}">
+                                    <td>
+                                        @if($imgSrc)
+                                            <img src="{{ $imgSrc }}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover; border: 1px solid #cbd5e1;" alt="Producto">
+                                        @else
+                                            <span class="badge badge-light text-muted p-2" style="font-size: 0.7rem;"><i class="fas fa-image mr-1"></i> Sin foto</span>
+                                        @endif
+                                    </td>
                                     <td><code>{{ $prod->codigo_barras }}</code></td>
                                     <td class="text-left font-weight-bold">{{ $prod->descripcion }}</td>
                                     <td class="text-success font-weight-bold">${{ number_format($prod->precio_venta, 2) }}</td>
                                     <td><span class="badge {{ $prod->existencia > 0 ? 'badge-success' : 'badge-danger' }}">{{ $prod->existencia }}</span></td>
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-outline-success font-weight-bold px-3" onclick="attachProductInfo('{{ addslashes($prod->descripcion) }}', '{{ number_format($prod->precio_venta, 2) }}', '{{ $prod->codigo_barras }}')">
-                                            <i class="fas fa-plus mr-1"></i> Insertar
+                                        <button type="button" class="btn btn-sm btn-outline-success font-weight-bold px-2 py-1" onclick="attachProductInfo('{{ addslashes($prod->descripcion) }}', '{{ number_format($prod->precio_venta, 2) }}', '{{ $prod->codigo_barras }}', '{{ $imgSrc }}')">
+                                            <i class="fas fa-plus mr-1"></i> {{ $imgSrc ? 'Insertar con Foto' : 'Insertar Datos' }}
                                         </button>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="py-3 text-muted">No hay productos registrados en el inventario.</td>
+                                    <td colspan="6" class="py-3 text-muted">No hay productos registrados en el inventario.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -540,6 +551,7 @@
     let activeConversationId = null;
     let activeConversationStep = null;
     let currentFilter = 'all';
+    let selectedProductImageUrl = null;
 
     function loadConversation(id) {
         activeConversationId = id;
@@ -633,6 +645,7 @@
 
     function handleImageSelected(input) {
         if (input.files && input.files[0]) {
+            selectedProductImageUrl = null; // Prioridad al archivo subido manualmente
             const file = input.files[0];
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -648,14 +661,24 @@
     function clearSelectedImage() {
         const fileInput = document.getElementById("imageInputFile");
         if (fileInput) fileInput.value = "";
+        selectedProductImageUrl = null;
         const bar = document.getElementById("imagePreviewBar");
         if (bar) bar.style.setProperty("display", "none", "important");
         document.getElementById("imagePreviewThumb").src = "";
     }
 
-    function attachProductInfo(name, price, barcode) {
+    function attachProductInfo(name, price, barcode, imageUrl) {
         const input = document.getElementById("messageInput");
         input.value = `🛍️ Producto: ${name} | 💰 Precio: $${price} | 🏷️ Cód: ${barcode}`;
+
+        if (imageUrl && imageUrl !== 'null' && imageUrl !== '') {
+            selectedProductImageUrl = imageUrl;
+            document.getElementById("imagePreviewThumb").src = imageUrl;
+            document.getElementById("imagePreviewName").innerText = "Foto de " + name;
+            const bar = document.getElementById("imagePreviewBar");
+            bar.style.setProperty("display", "flex", "important");
+        }
+
         $('#modalProductos').modal('hide');
         input.focus();
     }
@@ -724,22 +747,30 @@
     function submitMessage(e) {
         e.preventDefault();
         const input = document.getElementById("messageInput");
+        const fileInput = document.getElementById("imageInputFile");
         const body = input.value.trim();
+        const file = fileInput ? fileInput.files[0] : null;
 
-        if (!body || !activeConversationId) return;
+        if ((!body && !file && !selectedProductImageUrl) || !activeConversationId) return;
+
+        const formData = new FormData();
+        formData.append('conversation_id', activeConversationId);
+        if (body) formData.append('body', body);
+        if (file) {
+            formData.append('image', file);
+        } else if (selectedProductImageUrl) {
+            formData.append('product_image_url', selectedProductImageUrl);
+        }
 
         input.value = "";
+        clearSelectedImage();
 
         fetch('/whatsapp/chat/send', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            body: JSON.stringify({
-                conversation_id: activeConversationId,
-                body: body
-            })
+            body: formData
         })
         .then(res => res.json())
         .then(data => {
@@ -748,6 +779,9 @@
             } else {
                 Swal.fire('Error', data.message || 'No se pudo enviar el mensaje', 'error');
             }
+        })
+        .catch(err => {
+            Swal.fire('Error', 'Ocurrió un error al procesar el envío', 'error');
         });
     }
 
