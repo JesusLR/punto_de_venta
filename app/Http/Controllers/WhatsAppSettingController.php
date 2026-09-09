@@ -187,12 +187,18 @@ class WhatsAppSettingController extends Controller
                 'step' => $conversation->step,
             ],
             'messages' => $conversation->messages->map(function ($msg) {
+                $mediaUrl = null;
+                if ($msg->media_url) {
+                    $mediaUrl = (strpos($msg->media_url, 'data:image') === 0 || filter_var($msg->media_url, FILTER_VALIDATE_URL)) 
+                        ? $msg->media_url 
+                        : asset($msg->media_url);
+                }
                 return [
                     'id' => $msg->id,
                     'direction' => $msg->direction,
                     'sender_name' => $msg->sender_name ?: ($msg->direction === 'outbound' ? 'Tienda' : 'Cliente'),
                     'body' => $msg->body,
-                    'media_url' => $msg->media_url ? asset($msg->media_url) : null,
+                    'media_url' => $mediaUrl,
                     'type' => $msg->type,
                     'time' => $msg->created_at->format('H:i d/m/Y'),
                 ];
@@ -201,7 +207,7 @@ class WhatsAppSettingController extends Controller
     }
 
     /**
-     * Enviar respuesta manual como agente humano (Texto e Imágenes)
+     * Enviar respuesta manual como agente humano (Texto e Imágenes en memoria sin guardar en disco)
      */
     public function sendMessage(Request $request, \App\Services\OpenWaService $openWaService)
     {
@@ -221,38 +227,45 @@ class WhatsAppSettingController extends Controller
 
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 $file = $request->file('image');
-                $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file->getClientOriginalName());
+                $filename = $file->getClientOriginalName();
+                $mimeType = $file->getClientMimeType() ?: 'image/jpeg';
 
-                $destinationPath = public_path('uploads/whatsapp');
-                if (!file_exists($destinationPath)) {
-                    mkdir($destinationPath, 0755, true);
-                }
-                $file->move($destinationPath, $filename);
-                $mediaUrl = 'uploads/whatsapp/' . $filename;
+                // Convertir la imagen directamente a Base64 en memoria sin guardar en disco
+                $rawBytes = file_get_contents($file->getRealPath());
+                $base64Data = 'data:' . $mimeType . ';base64,' . base64_encode($rawBytes);
+
+                $mediaUrl = $base64Data;
                 $msgType = 'image';
-
-                // Convertir a Data URL para envío por OpenWA
-                $fullPath = $destinationPath . '/' . $filename;
-                $mimeType = function_exists('mime_content_type') ? mime_content_type($fullPath) : 'image/jpeg';
-                $base64Data = 'data:' . $mimeType . ';base64,' . base64_encode(file_get_contents($fullPath));
 
                 // Enviar imagen por WhatsApp vía OpenWA
                 $openWaService->sendImage($sessionId, $conversation->chat_id, $base64Data, $filename, $bodyText);
-            } elseif ($request->filled('product_image_url')) {
-                $pathOnly = parse_url($request->product_image_url, PHP_URL_PATH);
-                $relPath = ltrim($pathOnly, '/');
-                $fullPath = public_path($relPath);
 
-                if (file_exists($fullPath)) {
-                    $mediaUrl = $relPath;
+            } elseif ($request->filled('product_image_url')) {
+                $rawUrl = $request->product_image_url;
+                $filename = basename(parse_url($rawUrl, PHP_URL_PATH));
+
+                $possiblePaths = [
+                    public_path('img/productos/' . $filename),
+                    public_path('img/' . $filename),
+                    base_path('public/img/productos/' . $filename),
+                ];
+
+                $fullPath = null;
+                foreach ($possiblePaths as $p) {
+                    if (file_exists($p) && is_file($p)) {
+                        $fullPath = $p;
+                        break;
+                    }
+                }
+
+                if ($fullPath) {
+                    $mediaUrl = 'img/productos/' . $filename;
                     $msgType = 'image';
-                    $filename = basename($fullPath);
                     $mimeType = function_exists('mime_content_type') ? mime_content_type($fullPath) : 'image/jpeg';
                     $base64Data = 'data:' . $mimeType . ';base64,' . base64_encode(file_get_contents($fullPath));
 
                     $openWaService->sendImage($sessionId, $conversation->chat_id, $base64Data, $filename, $bodyText);
                 } else {
-                    // Si no existe físicamente en servidor, enviar texto
                     $openWaService->sendText($sessionId, $conversation->chat_id, $bodyText);
                 }
             } else {
@@ -283,6 +296,13 @@ class WhatsAppSettingController extends Controller
                 'last_interaction_at' => now()
             ]);
 
+            $finalMediaUrl = null;
+            if ($message->media_url) {
+                $finalMediaUrl = (strpos($message->media_url, 'data:image') === 0 || filter_var($message->media_url, FILTER_VALIDATE_URL)) 
+                    ? $message->media_url 
+                    : asset($message->media_url);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => [
@@ -290,7 +310,7 @@ class WhatsAppSettingController extends Controller
                     'direction' => $message->direction,
                     'sender_name' => $message->sender_name,
                     'body' => $message->body,
-                    'media_url' => $message->media_url ? asset($message->media_url) : null,
+                    'media_url' => $finalMediaUrl,
                     'type' => $message->type,
                     'time' => $message->created_at->format('H:i d/m/Y'),
                 ]
@@ -302,6 +322,7 @@ class WhatsAppSettingController extends Controller
                 'message' => 'Error al enviar mensaje: ' . $ex->getMessage()
             ], 500);
         }
+    }
     }
 
     /**
