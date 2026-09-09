@@ -411,8 +411,8 @@
                 </div>
             </div>
 
-            <!-- Placeholder Vacío -->
-            <div id="noChatSelected" class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4">
+            <!-- Placeholder Vacío (Solo visible cuando NO hay chat seleccionado) -->
+            <div id="noChatSelected" class="flex-column align-items-center justify-content-center h-100 text-center p-4">
                 <div class="p-4 bg-white rounded-circle shadow-sm mb-3">
                     <i class="fab fa-whatsapp text-success" style="font-size: 4rem;"></i>
                 </div>
@@ -479,8 +479,13 @@
                 const conv = data.conversation;
                 activeConversationStep = conv.step;
 
+                // Ocultar placeholder
+                const placeholder = document.getElementById("noChatSelected");
+                placeholder.classList.add("d-none");
+                placeholder.classList.remove("d-flex");
+                placeholder.style.setProperty("display", "none", "important");
+
                 // Mostrar vistas
-                document.getElementById("noChatSelected").style.display = "none";
                 document.getElementById("chatHeader").style.display = "flex";
                 document.getElementById("chatThread").style.display = "flex";
                 document.getElementById("quickRepliesBar").style.display = "flex";
@@ -687,6 +692,17 @@
             loadConversation(activeConversationId);
         }
     }, 4000);
+
+    // Cargar automáticamente el primer chat al abrir la pantalla
+    document.addEventListener("DOMContentLoaded", () => {
+        const firstChat = document.querySelector(".chat-item");
+        if (firstChat) {
+            const id = firstChat.dataset.id;
+            if (id) {
+                loadConversation(id);
+            }
+        }
+    });
 </script>
 
 @endsection
