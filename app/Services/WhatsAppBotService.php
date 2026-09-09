@@ -83,6 +83,16 @@ class WhatsAppBotService
                 $conversation->cliente_id = $cliente->id;
             }
 
+            // Registrar el mensaje entrante del cliente en el historial
+            \App\WhatsAppMessage::create([
+                'conversation_id' => $conversation->id,
+                'chat_id' => $chatId,
+                'direction' => 'inbound',
+                'sender_name' => $senderName,
+                'body' => $body,
+                'type' => 'text'
+            ]);
+
             // Si un agente humano ha tomado el control, no responder automáticamente a menos que escriba RESET
             if ($conversation->step === 'agent_active' && strtoupper($body) !== 'RESET' && strtoupper($body) !== 'MENU') {
                 $conversation->update(['last_interaction_at' => now()]);
@@ -96,6 +106,16 @@ class WhatsAppBotService
             $sessionId = config('services.openwa.session_id') ?: '581655e7-d546-4e9c-88da-f1f8843bc8f6';
             if (!empty($response['text'])) {
                 $this->openWaService->sendText($sessionId, $chatId, $response['text']);
+
+                // Registrar la respuesta del bot en el historial
+                \App\WhatsAppMessage::create([
+                    'conversation_id' => $conversation->id,
+                    'chat_id' => $chatId,
+                    'direction' => 'outbound',
+                    'sender_name' => 'Bot Joyería Colibrí',
+                    'body' => $response['text'],
+                    'type' => 'text'
+                ]);
             }
 
             // Si hay un documento o PDF adjunto que enviar

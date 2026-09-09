@@ -27,4 +27,14 @@ class WhatsAppConversation extends Model
     {
         return $this->belongsTo(Cliente::class, 'cliente_id');
     }
+
+    public function messages()
+    {
+        return $this->hasMany(WhatsAppMessage::class, 'conversation_id');
+    }
+
+    public function lastMessage()
+    {
+        return $this->hasOne(WhatsAppMessage::class, 'conversation_id')->latest();
+    }
 }

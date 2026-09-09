@@ -520,6 +520,10 @@
                         </a>
                     @endif
 
+                    <a class="sidebar-link {{ request()->routeIs('whatsapp.chat.index') ? 'active' : '' }}" href="{{route("whatsapp.chat.index")}}">
+                        <i class="fas fa-comments" style="color: #25D366;"></i>
+                        <span>Centro de Mensajes</span>
+                    </a>
                     <a class="sidebar-link {{ request()->routeIs('whatsapp.links.index') ? 'active' : '' }}" href="{{route("whatsapp.links.index")}}">
                         <i class="fab fa-whatsapp" style="color: #25D366;"></i>
                         <span>WhatsApp Enlaces / QR</span>
