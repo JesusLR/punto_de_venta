@@ -52,18 +52,22 @@ class OpenWaService
         }
     }
 
-    public function sendImage(string $sessionId, string $chatId, string $base64OrUrl, string $filename = 'producto.jpg', string $caption = ''): ?Response
+    public function sendImage(string $sessionId, string $chatId, string $base64OrUrl, string $filename = 'producto.jpg', string $caption = '', string $mimetype = 'image/jpeg'): ?Response
     {
         try {
             $base64Data = $base64OrUrl;
-            if (strpos($base64Data, 'data:image') === false && !filter_var($base64Data, FILTER_VALIDATE_URL)) {
-                $base64Data = 'data:image/jpeg;base64,' . $base64Data;
+            
+            // Extraer automáticamente el mimetype si viene en formato Data URL (data:image/png;base64,...)
+            if (preg_match('/^data:(image\/[a-zA-Z0-9\+\-\.]+);base64,/', $base64Data, $matches)) {
+                $mimetype = $matches[1];
+            } else if (strpos($base64Data, 'data:image') === false && !filter_var($base64Data, FILTER_VALIDATE_URL)) {
+                $base64Data = 'data:' . $mimetype . ';base64,' . $base64Data;
             }
 
             $payload = [
                 'chatId' => $chatId,
                 'base64' => $base64Data,
-                'mimetype' => 'image/jpeg',
+                'mimetype' => $mimetype,
                 'filename' => $filename,
                 'caption' => $caption,
             ];
@@ -73,8 +77,8 @@ class OpenWaService
                 return $res;
             }
 
-            // Fallback a sendDocument
-            return $this->sendDocument($sessionId, $chatId, $base64Data, 'image/jpeg', $filename);
+            // Fallback a sendDocument con el mimetype detectado
+            return $this->sendDocument($sessionId, $chatId, $base64Data, $mimetype, $filename);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en OpenWaService sendImage: ' . $e->getMessage());
             return null;
