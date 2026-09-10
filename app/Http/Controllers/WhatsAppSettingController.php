@@ -258,10 +258,39 @@ class WhatsAppSettingController extends Controller
                     }
                 }
 
-                if ($fullPath) {
+                // Fallback sensible a mayúsculas/minúsculas para servidores Linux (Case-insensitive)
+                if (!$fullPath) {
+                    $dir = public_path('img/productos');
+                    if (is_dir($dir)) {
+                        $files = @scandir($dir);
+                        if (is_array($files)) {
+                            foreach ($files as $f) {
+                                if (strtolower($f) === strtolower($filename)) {
+                                    $fullPath = $dir . '/' . $f;
+                                    $filename = $f;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ($fullPath && is_file($fullPath)) {
                     $mediaUrl = 'img/productos/' . $filename;
                     $msgType = 'image';
-                    $mimeType = function_exists('mime_content_type') ? mime_content_type($fullPath) : 'image/jpeg';
+
+                    $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+                    $mimeType = 'image/jpeg';
+                    if (function_exists('mime_content_type')) {
+                        $detectedMime = @mime_content_type($fullPath);
+                        if ($detectedMime && strpos($detectedMime, 'image/') === 0) {
+                            $mimeType = $detectedMime;
+                        }
+                    }
+                    if ($mimeType === 'image/jpeg' && in_array($ext, ['png', 'webp', 'gif', 'svg'])) {
+                        $mimeType = 'image/' . ($ext === 'jpg' ? 'jpeg' : $ext);
+                    }
+
                     $base64Data = 'data:' . $mimeType . ';base64,' . base64_encode(file_get_contents($fullPath));
 
                     $openWaService->sendImage($sessionId, $conversation->chat_id, $base64Data, $filename, $bodyText);

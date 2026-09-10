@@ -21,7 +21,7 @@ class OpenWaService
         return Http::withHeaders([
             'X-API-Key' => $this->apiKey,
             'Content-Type' => 'application/json',
-        ]);
+        ])->timeout(30)->withoutVerifying();
     }
 
     public function sendText(string $sessionId, string $chatId, string $text): ?Response
