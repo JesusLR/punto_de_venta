@@ -454,9 +454,9 @@
                     <h5 class="font-weight-bold text-white mb-0" style="font-size: 1.05rem;">
                         <i class="fab fa-whatsapp text-success mr-1"></i> Mensajería
                     </h5>
-                    <span class="badge badge-success px-2 py-1" style="border-radius: 10px; font-size: 0.68rem;">
-                        <span class="pulse-green mr-1"></span> En Vivo
-                    </span>
+                    <a href="{{ route('whatsapp.settings.index') }}" class="badge badge-success px-2 py-1 text-white text-decoration-none" style="border-radius: 10px; font-size: 0.68rem;" title="Configurar sesión / Escanear QR">
+                        <span class="pulse-green mr-1"></span> En Vivo <i class="fas fa-cog ml-1"></i>
+                    </a>
                 </div>
                 <div class="chat-search-box">
                     <i class="fas fa-search"></i>

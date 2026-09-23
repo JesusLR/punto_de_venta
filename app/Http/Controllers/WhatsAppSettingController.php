@@ -19,9 +19,16 @@ class WhatsAppSettingController extends Controller
     /**
      * Vista de Generador de Enlaces de WhatsApp
      */
-    public function indexLinks(Request $request)
+    public function indexLinks(Request $request, \App\Services\OpenWaService $openWaService)
     {
-        $storePhone = HomepageSetting::getValue('wa_phone_number', '5219991629742');
+        $activeSessionId = $openWaService->getActiveSessionId();
+        $sessionRes = $openWaService->getSession($activeSessionId);
+        $sessionData = $sessionRes && $sessionRes->successful() ? $sessionRes->json() : null;
+
+        $storePhone = ($sessionData && !empty($sessionData['phone'])) 
+            ? $sessionData['phone'] 
+            : HomepageSetting::getValue('wa_phone_number', '5219991629742');
+
         $categorias = Categorias::all();
         $productos = Producto::orderBy('id', 'desc')->take(20)->get();
 
@@ -37,12 +44,14 @@ class WhatsAppSettingController extends Controller
     /**
      * Vista de Configuración del Bot de WhatsApp
      */
-    public function indexSettings(Request $request)
+    public function indexSettings(Request $request, \App\Services\OpenWaService $openWaService)
     {
         $settings = [
             'wa_phone_number' => HomepageSetting::getValue('wa_phone_number', '5219991629742'),
             'wa_bot_enabled' => HomepageSetting::getValue('wa_bot_enabled', '1'),
             'wa_welcome_text' => HomepageSetting::getValue('wa_welcome_text', ''),
+            'wa_api_url' => HomepageSetting::getValue('wa_api_url', config('services.openwa.url', 'http://74.208.53.13:2785')),
+            'wa_session_id' => $openWaService->getActiveSessionId(),
         ];
 
         return view('whatsapp.settings', compact('settings'));
@@ -57,12 +66,20 @@ class WhatsAppSettingController extends Controller
             'wa_phone_number' => 'nullable|string|max:20',
             'wa_bot_enabled' => 'required|in:0,1',
             'wa_welcome_text' => 'nullable|string|max:1000',
+            'wa_api_url' => 'nullable|string|max:255',
+            'wa_session_id' => 'nullable|string|max:255',
         ]);
 
         try {
             HomepageSetting::setValue('wa_phone_number', preg_replace('/[^0-9]/', '', $request->wa_phone_number));
             HomepageSetting::setValue('wa_bot_enabled', $request->wa_bot_enabled);
             HomepageSetting::setValue('wa_welcome_text', $request->wa_welcome_text);
+            if ($request->filled('wa_api_url')) {
+                HomepageSetting::setValue('wa_api_url', rtrim($request->wa_api_url, '/'));
+            }
+            if ($request->filled('wa_session_id')) {
+                HomepageSetting::setValue('wa_session_id', trim($request->wa_session_id));
+            }
 
             return redirect()->route('whatsapp.settings.index')
                 ->with('mensaje', 'Configuración de WhatsApp guardada correctamente.');
@@ -220,7 +237,7 @@ class WhatsAppSettingController extends Controller
 
         try {
             $conversation = WhatsAppConversation::findOrFail($request->conversation_id);
-            $sessionId = config('services.openwa.session_id') ?: '581655e7-d546-4e9c-88da-f1f8843bc8f6';
+            $sessionId = $openWaService->getActiveSessionId();
             $bodyText = $request->body ?: '';
             $mediaUrl = null;
             $msgType = 'text';
@@ -393,5 +410,172 @@ class WhatsAppSettingController extends Controller
                 'message' => 'Error al eliminar la conversación: ' . $ex->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Obtener lista de sesiones registradas en OpenWA (API AJAX)
+     */
+    public function getSessionsAjax(\App\Services\OpenWaService $openWaService)
+    {
+        $activeSessionId = $openWaService->getActiveSessionId();
+        $apiUrl = $openWaService->getBaseUrl();
+        $res = $openWaService->getSessions();
+
+        if ($res && $res->successful()) {
+            $sessions = $res->json();
+            return response()->json([
+                'success' => true,
+                'active_session_id' => $activeSessionId,
+                'api_url' => $apiUrl,
+                'sessions' => $sessions
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No se pudo conectar con el servidor de OpenWA en ' . $apiUrl,
+            'active_session_id' => $activeSessionId,
+            'api_url' => $apiUrl,
+            'sessions' => []
+        ], 500);
+    }
+
+    /**
+     * Crear una nueva sesión en OpenWA (API AJAX)
+     */
+    public function createSessionAjax(Request $request, \App\Services\OpenWaService $openWaService)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100',
+        ]);
+
+        $res = $openWaService->createSession($request->name);
+
+        if ($res && ($res->status() === 201 || $res->successful())) {
+            $sessionData = $res->json();
+            $sessionId = $sessionData['id'] ?? null;
+
+            if ($sessionId) {
+                HomepageSetting::setValue('wa_session_id', $sessionId);
+                // Iniciar automáticamente la sesión recién creada para comenzar la generación del QR
+                $openWaService->startSession($sessionId);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sesión creada e iniciada correctamente. Generando código QR...',
+                'session' => $sessionData
+            ]);
+        }
+
+        $errorData = $res ? $res->json() : null;
+        $errMsg = is_array($errorData) && isset($errorData['message']) ? $errorData['message'] : 'Error al crear la sesión en OpenWA.';
+
+        return response()->json([
+            'success' => false,
+            'message' => $errMsg
+        ], 400);
+    }
+
+    /**
+     * Iniciar una sesión en OpenWA (API AJAX)
+     */
+    public function startSessionAjax(Request $request, \App\Services\OpenWaService $openWaService)
+    {
+        $request->validate([
+            'session_id' => 'required|string',
+        ]);
+
+        $res = $openWaService->startSession($request->session_id);
+
+        if ($res && $res->successful()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Sesión iniciada. Generando código QR...',
+                'session' => $res->json()
+            ]);
+        }
+
+        $errorData = $res ? $res->json() : null;
+        $errMsg = is_array($errorData) && isset($errorData['message']) ? $errorData['message'] : 'La sesión ya está iniciada o no se pudo iniciar.';
+
+        return response()->json([
+            'success' => false,
+            'message' => $errMsg
+        ], 400);
+    }
+
+    /**
+     * Detener una sesión en OpenWA (API AJAX)
+     */
+    public function stopSessionAjax(Request $request, \App\Services\OpenWaService $openWaService)
+    {
+        $request->validate([
+            'session_id' => 'required|string',
+        ]);
+
+        $res = $openWaService->stopSession($request->session_id);
+
+        if ($res && $res->successful()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Sesión detenida correctamente.',
+                'session' => $res->json()
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No se pudo detener la sesión.'
+        ], 400);
+    }
+
+    /**
+     * Obtener el código QR de una sesión (API AJAX)
+     */
+    public function getQrCodeAjax(Request $request, $id, \App\Services\OpenWaService $openWaService)
+    {
+        $qrRes = $openWaService->getQRCode($id);
+        $sessionRes = $openWaService->getSession($id);
+
+        $sessionData = $sessionRes && $sessionRes->successful() ? $sessionRes->json() : null;
+        $qrData = $qrRes && $qrRes->successful() ? $qrRes->json() : null;
+
+        $qrCode = null;
+        if (is_array($qrData)) {
+            $qrCode = $qrData['qrCode'] ?? $qrData['qr'] ?? null;
+        } elseif (is_string($qrData)) {
+            $qrCode = $qrData;
+        }
+
+        $rawStatus = $sessionData['status'] ?? ($qrData['status'] ?? 'DISCONNECTED');
+        $normalizedStatus = strtoupper((string)$rawStatus);
+
+        return response()->json([
+            'success' => true,
+            'status' => $normalizedStatus,
+            'qrCode' => $qrCode,
+            'phone' => $sessionData['phone'] ?? null,
+            'pushName' => $sessionData['pushName'] ?? null,
+            'session' => $sessionData
+        ]);
+    }
+
+    /**
+     * Establcer una sesión como la activa en la configuración del sistema (API AJAX)
+     */
+    public function setActiveSessionAjax(Request $request)
+    {
+        $request->validate([
+            'session_id' => 'required|string',
+        ]);
+
+        HomepageSetting::setValue('wa_session_id', trim($request->session_id));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sesión activa actualizada a: ' . $request->session_id,
+            'active_session_id' => $request->session_id
+        ]);
     }
 }

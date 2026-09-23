@@ -144,6 +144,14 @@ Auth::routes([
                 Route::get('/whatsapp/settings', 'WhatsAppSettingController@indexSettings')->name('whatsapp.settings.index');
                 Route::post('/whatsapp/settings', 'WhatsAppSettingController@updateSettings')->name('whatsapp.settings.update');
 
+                // WhatsApp Session Management Routes (AJAX)
+                Route::get('/whatsapp/settings/sessions', 'WhatsAppSettingController@getSessionsAjax')->name('whatsapp.settings.sessions.list');
+                Route::post('/whatsapp/settings/sessions/create', 'WhatsAppSettingController@createSessionAjax')->name('whatsapp.settings.sessions.create');
+                Route::post('/whatsapp/settings/sessions/start', 'WhatsAppSettingController@startSessionAjax')->name('whatsapp.settings.sessions.start');
+                Route::post('/whatsapp/settings/sessions/stop', 'WhatsAppSettingController@stopSessionAjax')->name('whatsapp.settings.sessions.stop');
+                Route::get('/whatsapp/settings/sessions/{id}/qr', 'WhatsAppSettingController@getQrCodeAjax')->name('whatsapp.settings.sessions.qr');
+                Route::post('/whatsapp/settings/sessions/active', 'WhatsAppSettingController@setActiveSessionAjax')->name('whatsapp.settings.sessions.active');
+
                 Route::post('/about/upload-image', [AboutController::class, 'uploadImage'])->name('about.upload.image');
                 Route::get('/gold-price', [HomeController::class, 'goldPrice'])->name('gold.price');
             });

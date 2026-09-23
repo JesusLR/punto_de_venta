@@ -39,7 +39,7 @@
                 <div class="card-body">
                     <form id="formGenerator">
                         <div class="form-group mb-3">
-                            <label class="font-weight-bold text-dark small">Número de WhatsApp de la Tienda</label>
+                            <label class="font-weight-bold text-dark small">Número de WhatsApp de la Tienda (Al cual se dirige el QR)</label>
                             <input type="text" id="phoneInput" class="form-control" placeholder="Ej: 5219998887766" value="{{ $storePhone }}">
                             <small class="form-text text-muted">Incluye la clave de país sin signos (ej. 521 para México).</small>
                         </div>

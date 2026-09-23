@@ -103,7 +103,7 @@ class WhatsAppBotService
             $response = $this->generateResponse($body, $conversation, $cliente);
 
             // 4. Enviar respuesta vía OpenWA
-            $sessionId = config('services.openwa.session_id') ?: '581655e7-d546-4e9c-88da-f1f8843bc8f6';
+            $sessionId = $this->openWaService->getActiveSessionId();
             if (!empty($response['text'])) {
                 $this->openWaService->sendText($sessionId, $chatId, $response['text']);
 
