@@ -7,21 +7,32 @@ use Illuminate\Http\Request;
 
 class OpenWaController extends Controller
 {
-    private function sessionId(): string
+    private function sessionId(OpenWaService $openwa): string
     {
-        return config('services.openwa.session_id') ?: '581655e7-d546-4e9c-88da-f1f8843bc8f6'; //Guardar en variable de configuracion
+        return $openwa->getActiveSessionId();
     }
 
     public function sendText(Request $request, OpenWaService $openwa)
     {
-
-
         $data = $request->validate([
             'chatId' => ['required', 'string'],
             'text' => ['required', 'string'],
         ]);
 
-        $response = $openwa->sendText($this->sessionId(), $request->chatId, $request->text);
+        $activeSessionId = $this->sessionId($openwa);
+        if (empty($activeSessionId)) {
+            return response()->json([
+                'message' => 'No hay ninguna sesión activa de WhatsApp seleccionada en la configuración.',
+            ], 400);
+        }
+
+        $response = $openwa->sendText($activeSessionId, $request->chatId, $request->text);
+
+        if (!$response) {
+            return response()->json([
+                'message' => 'No se pudo comunicar con el servicio de WhatsApp OpenWA.',
+            ], 500);
+        }
 
         return response()->json($response->json(), $response->status());
     }
@@ -35,6 +46,13 @@ class OpenWaController extends Controller
             'mimetype' => ['nullable', 'string'],
             'filename' => ['nullable', 'string'],
         ]);
+
+        $activeSessionId = $this->sessionId($openwa);
+        if (empty($activeSessionId)) {
+            return response()->json([
+                'message' => 'No hay ninguna sesión activa de WhatsApp seleccionada en la configuración.',
+            ], 400);
+        }
 
         $base64 = null;
         $mimetype = null;
@@ -56,12 +74,18 @@ class OpenWaController extends Controller
         }
 
         $response = $openwa->sendDocument(
-            $this->sessionId(),
+            $activeSessionId,
             $data['chatId'],
             $base64,
             $mimetype,
             $filename
         );
+
+        if (!$response) {
+            return response()->json([
+                'message' => 'No se pudo comunicar con el servicio de WhatsApp OpenWA.',
+            ], 500);
+        }
 
         return response()->json($response->json(), $response->status());
     }

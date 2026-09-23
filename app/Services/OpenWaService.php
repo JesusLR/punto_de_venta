@@ -20,11 +20,43 @@ class OpenWaService
     }
 
     /**
-     * Obtener el ID de sesión activo configurado
+     * Obtener el ID de sesión activo configurado dinámicamente
      */
     public function getActiveSessionId(): string
     {
-        return HomepageSetting::getValue('wa_session_id') ?: config('services.openwa.session_id', '581655e7-d546-4e9c-88da-f1f8843bc8f6');
+        $savedId = HomepageSetting::getValue('wa_session_id');
+        if (!empty($savedId)) {
+            return $savedId;
+        }
+
+        $envId = config('services.openwa.session_id');
+        if (!empty($envId)) {
+            return $envId;
+        }
+
+        // Si no hay ninguna configurada en DB ni env, consultar sesiones disponibles de OpenWA y tomar la activa
+        try {
+            $res = $this->getSessions();
+            if ($res && $res->successful()) {
+                $sessions = $res->json();
+                if (is_array($sessions) && count($sessions) > 0) {
+                    foreach ($sessions as $s) {
+                        if (isset($s['status']) && strtoupper((string)$s['status']) === 'READY') {
+                            HomepageSetting::setValue('wa_session_id', $s['id']);
+                            return $s['id'];
+                        }
+                    }
+                    if (isset($sessions[0]['id'])) {
+                        HomepageSetting::setValue('wa_session_id', $sessions[0]['id']);
+                        return $sessions[0]['id'];
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error resolviendo sesión activa en OpenWaService: ' . $e->getMessage());
+        }
+
+        return '';
     }
 
     /**
@@ -59,9 +91,12 @@ class OpenWaService
     public function sendDocument(string $sessionId, string $chatId, string $base64, string $mimetype, string $filename): ?Response
     {
         try {
+            // Limpiar prefijo data:mime/type;base64, si viene incluido
+            $cleanBase64 = preg_replace('/^data:[^;]+;base64,/', '', $base64);
+
             return $this->client()->post("{$this->baseUrl}/api/sessions/{$sessionId}/messages/send-document", [
                 'chatId' => $chatId,
-                'base64' => $base64,
+                'base64' => $cleanBase64,
                 'mimetype' => $mimetype,
                 'filename' => $filename,
             ]);
@@ -196,4 +231,4 @@ class OpenWaService
             return null;
         }
     }
-}
+}
