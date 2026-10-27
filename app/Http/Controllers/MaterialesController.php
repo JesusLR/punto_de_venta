@@ -10,6 +10,14 @@ use App\Imports\importProductos;
 
 class MaterialesController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:ver_materiales')->only(['index', 'gridMateriales']);
+        $this->middleware('permission:manage_materials')->only(['saveMateriales', 'getMaterial']);
+        $this->middleware('permission:delete_materials')->only(['deleteMaterial']);
+    }
+
     public function index(){
         return view('materiales.materiales_index');
     }

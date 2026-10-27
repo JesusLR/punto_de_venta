@@ -27,6 +27,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class Producto extends Model
 {
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($producto) {
+            if ($producto->existencia > 3) {
+                \DB::table('notificaciones_leidas')
+                    ->where('notification_type', 'stock_bajo')
+                    ->where('notification_id', $producto->id)
+                    ->delete();
+            }
+        });
+    }
+
     protected $fillable = [
         "codigo_barras", 
         "descripcion", 

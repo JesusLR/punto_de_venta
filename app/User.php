@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'role_id',
     ];
 
     /**
@@ -36,4 +36,50 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Relación con el Rol del usuario
+     */
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Comprobar si el usuario tiene un permiso específico
+     */
+    public function hasPermission($permissionSlug)
+    {
+        // El usuario con ID 1 siempre es super-administrador
+        if ($this->id === 1) {
+            return true;
+        }
+
+        if (!$this->role) {
+            return false;
+        }
+
+        // Si el rol es administrador, tiene todos los permisos
+        if ($this->role->slug === 'admin') {
+            return true;
+        }
+
+        return $this->role->permissions->contains('slug', $permissionSlug);
+    }
+
+    /**
+     * Obtener lista plana de slugs de todos los permisos asignados
+     */
+    public function getAllPermissions()
+    {
+        if ($this->id === 1 || ($this->role && $this->role->slug === 'admin')) {
+            return Permission::pluck('slug')->toArray();
+        }
+
+        if (!$this->role) {
+            return [];
+        }
+
+        return $this->role->permissions->pluck('slug')->toArray();
+    }
 }

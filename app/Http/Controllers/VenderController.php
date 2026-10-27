@@ -32,7 +32,9 @@ use App\ProductoVendido;
 use App\Venta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class VenderController extends Controller
 {
@@ -170,6 +172,9 @@ class VenderController extends Controller
     {
         $request->validate([
             'tipo_pago' => 'required|in:EFECTIVO,MERCADO_PAGO',
+            'enviar_whatsapp' => 'nullable|in:0,1',
+            'telefono_whatsapp' => 'nullable|string|max:30',
+            'ticket_pdf_base64' => 'nullable|string',
         ], [
             'tipo_pago.required' => 'Debes seleccionar un tipo de pago para terminar la venta.',
             'tipo_pago.in' => 'El tipo de pago seleccionado no es válido.',
@@ -201,10 +206,69 @@ class VenderController extends Controller
             $productoActualizado->existencia -= $productoVendido->cantidad;
             $productoActualizado->saveOrFail();
         }
+
+        $mensaje = 'Venta terminada';
+
+        if ($request->input('enviar_whatsapp') === '1') {
+            $telefono = $this->normalizarTelefonoMx($request->input('telefono_whatsapp'));
+            if (strlen($telefono) !== 10) {
+                $mensaje .= ' (sin envío WhatsApp: teléfono inválido)';
+            } else {
+                try {
+                    $ventaConDetalle = Venta::with(['cliente', 'user', 'productos'])->findOrFail($idVenta);
+                    $totalVenta = 0;
+                    foreach ($ventaConDetalle->productos as $producto) {
+                        $totalVenta += $producto->cantidad * $producto->precio;
+                    }
+
+                    $pdf = Pdf::loadView('ventas.pdf', [
+                        'venta' => $ventaConDetalle,
+                        'total' => $totalVenta,
+                    ])->setPaper('letter', 'portrait');
+
+                    $ticketPdfBase64 = base64_encode($pdf->output());
+
+                    $response = Http::post(url('/api/openwa/send-document'), [
+                        'chatId' => '521' . $telefono . '@c.us',
+                        'base64' => $ticketPdfBase64,
+                        'mimetype' => 'application/pdf',
+                        'filename' => 'ticket_venta_' . $idVenta . '.pdf',
+                    ]);
+
+                    if ($response->successful()) {
+                        $mensaje .= ' y PDF enviado por WhatsApp';
+                    } else {
+                        $mensaje .= ' (sin envío WhatsApp)';
+                    }
+                } catch (\Throwable $e) {
+                    $mensaje .= ' (sin envío WhatsApp)';
+                }
+            }
+        }
+
         $this->vaciarProductos();
         return redirect()
             ->route("vender.index")
-            ->with("mensaje", "Venta terminada");
+            ->with("mensaje", $mensaje);
+    }
+
+    private function normalizarTelefonoMx($telefono)
+    {
+        $soloDigitos = preg_replace('/\D/', '', (string) $telefono);
+
+        if (strpos($soloDigitos, '521') === 0 && strlen($soloDigitos) > 10) {
+            return substr($soloDigitos, 3);
+        }
+
+        if (strpos($soloDigitos, '52') === 0 && strlen($soloDigitos) > 10) {
+            return substr($soloDigitos, 2);
+        }
+
+        if (strpos($soloDigitos, '1') === 0 && strlen($soloDigitos) === 11) {
+            return substr($soloDigitos, 1);
+        }
+
+        return $soloDigitos;
     }
 
     private function calcularTotalCarrito(array $productos)

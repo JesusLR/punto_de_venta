@@ -10,6 +10,7 @@ class Egreso extends Model
 
     protected $fillable = [
         'id_usuario',
+        'id_egreso_automatico',
         'concepto',
         'monto',
         'fecha',

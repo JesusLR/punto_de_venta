@@ -14,6 +14,12 @@ $(document).ready(function () {
         // allowClear: true
     });
 
+    $("#cFiltroUnidades").select2({
+        width: '100%',
+        // placeholder: 'Selecciona un producto',
+        // allowClear: true
+    });
+
     $("#btnBuscarEstadistica").on('click', function () {
         cargarDetalleProductos();
     });

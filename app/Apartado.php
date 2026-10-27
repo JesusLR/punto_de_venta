@@ -6,6 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Apartado extends Model
 {
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($apartado) {
+            \DB::table('notificaciones_leidas')
+                ->where('notification_type', 'apartado_inactivo')
+                ->where('notification_id', $apartado->id)
+                ->delete();
+        });
+    }
+
     protected $table = 'apartados';
 
     protected $fillable = [

@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:manage_users');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +21,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return view("usuarios.usuarios_index", ["usuarios" => User::all()]);
+        return view("usuarios.usuarios_index", ["usuarios" => User::with('role')->get()]);
     }
 
     /**
@@ -25,7 +31,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view("usuarios.usuarios_create");
+        $roles = \App\Role::all();
+        return view("usuarios.usuarios_create", compact('roles'));
     }
 
     /**
@@ -36,8 +43,15 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6',
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
         $usuario = new User($request->input());
-        $usuario->password = Hash::make($usuario->password);
+        $usuario->password = Hash::make($request->password);
         $usuario->saveOrFail();
         return redirect()->route("usuarios.index")->with("mensaje", "Usuario guardado");
     }
@@ -62,8 +76,8 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $user->password = "";
-        return view("usuarios.usuarios_edit", ["usuario" => $user,
-        ]);
+        $roles = \App\Role::all();
+        return view("usuarios.usuarios_edit", ["usuario" => $user, "roles" => $roles]);
     }
 
     /**
@@ -75,8 +89,20 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $user->fill($request->input());
-        $user->password = Hash::make($user->password);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->role_id = $request->role_id;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
         $user->saveOrFail();
         return redirect()->route("usuarios.index")->with("mensaje", "Usuario actualizado");
     }

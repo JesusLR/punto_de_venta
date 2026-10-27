@@ -1,0 +1,1076 @@
+@extends("maestra")
+@section("titulo", "Centro de Mensajes de WhatsApp")
+@section("contenido")
+
+<style>
+    /* Ajuste de contenedor principal para que la interfaz ocupe el 100% de la ventana sin scroll del navegador */
+    body.authenticated .main-wrapper {
+        min-height: 100vh;
+    }
+    
+    @media (min-width: 992px) {
+        body.authenticated .main-wrapper main {
+            padding: 0.75rem 1rem !important;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+    }
+
+    @media (max-width: 991.98px) {
+        body.authenticated .main-wrapper main {
+            padding: 0.35rem 0.5rem !important;
+            height: calc(100vh - 60px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+    }
+
+    .chat-page-container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        flex: 1 1 auto;
+    }
+
+    /* Estilos Principales del Módulo de Mensajería */
+    .chat-wrapper {
+        flex: 1 1 auto;
+        height: 100%;
+        min-height: 0;
+        max-height: 100%;
+        background: #ffffff;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        display: flex;
+        border: 1px solid #e2e8f0;
+    }
+
+    /* Columna Izquierda: Lista de Chats */
+    .chat-sidebar {
+        width: 360px;
+        background: #ffffff;
+        border-right: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        height: 100%;
+        min-height: 0;
+    }
+
+    .chat-sidebar-header {
+        padding: 1rem 1.25rem;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: white;
+        border-bottom: 2px solid #D4AF37;
+        flex-shrink: 0;
+    }
+
+    .chat-search-box {
+        position: relative;
+        margin-top: 0.75rem;
+    }
+
+    .chat-search-box i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .chat-search-box input {
+        padding-left: 36px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        font-size: 0.85rem;
+    }
+
+    .chat-search-box input::placeholder {
+        color: #94a3b8;
+    }
+
+    .chat-search-box input:focus {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        box-shadow: none;
+        border-color: #D4AF37;
+    }
+
+    /* Tabs de Filtro */
+    .chat-filter-tabs {
+        display: flex;
+        background: #f8fafc;
+        padding: 6px;
+        border-bottom: 1px solid #e2e8f0;
+        gap: 4px;
+        flex-shrink: 0;
+    }
+
+    .chat-filter-btn {
+        flex: 1;
+        border: none;
+        background: transparent;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        padding: 6px 8px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .chat-filter-btn.active {
+        background: #ffffff;
+        color: #0f172a;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .chat-list {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+    }
+
+    .chat-item {
+        padding: 12px 14px;
+        border-bottom: 1px solid #f1f5f9;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+    }
+
+    .chat-item:hover {
+        background-color: #f8fafc;
+    }
+
+    .chat-item.active {
+        background-color: #f1f5f9;
+        border-left: 4px solid #25D366;
+    }
+
+    .chat-avatar-container {
+        position: relative;
+    }
+
+    .chat-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        box-shadow: 0 3px 8px rgba(16, 185, 129, 0.2);
+    }
+
+    .status-indicator {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    .status-indicator.bot {
+        background-color: #10b981;
+    }
+
+    .status-indicator.agent {
+        background-color: #f59e0b;
+    }
+
+    .chat-info {
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    .chat-name {
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .chat-last-msg {
+        font-size: 0.78rem;
+        color: #64748b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Columna Derecha: Hilo Principal */
+    .chat-main {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        background: #f8fafc;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .chat-header {
+        padding: 0.75rem 1.25rem;
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        z-index: 10;
+        flex-shrink: 0;
+    }
+
+    .chat-thread {
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 1.25rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: #efeae2 url('https://user-images.githubusercontent.com/15075759/28719144-86ece05e-7696-11e7-9364-2c7ef85100d4.png') repeat;
+    }
+
+    /* Burbujas de Mensaje */
+    .message-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .message-bubble {
+        max-width: 72%;
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: 0.88rem;
+        line-height: 1.45;
+        position: relative;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        word-break: break-word;
+        white-space: pre-wrap;
+    }
+
+    .message-inbound {
+        background: #ffffff;
+        color: #0f172a;
+        align-self: flex-start;
+        border-top-left-radius: 2px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .message-outbound {
+        background: #dcf8c6;
+        color: #0f172a;
+        align-self: flex-end;
+        border-top-right-radius: 2px;
+    }
+
+    .message-sender {
+        font-size: 0.75rem;
+        font-weight: 800;
+        margin-bottom: 3px;
+    }
+
+    .message-time {
+        font-size: 0.68rem;
+        color: #94a3b8;
+        margin-top: 4px;
+        text-align: right;
+        display: block;
+    }
+
+    /* Barra de Respuestas Rápidas */
+    .quick-replies-bar {
+        padding: 6px 14px;
+        background: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .quick-reply-chip {
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .quick-reply-chip:hover {
+        background: #25D366;
+        color: white;
+        border-color: #25D366;
+    }
+
+    .chat-footer {
+        padding: 0.75rem 1rem;
+        background: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        flex-shrink: 0;
+    }
+
+    .send-btn {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border: none;
+        color: white;
+        border-radius: 50%;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .send-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Pulse animation for active bot */
+    .pulse-green {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        animation: pulse 1.6s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Responsivo para Celulares y Tablets (< 768px) */
+    @media (max-width: 768px) {
+        .chat-wrapper {
+            border-radius: 8px;
+            border: none;
+            position: relative;
+        }
+
+        .chat-sidebar {
+            width: 100%;
+            display: flex;
+            height: 100%;
+        }
+
+        .chat-main {
+            display: none;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            z-index: 100;
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        .chat-wrapper.mobile-active .chat-sidebar {
+            display: none !important;
+        }
+
+        .chat-wrapper.mobile-active .chat-main {
+            display: flex !important;
+        }
+
+        .chat-header {
+            padding: 0.5rem 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .chat-thread {
+            flex: 1 1 auto;
+            min-height: 0;
+            padding: 0.75rem;
+        }
+
+        .chat-footer {
+            padding: 0.5rem 0.5rem;
+            flex-shrink: 0;
+            background: #ffffff;
+        }
+
+        .message-bubble {
+            max-width: 88%;
+            font-size: 0.85rem;
+        }
+
+        .quick-replies-bar {
+            padding: 4px 8px;
+            flex-shrink: 0;
+        }
+
+        .quick-reply-chip {
+            font-size: 0.72rem;
+            padding: 3px 8px;
+        }
+    }
+</style>
+
+<div class="container-fluid px-0 px-md-2 chat-page-container">
+    <div class="chat-wrapper" id="chatWrapper">
+        <!-- Columna Izquierda: Lista de Conversaciones -->
+        <div class="chat-sidebar">
+            <div class="chat-sidebar-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="font-weight-bold text-white mb-0" style="font-size: 1.05rem;">
+                        <i class="fab fa-whatsapp text-success mr-1"></i> Mensajería
+                    </h5>
+                    <a href="{{ route('whatsapp.settings.index') }}" class="badge badge-success px-2 py-1 text-white text-decoration-none" style="border-radius: 10px; font-size: 0.68rem;" title="Configurar sesión / Escanear QR">
+                        <span class="pulse-green mr-1"></span> En Vivo <i class="fas fa-cog ml-1"></i>
+                    </a>
+                </div>
+                <div class="chat-search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchChat" onkeyup="filterChats()" placeholder="Buscar cliente o número...">
+                </div>
+            </div>
+
+            <!-- Filtros de Estado -->
+            <div class="chat-filter-tabs">
+                <button class="chat-filter-btn active" onclick="setFilter('all', this)">Todos (<span id="countAll">{{ count($conversaciones) }}</span>)</button>
+                <button class="chat-filter-btn" onclick="setFilter('bot', this)">🤖 Bot</button>
+                <button class="chat-filter-btn" onclick="setFilter('agent', this)">👩‍💻 Agente</button>
+            </div>
+
+            <div class="chat-list" id="chatList">
+                @forelse($conversaciones as $conv)
+                    <div class="chat-item" data-id="{{ $conv->id }}" data-step="{{ $conv->step }}" data-search="{{ strtolower(($conv->cliente ? $conv->cliente->nombre : '') . ' ' . $conv->phone . ' ' . $conv->chat_id) }}" onclick="loadConversation({{ $conv->id }})">
+                        <div class="chat-avatar-container">
+                            <div class="chat-avatar">
+                                {{ strtoupper(substr($conv->cliente ? $conv->cliente->nombre : 'L', 0, 1)) }}
+                            </div>
+                            <div class="status-indicator {{ $conv->step === 'agent_active' ? 'agent' : 'bot' }}"></div>
+                        </div>
+                        <div class="chat-info">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="chat-name">{{ $conv->cliente ? $conv->cliente->nombre : 'Lead Anónimo' }}</span>
+                                <span class="small text-muted" style="font-size: 0.68rem;">{{ $conv->updated_at->diffForHumans(null, true) }}</span>
+                            </div>
+                            <div class="chat-last-msg">
+                                {{ $conv->lastMessage ? $conv->lastMessage->body : 'Sin mensajes' }}
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-5 text-muted small">
+                        <i class="fas fa-inbox text-muted mb-2" style="font-size: 2rem;"></i>
+                        <p class="mb-0">No hay conversaciones registradas.</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Hilo de Chat -->
+        <div class="chat-main">
+            <!-- Header del Chat Abierto -->
+            <div class="chat-header" id="chatHeader" style="display: none;">
+                <div class="d-flex align-items-center" style="min-width: 0; flex: 1 1 auto;">
+                    <button class="btn btn-sm btn-light d-md-none mr-2 flex-shrink-0" onclick="closeMobileChat()" title="Volver a chats">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="chat-avatar mr-2 mr-sm-3 flex-shrink-0" id="activeAvatar">A</div>
+                    <div style="min-width: 0; flex: 1 1 auto;">
+                        <div class="d-flex align-items-center flex-wrap" style="gap: 4px;">
+                            <h6 class="font-weight-bold text-dark mb-0 mr-1 text-truncate" id="activeName" style="max-width: 100%; font-size: 0.95rem;">Selecciona un chat</h6>
+                            <span id="activeStatusBadge" class="badge flex-shrink-0" style="font-size: 0.65rem;"></span>
+                        </div>
+                        <small class="text-muted d-block text-truncate" style="font-size: 0.72rem;">
+                            <i class="fas fa-phone-alt mr-1 text-success"></i><span id="activePhone"></span>
+                        </small>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center flex-shrink-0 ml-2">
+                    <button type="button" class="btn btn-sm shadow-sm font-weight-bold px-2 px-sm-3" id="btnToggleBot" onclick="toggleBot()" style="border-radius: 8px;">
+                        <i class="fas fa-robot"></i> <span id="botBtnText" class="d-none d-sm-inline ml-1">Pausar Bot</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger shadow-sm font-weight-bold ml-1 px-2 px-sm-3" onclick="deleteActiveConversation()" style="border-radius: 8px;" title="Eliminar conversación">
+                        <i class="fas fa-trash-alt"></i> <span class="d-none d-sm-inline ml-1">Eliminar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Placeholder Vacío (Solo visible cuando NO hay chat seleccionado) -->
+            <div id="noChatSelected" class="flex-column align-items-center justify-content-center h-100 text-center p-4">
+                <div class="p-4 bg-white rounded-circle shadow-sm mb-3">
+                    <i class="fab fa-whatsapp text-success" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="font-weight-bold text-dark mb-1">Centro de Mensajería en Vivo</h4>
+                <p class="text-muted small" style="max-width: 400px;">
+                    Selecciona un chat de la lista izquierda para atender clientes, revisar cotizaciones enviadas o enviar respuestas personalizadas.
+                </p>
+            </div>
+
+            <!-- Hilo de Mensajes -->
+            <div class="chat-thread" id="chatThread" style="display: none;"></div>
+
+            <!-- Respuestas Rápidas (Pills) -->
+            <div class="quick-replies-bar" id="quickRepliesBar" style="display: none;">
+                <span class="quick-reply-chip" onclick="insertQuickReply('👋 ¡Hola! Bienvenido(a) a Joyería Colibrí, ¿en qué podemos ayudarte hoy?')">
+                    👋 Saludo Inicial
+                </span>
+                <span class="quick-reply-chip" onclick="insertQuickReply('🛍️ Con gusto te proporcionamos información de nuestro catálogo de joyas.')">
+                    🛍️ Catálogo
+                </span>
+                <span class="quick-reply-chip" onclick="insertQuickReply('💍 El precio del oro del día está actualizado en nuestro sistema.')">
+                    💍 Cotización Oro
+                </span>
+                <span class="quick-reply-chip" onclick="insertQuickReply('📍 Nos encontramos en Calle 27 s/n Centro, Progreso, Yucatán. ¡Te esperamos!')">
+                    📍 Ubicación
+                </span>
+            </div>
+
+            <!-- Previsualización de Imagen Adjunta -->
+            <div id="imagePreviewBar" class="px-3 py-2 bg-light border-top border-bottom justify-content-between align-items-center" style="display: none !important;">
+                <div class="d-flex align-items-center">
+                    <img id="imagePreviewThumb" src="" class="rounded shadow-sm mr-2" style="width: 48px; height: 48px; object-fit: cover; border: 1px solid #cbd5e1;">
+                    <div>
+                        <small class="font-weight-bold text-dark d-block" id="imagePreviewName">imagen.jpg</small>
+                        <small class="text-success" style="font-size: 0.72rem;"><i class="fas fa-check-circle mr-1"></i> Imagen lista para enviar</small>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger rounded-circle font-weight-bold ml-auto" onclick="clearSelectedImage()" title="Quitar Imagen">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Formulario de Respuesta -->
+            <div class="chat-footer" id="chatFooter" style="display: none;">
+                <form id="sendForm" onsubmit="submitMessage(event)" class="d-flex align-items-center gap-2" enctype="multipart/form-data">
+                    <!-- Botón Seleccionar Imagen de Producto -->
+                    <label for="imageInputFile" class="btn btn-light rounded-circle shadow-sm mb-0 mr-2 flex-shrink-0" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Adjuntar Imagen de Producto">
+                        <i class="fas fa-camera text-primary" style="font-size: 1.15rem;"></i>
+                        <input type="file" id="imageInputFile" name="image" accept="image/*" style="display:none;" onchange="handleImageSelected(this)">
+                    </label>
+
+                    <!-- Botón Modal Productos POS -->
+                    <button type="button" class="btn btn-light rounded-circle shadow-sm mb-0 mr-2 flex-shrink-0" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;" onclick="openProductsModal()" title="Ver Inventario de Productos">
+                        <i class="fas fa-gem text-warning" style="font-size: 1.15rem;"></i>
+                    </button>
+
+                    <input type="text" id="messageInput" class="form-control py-3" placeholder="Escribe un mensaje o descripción del producto..." autocomplete="off" style="border-radius: 24px; background: #f8fafc; border: 1px solid #cbd5e1;">
+                    
+                    <button type="submit" class="send-btn ml-2" title="Enviar Mensaje">
+                        <i class="fas fa-paper-plane" style="font-size: 1.1rem;"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Inventario de Productos del POS (Carga por Bloques AJAX) -->
+<div class="modal fade" id="modalProductos" tabindex="-1" role="dialog" aria-labelledby="modalProductosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header bg-dark text-white" style="border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom: 2px solid #D4AF37;">
+                <h5 class="modal-title font-weight-bold" id="modalProductosLabel">
+                    <i class="fas fa-gem text-warning mr-2"></i> Seleccionar Producto del Inventario
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-3">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text bg-light border-right-0"><i class="fas fa-search"></i></span>
+                    </div>
+                    <input type="text" id="searchProductModal" class="form-control border-left-0" placeholder="Buscar por código de barras o descripción..." onkeyup="debounceProductSearch()">
+                </div>
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="table table-hover table-sm text-center mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Foto</th>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Precio Venta</th>
+                                <th>Stock</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalProductList">
+                            <!-- Productos cargados dinámicamente por AJAX en bloques -->
+                        </tbody>
+                    </table>
+                </div>
+                <button id="btnLoadMoreProducts" type="button" class="btn btn-sm btn-block btn-light font-weight-bold py-2 my-2 text-primary shadow-sm" onclick="loadMoreProducts()" style="display:none; border-radius: 8px;">
+                    <i class="fas fa-sync-alt mr-1"></i> Cargar más productos...
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let activeConversationId = null;
+    let activeConversationStep = null;
+    let currentFilter = 'all';
+    let selectedProductImageUrl = null;
+
+    let currentProductPage = 1;
+    let productSearchQuery = '';
+    let searchDebounceTimer = null;
+    let hasMoreProducts = false;
+
+    function openProductsModal() {
+        currentProductPage = 1;
+        productSearchQuery = '';
+        document.getElementById("searchProductModal").value = '';
+        document.getElementById("modalProductList").innerHTML = `<tr><td colspan="6" class="py-4 text-center text-muted"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando productos...</td></tr>`;
+        fetchProductsBlock(1, true);
+        $('#modalProductos').modal('show');
+    }
+
+    function debounceProductSearch() {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => {
+            productSearchQuery = document.getElementById("searchProductModal").value.trim();
+            currentProductPage = 1;
+            fetchProductsBlock(1, true);
+        }, 300);
+    }
+
+    function loadMoreProducts() {
+        if (!hasMoreProducts) return;
+        currentProductPage++;
+        fetchProductsBlock(currentProductPage, false);
+    }
+
+    function fetchProductsBlock(page, replace) {
+        const url = `/whatsapp/chat/productos?search=${encodeURIComponent(productSearchQuery)}&page=${page}`;
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) return;
+                const list = document.getElementById("modalProductList");
+                if (replace) list.innerHTML = '';
+
+                hasMoreProducts = data.has_more;
+                const loadBtn = document.getElementById("btnLoadMoreProducts");
+                if (loadBtn) loadBtn.style.display = hasMoreProducts ? 'block' : 'none';
+
+                if (data.products.length === 0 && replace) {
+                    list.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-muted">No se encontraron productos en el inventario.</td></tr>`;
+                    return;
+                }
+
+                data.products.forEach(prod => {
+                    const tr = document.createElement("tr");
+                    const imgSrc = prod.img_url;
+                    const photoHtml = imgSrc 
+                        ? `<img src="${imgSrc}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover; border: 1px solid #cbd5e1;" alt="Producto">`
+                        : `<span class="badge badge-light text-muted p-2" style="font-size: 0.7rem;"><i class="fas fa-image mr-1"></i> Sin foto</span>`;
+
+                    const btnText = imgSrc ? 'Insertar con Foto' : 'Insertar Datos';
+                    const safeName = escapeHtml(prod.descripcion).replace(/'/g, "\\'");
+                    const safeCode = escapeHtml(prod.codigo_barras).replace(/'/g, "\\'");
+                    const safeImg = imgSrc ? imgSrc.replace(/'/g, "\\'") : '';
+
+                    tr.innerHTML = `
+                        <td>${photoHtml}</td>
+                        <td><code>${safeCode}</code></td>
+                        <td class="text-left font-weight-bold">${escapeHtml(prod.descripcion)}</td>
+                        <td class="text-success font-weight-bold">$${prod.precio_venta}</td>
+                        <td><span class="badge ${prod.existencia > 0 ? 'badge-success' : 'badge-danger'}">${prod.existencia}</span></td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-success font-weight-bold px-2 py-1" onclick="attachProductInfo('${safeName}', '${prod.precio_venta}', '${safeCode}', '${safeImg}')">
+                                <i class="fas fa-plus mr-1"></i> ${btnText}
+                            </button>
+                        </td>
+                    `;
+                    list.appendChild(tr);
+                });
+            })
+            .catch(err => {
+                console.error("Error al cargar productos", err);
+            });
+    }
+
+    function loadConversation(id) {
+        activeConversationId = id;
+        document.getElementById("chatWrapper").classList.add("mobile-active");
+
+        // Resaltar item activo
+        document.querySelectorAll(".chat-item").forEach(el => el.classList.remove("active"));
+        const activeItem = document.querySelector(`.chat-item[data-id="${id}"]`);
+        if (activeItem) activeItem.classList.add("active");
+
+        fetch(`/whatsapp/chat/${id}/messages`)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) return;
+
+                const conv = data.conversation;
+                activeConversationStep = conv.step;
+
+                // Ocultar placeholder
+                const placeholder = document.getElementById("noChatSelected");
+                placeholder.classList.add("d-none");
+                placeholder.classList.remove("d-flex");
+                placeholder.style.setProperty("display", "none", "important");
+
+                // Mostrar vistas
+                document.getElementById("chatHeader").style.display = "flex";
+                document.getElementById("chatThread").style.display = "flex";
+                document.getElementById("quickRepliesBar").style.display = "flex";
+                document.getElementById("chatFooter").style.display = "block";
+
+                // Actualizar Header
+                document.getElementById("activeName").innerText = conv.nombre;
+                document.getElementById("activePhone").innerText = conv.phone || conv.chat_id;
+                document.getElementById("activeAvatar").innerText = conv.nombre.charAt(0).toUpperCase();
+
+                updateBotButtonState(conv.step);
+
+                // Renderizar Mensajes
+                const thread = document.getElementById("chatThread");
+                thread.innerHTML = "";
+
+                if (data.messages.length === 0) {
+                    thread.innerHTML = `<div class="text-center my-auto text-muted small">No hay historial previo registrado en este chat.</div>`;
+                } else {
+                    data.messages.forEach(msg => {
+                        const isOutbound = msg.direction === 'outbound';
+                        const bubble = document.createElement("div");
+                        bubble.className = `message-bubble ${isOutbound ? 'message-outbound' : 'message-inbound'}`;
+
+                        let mediaHtml = '';
+                        if (msg.media_url || msg.type === 'image') {
+                            const imgUrl = msg.media_url || '';
+                            mediaHtml = `
+                                <div class="mb-2 text-center">
+                                    <img src="${imgUrl}" class="img-fluid rounded shadow-sm" style="max-height: 250px; cursor: pointer; object-fit: cover; border: 1px solid rgba(0,0,0,0.1);" onclick="zoomImage('${imgUrl}')" alt="Imagen del producto">
+                                </div>
+                            `;
+                        }
+
+                        const statusIcon = isOutbound ? '<i class="fas fa-check-double text-success mr-1" title="Enviado por WhatsApp"></i>' : '';
+
+                        bubble.innerHTML = `
+                            <div class="message-sender ${isOutbound ? 'text-success' : 'text-primary'}">${escapeHtml(msg.sender_name)}</div>
+                            ${mediaHtml}
+                            ${msg.body ? `<div>${escapeHtml(msg.body)}</div>` : ''}
+                            <span class="message-time">${statusIcon}${msg.time}</span>
+                        `;
+                        thread.appendChild(bubble);
+                    });
+                }
+
+                thread.scrollTop = thread.scrollHeight;
+            });
+    }
+
+    function updateBotButtonState(step) {
+        const btn = document.getElementById("btnToggleBot");
+        const btnText = document.getElementById("botBtnText");
+        const badge = document.getElementById("activeStatusBadge");
+
+        if (step === 'agent_active') {
+            btn.className = "btn btn-sm btn-warning text-dark shadow-sm font-weight-bold";
+            btnText.innerText = "🤖 Reactivar Bot";
+            badge.className = "badge badge-warning text-dark";
+            badge.innerText = "👩‍💻 Atendiendo por Agente";
+        } else {
+            btn.className = "btn btn-sm btn-outline-secondary shadow-sm font-weight-bold";
+            btnText.innerText = "⏸️ Pausar Bot";
+            badge.className = "badge badge-success";
+            badge.innerText = "🤖 Bot Automático Activo";
+        }
+    }
+
+    function handleImageSelected(input) {
+        if (input.files && input.files[0]) {
+            selectedProductImageUrl = null; // Prioridad al archivo subido manualmente
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById("imagePreviewThumb").src = e.target.result;
+                document.getElementById("imagePreviewName").innerText = file.name;
+                const bar = document.getElementById("imagePreviewBar");
+                bar.style.setProperty("display", "flex", "important");
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearSelectedImage() {
+        const fileInput = document.getElementById("imageInputFile");
+        if (fileInput) fileInput.value = "";
+        selectedProductImageUrl = null;
+        const bar = document.getElementById("imagePreviewBar");
+        if (bar) bar.style.setProperty("display", "none", "important");
+        document.getElementById("imagePreviewThumb").src = "";
+    }
+
+    function attachProductInfo(name, price, barcode, imageUrl) {
+        const input = document.getElementById("messageInput");
+        input.value = `🛍️ Producto: ${name} | 💰 Precio: $${price} | 🏷️ Cód: ${barcode}`;
+
+        if (imageUrl && imageUrl !== 'null' && imageUrl !== '') {
+            selectedProductImageUrl = imageUrl;
+            document.getElementById("imagePreviewThumb").src = imageUrl;
+            document.getElementById("imagePreviewName").innerText = "Foto de " + name;
+            const bar = document.getElementById("imagePreviewBar");
+            bar.style.setProperty("display", "flex", "important");
+        }
+
+        $('#modalProductos').modal('hide');
+        input.focus();
+    }
+
+    function filterModalProducts() {
+        const query = document.getElementById("searchProductModal").value.toLowerCase();
+        document.querySelectorAll("#modalProductList tr").forEach(row => {
+            const search = row.dataset.search || "";
+            row.style.display = search.includes(query) ? "" : "none";
+        });
+    }
+
+    function zoomImage(url) {
+        if (!url) return;
+        Swal.fire({
+            imageUrl: url,
+            imageAlt: 'Foto de Producto',
+            showCloseButton: true,
+            showConfirmButton: false,
+            background: '#0f172a',
+            customClass: {
+                image: 'rounded shadow-lg'
+            }
+        });
+    }
+
+    function toggleBot() {
+        if (!activeConversationId) return;
+
+        const newStatus = activeConversationStep === 'agent_active' ? 'active' : 'paused';
+
+        fetch('/whatsapp/chat/toggle-bot', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                conversation_id: activeConversationId,
+                status: newStatus
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                activeConversationStep = data.new_step;
+                updateBotButtonState(data.new_step);
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'info',
+                    title: newStatus === 'active' ? 'Bot Reactivado' : 'Bot Pausado',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        });
+    }
+
+    function insertQuickReply(text) {
+        const input = document.getElementById("messageInput");
+        input.value = text;
+        input.focus();
+    }
+
+    function submitMessage(e) {
+        e.preventDefault();
+        const input = document.getElementById("messageInput");
+        const fileInput = document.getElementById("imageInputFile");
+        const body = input.value.trim();
+        const file = fileInput ? fileInput.files[0] : null;
+
+        if ((!body && !file && !selectedProductImageUrl) || !activeConversationId) return;
+
+        const formData = new FormData();
+        formData.append('conversation_id', activeConversationId);
+        if (body) formData.append('body', body);
+        if (file) {
+            formData.append('image', file);
+        } else if (selectedProductImageUrl) {
+            formData.append('product_image_url', selectedProductImageUrl);
+        }
+
+        const sendBtn = document.querySelector("#sendForm button[type='submit']");
+        const originalBtnHtml = sendBtn ? sendBtn.innerHTML : '<i class="fas fa-paper-plane" style="font-size: 1.1rem;"></i>';
+
+        if (sendBtn) {
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 1.1rem;"></i>';
+        }
+
+        input.value = "";
+        clearSelectedImage();
+
+        fetch('/whatsapp/chat/send', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = originalBtnHtml;
+            }
+            if (data.success) {
+                loadConversation(activeConversationId);
+            } else {
+                Swal.fire('Error', data.message || 'No se pudo enviar el mensaje', 'error');
+            }
+        })
+        .catch(err => {
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = originalBtnHtml;
+            }
+            Swal.fire('Error', 'Ocurrió un error al procesar el envío', 'error');
+        });
+    }
+
+    function deleteActiveConversation() {
+        if (!activeConversationId) return;
+
+        Swal.fire({
+            title: '¿Eliminar conversación?',
+            text: "Se borrará permanentemente la conversación y todo el historial.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/whatsapp/chat/${activeConversationId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Eliminado', data.message, 'success').then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', data.message || 'No se pudo eliminar', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+    function filterChats() {
+        const query = document.getElementById("searchChat").value.toLowerCase();
+        document.querySelectorAll(".chat-item").forEach(item => {
+            const searchText = item.dataset.search || "";
+            const step = item.dataset.step || "";
+
+            let matchesSearch = searchText.includes(query);
+            let matchesFilter = true;
+
+            if (currentFilter === 'bot') {
+                matchesFilter = step !== 'agent_active';
+            } else if (currentFilter === 'agent') {
+                matchesFilter = step === 'agent_active';
+            }
+
+            if (matchesSearch && matchesFilter) {
+                item.style.display = "flex";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    }
+
+    function setFilter(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll(".chat-filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        filterChats();
+    }
+
+    function closeMobileChat() {
+        document.getElementById("chatWrapper").classList.remove("mobile-active");
+    }
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Polling cada 4 segundos
+    setInterval(() => {
+        if (activeConversationId) {
+            loadConversation(activeConversationId);
+        }
+    }, 4000);
+
+    // Cargar automáticamente el primer chat solo en pantallas de escritorio
+    document.addEventListener("DOMContentLoaded", () => {
+        const firstChat = document.querySelector(".chat-item");
+        if (firstChat && window.innerWidth > 768) {
+            const id = firstChat.dataset.id;
+            if (id) {
+                loadConversation(id);
+            }
+        }
+    });
+</script>
+
+@endsection

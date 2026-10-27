@@ -29,7 +29,7 @@
         <div class="col-12">
             <div class="productos-header">
                 <h1><i class="fas fa-truck"></i> Proveedores</h1>
-                @if (Auth::user()->id == 1)
+                @if (Auth::user()->hasPermission('manage_suppliers'))
                     <div class="header-actions">
                         <a href="#" id="btnAgregarProveedor" class="btn-modern btn-success-modern" title="Agregar Proveedor">
                             <i class="fas fa-plus"></i> Agregar proveedor

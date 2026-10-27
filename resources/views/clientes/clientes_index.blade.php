@@ -27,11 +27,13 @@ ____          _____               _ _           _
         <div class="col-12">
             <div class="productos-header">
                 <h1><i class="fa fa-users"></i> Clientes</h1>
-                <div class="header-actions">
-                    <a href="{{route("clientes.create")}}" class="btn-modern btn-success-modern">
-                        <i class="fas fa-plus"></i> Agregar cliente
-                    </a>
-                </div>
+                @if(Auth::user()->hasPermission('manage_clients'))
+                    <div class="header-actions">
+                        <a href="{{route("clientes.create")}}" class="btn-modern btn-success-modern">
+                            <i class="fas fa-plus"></i> Agregar cliente
+                        </a>
+                    </div>
+                @endif
             </div>
             @include("notificacion")
             <div class="table-container">
@@ -42,8 +44,12 @@ ____          _____               _ _           _
                             <tr>
                                 <th>Nombre</th>
                                 <th>Teléfono</th>
-                                <th>Editar</th>
-                                <th>Eliminar</th>
+                                @if(Auth::user()->hasPermission('manage_clients'))
+                                    <th>Editar</th>
+                                @endif
+                                @if(Auth::user()->hasPermission('delete_clients'))
+                                    <th>Eliminar</th>
+                                @endif
                             </tr>
                             </thead>
                             <tbody>
@@ -51,20 +57,24 @@ ____          _____               _ _           _
                                 <tr>
                                     <td>{{$cliente->nombre}}</td>
                                     <td>{{$cliente->telefono}}</td>
-                                    <td>
-                                        <a class="btn btn-warning btn-table-action" href="{{route("clientes.edit",[$cliente])}}">
-                                            <i class="fa fa-edit"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <form action="{{route("clientes.destroy", [$cliente])}}" method="post">
-                                            @method("delete")
-                                            @csrf
-                                            <button type="submit" class="btn btn-danger btn-table-action">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
+                                    @if(Auth::user()->hasPermission('manage_clients'))
+                                        <td>
+                                            <a class="btn btn-warning btn-table-action" href="{{route("clientes.edit",[$cliente])}}">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    @endif
+                                    @if(Auth::user()->hasPermission('delete_clients'))
+                                        <td>
+                                            <form action="{{route("clientes.destroy", [$cliente])}}" method="post">
+                                                @method("delete")
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger btn-table-action">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    @endif
                                 </tr>
                             @endforeach
                             </tbody>

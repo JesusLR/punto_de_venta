@@ -51,6 +51,8 @@ Auth::routes([
                 Route::get('/finanzas/excel', 'FinanzasController@exportExcel')->name('finanzas.excel');
                 Route::post('/finanzas/egresos', 'FinanzasController@store')->name('finanzas.store');
                 Route::delete('/finanzas/egresos/{id}', 'FinanzasController@destroy')->name('finanzas.destroy');
+                Route::post('/finanzas/ingresos', 'FinanzasController@storeIngreso')->name('finanzas.storeIngreso');
+                Route::delete('/finanzas/ingresos/{id}', 'FinanzasController@destroyIngreso')->name('finanzas.destroyIngreso');
 
                 // Apartados
                 Route::get("/apartados", "ApartadosController@index")->name("apartados.index");
@@ -66,10 +68,13 @@ Auth::routes([
                 Route::get("/apartados/detalle/{id}", "ApartadosController@detalle")->name("apartados.detalle");
                 Route::post("/gridApartados/gridApartados", "ApartadosController@gridApartados")->name("gridApartados");
                 Route::post("/apartados/cambiarNombre", "ApartadosController@cambiarNombre")->name("apartados.cambiarNombre");
+                Route::post("/apartados/openWA", "ApartadosController@openWA")->name("apartados.openWA");
+                Route::get("/api/notificaciones", "HomeController@obtenerNotificaciones")->name("notificaciones.api");
+                Route::post("/api/notificaciones/marcar-leida", "HomeController@marcarNotificacionLeida")->name("notificaciones.marcarLeida");
 
                 //Productos
                 Route::post("/gridProductos", "ProductosController@gridProductos")->name("gridProductos");
-                Route::get("/editarProducto/{id}", "ProductosController@editarProducto")->name("editarProducto");
+                Route::get("/editarProducto/{id}", "ProductosController@editarProducto")->name("productos.editarProducto");
                 Route::post("/deleteProducto", "ProductosController@deleteProducto")->name("deleteProducto");
                 Route::get("/getProductos", "ProductosController@getProductos")->name("getProductos");
                 Route::post("/cargarProductosExcell", "ProductosController@cargarProductosExcell")->name("cargarProductosExcell");
@@ -77,6 +82,7 @@ Auth::routes([
                 //Ventas
                 Route::post("/gridVentas", "VentasController@gridVentas")->name("gridVentas");
                 Route::post("/saveNombreVenta", "VentasController@saveNombreVenta")->name("saveNombreVenta");
+                Route::post("/ventas/enviar-pdf-whatsapp", "VentasController@enviarPdfWhatsapp")->name("ventas.enviarPdfWhatsapp");
                 
 
                 //Estadisticas
@@ -84,6 +90,9 @@ Auth::routes([
                 Route::post("/gridEstadisticas", "EstadisticasController@gridEstadisticas")->name("gridEstadisticas");
                 Route::post("/graficaVentas", "EstadisticasController@graficaVentas")->name("graficaVentas");
                 Route::post("/estadisticas/productos-filtro", "EstadisticasController@productosVendidosFiltro")->name("estadisticas.productosFiltro");
+                Route::get("/analytics", function () {
+                    return view("estadisticas.analytics");
+                })->name("analytics.index")->middleware("permission:view_statistics");
 
                 //Proveedores
                 Route::resource("proveedores", "ProveedoresController");
@@ -99,12 +108,49 @@ Auth::routes([
                 Route::post("/deleteCategoria", "CategoriasController@deleteCategoria")->name("deleteCategoria");
                 Route::get("/getCategoria/{id}", "CategoriasController@getCategoria")->name("getCategoria");
 
+                //Roles y Permisos
+                Route::resource("roles", "RoleController");
+
                 //Materiales
                 Route::resource("materiales", "MaterialesController");
                 Route::post("/gridMateriales", "MaterialesController@gridMateriales")->name("gridMateriales");
                 Route::post("/saveMateriales", "MaterialesController@saveMateriales")->name("saveMateriales");
                 Route::post("/deleteMaterial", "MaterialesController@deleteMaterial")->name("deleteMaterial");
                 Route::get("/getMaterial/{id}", "MaterialesController@getMaterial")->name("getMaterial");
+
+                // Configuración de Portada
+                Route::middleware('permission:manage_homepage')->group(function() {
+                    Route::get('/configuracion-portada', 'HomepageSettingController@index')->name('homepage.settings.index');
+                    Route::post('/configuracion-portada/update', 'HomepageSettingController@update')->name('homepage.settings.update');
+                });
+
+                // Configuración General
+                Route::middleware('permission:manage_general_settings')->group(function() {
+                    Route::get('/configuracion-general', 'GeneralSettingController@index')->name('general.settings.index');
+                    Route::post('/configuracion-general/update', 'GeneralSettingController@update')->name('general.settings.update');
+                    Route::post('/configuracion-general/egresos-automaticos', 'GeneralSettingController@storeEgresoAutomatico')->name('general.egresos_automaticos.store');
+                    Route::delete('/configuracion-general/egresos-automaticos/{id}', 'GeneralSettingController@destroyEgresoAutomatico')->name('general.egresos_automaticos.destroy');
+                });
+
+                // WhatsApp Chatbot & Live Chat
+                Route::get('/whatsapp/chat', 'WhatsAppSettingController@indexChat')->name('whatsapp.chat.index');
+                Route::get('/whatsapp/chat/conversations', 'WhatsAppSettingController@getConversations')->name('whatsapp.chat.conversations');
+                Route::get('/whatsapp/chat/productos', 'WhatsAppSettingController@getProductsAjax')->name('whatsapp.chat.products');
+                Route::get('/whatsapp/chat/{id}/messages', 'WhatsAppSettingController@getMessages')->name('whatsapp.chat.messages');
+                Route::post('/whatsapp/chat/send', 'WhatsAppSettingController@sendMessage')->name('whatsapp.chat.send');
+                Route::post('/whatsapp/chat/toggle-bot', 'WhatsAppSettingController@toggleBotStatus')->name('whatsapp.chat.toggleBot');
+                Route::delete('/whatsapp/chat/{id}', 'WhatsAppSettingController@deleteConversation')->name('whatsapp.chat.delete');
+                Route::get('/whatsapp/links', 'WhatsAppSettingController@indexLinks')->name('whatsapp.links.index');
+                Route::get('/whatsapp/settings', 'WhatsAppSettingController@indexSettings')->name('whatsapp.settings.index');
+                Route::post('/whatsapp/settings', 'WhatsAppSettingController@updateSettings')->name('whatsapp.settings.update');
+
+                // WhatsApp Session Management Routes (AJAX)
+                Route::get('/whatsapp/settings/sessions', 'WhatsAppSettingController@getSessionsAjax')->name('whatsapp.settings.sessions.list');
+                Route::post('/whatsapp/settings/sessions/create', 'WhatsAppSettingController@createSessionAjax')->name('whatsapp.settings.sessions.create');
+                Route::post('/whatsapp/settings/sessions/start', 'WhatsAppSettingController@startSessionAjax')->name('whatsapp.settings.sessions.start');
+                Route::post('/whatsapp/settings/sessions/stop', 'WhatsAppSettingController@stopSessionAjax')->name('whatsapp.settings.sessions.stop');
+                Route::get('/whatsapp/settings/sessions/{id}/qr', 'WhatsAppSettingController@getQrCodeAjax')->name('whatsapp.settings.sessions.qr');
+                Route::post('/whatsapp/settings/sessions/active', 'WhatsAppSettingController@setActiveSessionAjax')->name('whatsapp.settings.sessions.active');
 
                 Route::post('/about/upload-image', [AboutController::class, 'uploadImage'])->name('about.upload.image');
                 Route::get('/gold-price', [HomeController::class, 'goldPrice'])->name('gold.price');

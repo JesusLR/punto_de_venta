@@ -52,11 +52,12 @@ $(document).ready(function () {
 });
 
 function accionesFormatter(value, row) {
-    var user = $("#userID").val()
-    html = ''
-    if(user == 1){
-        html += '<button type="button" style="margin-right: 2px;" class="btn btn-warning" onclick="editMaterial('+row.id+')"><i class="fa fa-edit"></i></button>'
-        html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" onclick="confirmDeleteMaterial(' + row.id + ', \'' + row.cNombreMaterial + '\')"><i class="fa fa-trash"></i></button>'
+    var html = '';
+    if (hasPermission('manage_materials')) {
+        html += '<button type="button" style="margin-right: 2px;" class="btn btn-warning" onclick="editMaterial('+row.id+')"><i class="fa fa-edit"></i></button>';
+    }
+    if (hasPermission('delete_materials')) {
+        html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" onclick="confirmDeleteMaterial(' + row.id + ', \'' + row.cNombreMaterial + '\')"><i class="fa fa-trash"></i></button>';
     }
     return html;
 }

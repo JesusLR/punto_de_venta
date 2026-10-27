@@ -14,10 +14,12 @@
                 Gestión de Productos
             </h1>
             <div class="header-actions">
-                <a href="{{route("productos.create")}}" class="btn-modern btn-success-modern">
-                    <i class="fas fa-plus-circle"></i>
-                    Nuevo Producto
-                </a>
+                @if(Auth::user()->hasPermission('manage_products'))
+                    <a href="{{route("productos.create")}}" class="btn-modern btn-success-modern">
+                        <i class="fas fa-plus-circle"></i>
+                        Nuevo Producto
+                    </a>
+                @endif
                 <button type="button" class="btn-modern btn-excel" id="btnExportExcel">
                     <i class="fas fa-file-excel"></i>
                     Exportar Excel
@@ -26,10 +28,12 @@
                     <i class="fas fa-file-pdf"></i>
                     Exportar PDF
                 </button>
-                <button type="button" class="btn-modern btn-excel" id="btnCargaExcell">
-                    <i class="fas fa-upload"></i>
-                    Importar Excel
-                </button>
+                @if(Auth::user()->hasPermission('manage_products'))
+                    <button type="button" class="btn-modern btn-excel" id="btnCargaExcell">
+                        <i class="fas fa-upload"></i>
+                        Importar Excel
+                    </button>
+                @endif
             </div>
         </div>
 
@@ -37,15 +41,26 @@
 
         <!-- Filtros -->
         <div class="filters-container">
-            <div class="filters-title">
-                <i class="fas fa-filter"></i>
-                Filtros de Búsqueda
+            <div class="filters-title" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.8rem; border-bottom: 2px solid #D4AF37;">
+                <span>
+                    <i class="fas fa-filter"></i>
+                    Filtros de Búsqueda
+                </span>
+                <button type="button" class="btn-clear-filters" id="btnLimpiarFiltros">
+                    <i class="fas fa-sync-alt"></i> Limpiar Filtros
+                </button>
             </div>
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group-modern">
-                        <label><i class="fas fa-search"></i>Buscar por:</label>
-                        <select required class="form-control" name="cTipoBusquedaProductos" id="cTipoBusquedaProductos">
+                        <label><i class="fas fa-search"></i>Buscar producto:</label>
+                        <input type="text" class="form-control-modern" id="txtBuscarProducto" placeholder="Código o descripción...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group-modern">
+                        <label><i class="fas fa-filter"></i>Estado:</label>
+                        <select required class="form-control-modern" name="cTipoBusquedaProductos" id="cTipoBusquedaProductos">
                                 <option value="T">Todos</option>
                                 <option value="F">Sin foto</option>
                                 <option value="B">Blancos</option>
@@ -55,7 +70,7 @@
                     </div>
                 </div>
                 {{-- @if(Auth::user()->id == 1) --}}
-                    <div class="col-md-3" @if(Auth::user()->id != 1) style="display:none;" @endif>
+                    <div class="col-md-2" @if(!Auth::user()->hasPermission('view_cost_and_utility')) style="display:none;" @endif>
                         <div class="form-group-modern">
                             <label><i class="fas fa-truck"></i>Proveedor:</label>
                             <select class="form-control-modern" id="cTipoBusquedaProveedor">
@@ -68,7 +83,7 @@
                         </div>
                     </div>
                 {{-- @endif --}}
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="form-group-modern">
                         <label><i class="fas fa-gem"></i>Material:</label>
                         <select class="form-control-modern" id="cTipoBusquedaMaterial">

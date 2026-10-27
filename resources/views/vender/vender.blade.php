@@ -38,12 +38,15 @@
                     @csrf
                     <input type="hidden" id="userID" name="userID" value="{{ Auth::user()->id }}">
                     <input type="hidden" id="tipo_pago_venta" name="tipo_pago" value="">
+                    <input type="hidden" id="enviar_whatsapp_venta" name="enviar_whatsapp" value="0">
+                    <input type="hidden" id="telefono_whatsapp_venta" name="telefono_whatsapp" value="">
+                    <input type="hidden" id="ticket_pdf_base64_venta" name="ticket_pdf_base64" value="">
 
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> Cliente</label>
                         <select required class="form-control-modern" name="id_cliente" id="id_cliente">
                             @foreach($clientes as $cliente)
-                                <option value="{{$cliente->id}}">{{$cliente->nombre}}</option>
+                                <option value="{{$cliente->id}}" data-telefono="{{$cliente->telefono}}">{{$cliente->nombre}}</option>
                             @endforeach
                         </select>
                         <button type="button" class="btn-action" style="background:#28a745; color:#fff; margin-top: 0.5rem;" id="btnNuevoClienteVenta">

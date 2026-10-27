@@ -27,6 +27,7 @@ use App\Venta;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
 use Exception;
@@ -34,6 +35,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class VentasController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:view_sales')->only(['index', 'gridVentas', 'show', 'pdf', 'enviarPdfWhatsapp']);
+        $this->middleware('permission:manage_sales')->only(['destroy', 'saveNombreVenta']);
+    }
 
     public function ticket($id){
         $venta = Venta::findOrFail($id);
@@ -99,7 +106,8 @@ class VentasController extends Controller
                 "clientes.nombre",
                 "users.name",
                 "apartados.id as apartado_id",
-                "apartados.id_venta as apartado_id_venta"
+                "apartados.id_venta as apartado_id_venta",
+                "clientes.telefono"
             )
             ->groupBy(
                 "ventas.id",
@@ -109,11 +117,12 @@ class VentasController extends Controller
                 "clientes.nombre",
                 "users.name",
                 "apartados.id",
-                "apartados.id_venta"
+                "apartados.id_venta",
+                "clientes.telefono"
             );
 
         if($request->cTipoBusqueda != "T"){
-            $ventasConTotales->where("id_usuario", $request->cTipoBusqueda);
+            $ventasConTotales->where("ventas.id_usuario", $request->cTipoBusqueda);
         }
 
         $ventasConTotales = $ventasConTotales->get(); 
@@ -175,6 +184,91 @@ class VentasController extends Controller
         ])->setPaper('letter', 'portrait');
 
         return $pdf->stream('venta_' . $venta->id . '.pdf');
+    }
+
+    public function enviarPdfWhatsapp(Request $request)
+    {
+        try {
+            $request->validate([
+                'id_venta' => 'required|exists:ventas,id',
+                'telefono' => 'required|string|max:30',
+            ]);
+
+            $venta = Venta::with(['cliente', 'user', 'productos'])->findOrFail($request->id_venta);
+
+            $telefono = $this->normalizarTelefonoMx($request->telefono);
+            if (strlen($telefono) !== 10) {
+                throw new Exception('Ingresa un número válido de 10 dígitos.');
+            }
+
+            $total = 0;
+            foreach ($venta->productos as $producto) {
+                $total += $producto->cantidad * $producto->precio;
+            }
+
+            $pdf = Pdf::loadView('ventas.pdf', [
+                'venta' => $venta,
+                'total' => $total,
+            ])->setPaper('letter', 'portrait');
+
+            $base64 = base64_encode($pdf->output());
+
+            $response = Http::post(url('/api/openwa/send-document'), [
+                'chatId' => '521' . $telefono . '@c.us',
+                'base64' => $base64,
+                'mimetype' => 'application/pdf',
+                'filename' => 'venta_' . $venta->id . '.pdf',
+            ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'lSuccess' => false,
+                    'cMensaje' => 'No se pudo enviar el PDF por WhatsApp.',
+                    'response' => $response->json(),
+                ], $response->status());
+            }
+
+            return response()->json([
+                'lSuccess' => true,
+                'cMensaje' => 'PDF enviado por WhatsApp exitosamente.',
+                'response' => $response->json(),
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $e->validator->errors()->first() ?: 'Datos inválidos.',
+                'errors' => $e->validator->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => $e->getMessage(),
+            ], 400);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'Error al enviar el PDF por WhatsApp.',
+            ], 500);
+        }
+    }
+
+    private function normalizarTelefonoMx($telefono)
+    {
+        $soloDigitos = preg_replace('/\D/', '', (string) $telefono);
+
+        if (strpos($soloDigitos, '521') === 0 && strlen($soloDigitos) > 10) {
+            return substr($soloDigitos, 3);
+        }
+
+        if (strpos($soloDigitos, '52') === 0 && strlen($soloDigitos) > 10) {
+            return substr($soloDigitos, 2);
+        }
+
+        if (strpos($soloDigitos, '1') === 0 && strlen($soloDigitos) === 11) {
+            return substr($soloDigitos, 1);
+        }
+
+        return $soloDigitos;
     }
 
     /**

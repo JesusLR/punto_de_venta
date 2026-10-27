@@ -9,6 +9,8 @@ use App\Apartado;
 use App\Egreso;
 use App\Materiales;
 use App\PrecioMateriales;
+use App\Producto;
+use App\Venta;
 
 class HomeController extends Controller
 {
@@ -30,6 +32,7 @@ class HomeController extends Controller
     public function index()
     {
         $this->precio_materiales_dia();
+        $this->procesarEgresosAutomaticos();
 
         $inicioMes = Carbon::now()->startOfMonth();
         $finMes = Carbon::now()->endOfMonth();
@@ -121,7 +124,11 @@ class HomeController extends Controller
             )
             ->sum('apartado_abonos.monto');
 
-        $ingresosAutomaticosMes = $totalVentasMes + $totalAbonosMes;
+        $ingresosManualesMes = (float) DB::table('ingresos')
+            ->whereBetween('fecha', [$inicioMes->toDateString(), $finMes->toDateString()])
+            ->sum('monto');
+
+        $ingresosAutomaticosMes = $totalVentasMes + $totalAbonosMes + $ingresosManualesMes;
 
         $egresosCapturadosMes = (float) Egreso::whereBetween('fecha', [$inicioMes->toDateString(), $finMes->toDateString()])
             ->sum('monto');
@@ -131,15 +138,149 @@ class HomeController extends Controller
         $productosVendidosMes = (int) round(
             (float) DB::table('ventas')
                 ->join('productos_vendidos', 'productos_vendidos.id_venta', '=', 'ventas.id')
-                ->whereBetween('ventas.created_at', [$inicioMes->toDateTimeString(), $finMes->toDateTimeString()])
+                ->whereBetween('ventas.created_at', [
+                    $inicioMes->toDateTimeString(),
+                    $finMes->toDateTimeString()
+                ])
+                ->when(auth()->id() != 1, fn ($query) => $query->where('ventas.id_usuario', auth()->id()))
                 ->sum('productos_vendidos.cantidad')
         );
 
         $apartadosPendientes = (int) Apartado::whereIn('estado', ['ABIERTO', 'PENDIENTE'])
             ->where('saldo', '>', 0)
+            ->when(auth()->id() != 1, function ($query) {
+                $query->where('id_usuario', auth()->id());
+            })
             ->count();
 
-        // dd($precios_oro_gramo);
+        // 1. Estadísticas de Flujo de Caja (últimos 15 días)
+        $ventasDias = DB::table('ventas')
+            ->join('productos_vendidos', 'productos_vendidos.id_venta', '=', 'ventas.id')
+            ->select(DB::raw('DATE(ventas.created_at) as fecha'), DB::raw('SUM(productos_vendidos.cantidad * productos_vendidos.precio) as total'))
+            ->where('ventas.created_at', '>=', Carbon::now()->subDays(15)->startOfDay())
+            ->where(function ($query) {
+                $query->whereNull('ventas.tipo_pago')
+                    ->orWhereIn('ventas.tipo_pago', ['EFECTIVO', 'MERCADO_PAGO']);
+            })
+            ->groupBy(DB::raw('DATE(ventas.created_at)'))
+            ->get();
+
+        $abonosDias = DB::table('apartado_abonos')
+            ->select(DB::raw('DATE(COALESCE(apartado_abonos.fecha_abono, apartado_abonos.created_at)) as fecha'), DB::raw('SUM(apartado_abonos.monto) as total'))
+            ->where(DB::raw('COALESCE(apartado_abonos.fecha_abono, apartado_abonos.created_at)'), '>=', Carbon::now()->subDays(15)->startOfDay())
+            ->groupBy('fecha')
+            ->get();
+
+        $egresosDias = DB::table('egresos')
+            ->select('fecha', DB::raw('SUM(monto) as total'))
+            ->where('fecha', '>=', Carbon::now()->subDays(15)->toDateString())
+            ->groupBy('fecha')
+            ->get();
+
+        $ingresosManualesDias = DB::table('ingresos')
+            ->select('fecha', DB::raw('SUM(monto) as total'))
+            ->where('fecha', '>=', Carbon::now()->subDays(15)->toDateString())
+            ->groupBy('fecha')
+            ->get();
+
+        $chartData = [];
+        for ($i = 14; $i >= 0; $i--) {
+            $dateStr = Carbon::now()->subDays($i)->toDateString();
+            $dateFormatted = Carbon::now()->subDays($i)->format('d M');
+            $chartData[$dateStr] = [
+                'fecha' => $dateFormatted,
+                'ingresos' => 0.0,
+                'egresos' => 0.0
+            ];
+        }
+
+        foreach ($ventasDias as $v) {
+            $f = Carbon::parse($v->fecha)->toDateString();
+            if (isset($chartData[$f])) {
+                $chartData[$f]['ingresos'] += (float) $v->total;
+            }
+        }
+        foreach ($abonosDias as $a) {
+            $f = Carbon::parse($a->fecha)->toDateString();
+            if (isset($chartData[$f])) {
+                $chartData[$f]['ingresos'] += (float) $a->total;
+            }
+        }
+        foreach ($ingresosManualesDias as $ing) {
+            $f = Carbon::parse($ing->fecha)->toDateString();
+            if (isset($chartData[$f])) {
+                $chartData[$f]['ingresos'] += (float) $ing->total;
+            }
+        }
+        foreach ($egresosDias as $e) {
+            $f = Carbon::parse($e->fecha)->toDateString();
+            if (isset($chartData[$f])) {
+                $chartData[$f]['egresos'] += (float) $e->total;
+            }
+        }
+        $dailyStats = array_values($chartData);
+
+        // 2. Ventas por Categoría (mes en curso)
+        $categoriasPopulares = DB::table('productos_vendidos')
+            ->join('ventas', 'productos_vendidos.id_venta', '=', 'ventas.id')
+            ->join('productos', 'productos_vendidos.codigo_barras', '=', 'productos.codigo_barras')
+            ->join('categorias', 'productos.id_categoria', '=', 'categorias.id')
+            ->select('categorias.cNombreCategoria as categoria', DB::raw('SUM(productos_vendidos.cantidad * productos_vendidos.precio) as total'))
+            ->whereBetween('ventas.created_at', [$inicioMes->toDateTimeString(), $finMes->toDateTimeString()])
+            ->groupBy('categorias.id', 'categorias.cNombreCategoria')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        // 3. Productos con Bajo Stock (existencia <= 3)
+        $productosBajoStock = Producto::with(['Materiales', 'Categorias'])
+            ->where('existencia', '<=', 3)
+            ->orderBy('existencia', 'asc')
+            ->limit(5)
+            ->get();
+
+        // 4. Ventas Recientes (últimas 5)
+        $ventasRecientes = Venta::with(['cliente', 'usuario'])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function ($venta) {
+                $total = DB::table('productos_vendidos')
+                    ->where('id_venta', $venta->id)
+                    ->sum(DB::raw('cantidad * precio'));
+                return [
+                    'id' => $venta->id,
+                    'cliente' => $venta->cliente ? $venta->cliente->nombre : 'Público General',
+                    'vendedor' => $venta->usuario ? $venta->usuario->name : 'N/A',
+                    'tipo_pago' => $venta->tipo_pago ?: 'EFECTIVO',
+                    'total' => (float)$total,
+                    'fecha' => $venta->created_at->format('d/m H:i'),
+                    'hace_tiempo' => $venta->created_at->diffForHumans()
+                ];
+            });
+
+        // 5. Historial del precio del oro (últimos 7 registros)
+        $oroHistoricoRaw = PrecioMateriales::join("materiales", "precios_materiales.id_material", "=", "materiales.id")
+            ->where('materiales.lActivoConsulta', 1)
+            ->where('materiales.cSimbolo', "XAU")
+            ->select('precios_materiales.created_at', 'precios_materiales.json')
+            ->orderBy('precios_materiales.created_at', 'desc')
+            ->limit(7)
+            ->get();
+
+        $oroHistorico = [];
+        foreach ($oroHistoricoRaw->reverse() as $h) {
+            $decoded = json_decode($h->json);
+            if ($decoded) {
+                $oroHistorico[] = [
+                    'fecha' => Carbon::parse($h->created_at)->format('d/m'),
+                    'price_10k' => isset($decoded->price_gram_10k) ? (float) $decoded->price_gram_10k : 0.0,
+                    'price_14k' => isset($decoded->price_gram_14k) ? (float) $decoded->price_gram_14k : 0.0,
+                    'price_24k' => isset($decoded->price_gram_24k) ? (float) $decoded->price_gram_24k : 0.0,
+                ];
+            }
+        }
+
         return view('home', compact(
             'precios_oro_gramo',
             'ingresosAutomaticosMes',
@@ -148,8 +289,74 @@ class HomeController extends Controller
             'productosVendidosMes',
             'apartadosPendientes',
             'inicioMes',
-            'finMes'
+            'finMes',
+            'dailyStats',
+            'categoriasPopulares',
+            'productosBajoStock',
+            'ventasRecientes',
+            'oroHistorico'
         ));
+    }
+
+    private function procesarEgresosAutomaticos()
+    {
+        try {
+            $hoy = Carbon::now();
+            $diaHoy = $hoy->day;
+            $mesHoy = $hoy->month;
+            $anioHoy = $hoy->year;
+            $diaSemanaHoy = $hoy->dayOfWeekIso; // 1 = Monday, 7 = Sunday
+
+            $egresosAuto = \App\EgresoAutomatico::all();
+
+            foreach ($egresosAuto as $auto) {
+                if ($auto->frecuencia === 'MENSUAL') {
+                    if ($auto->dia_mes <= $diaHoy) {
+                        // Verificar si ya se registró para este mes y año
+                        $yaExiste = \App\Egreso::where('id_egreso_automatico', $auto->id)
+                            ->whereYear('fecha', $anioHoy)
+                            ->whereMonth('fecha', $mesHoy)
+                            ->exists();
+
+                        if (!$yaExiste) {
+                            $fechaEgreso = Carbon::createFromDate($anioHoy, $mesHoy, $auto->dia_mes)->toDateString();
+                            \App\Egreso::create([
+                                'id_usuario' => auth()->id() ?: 1,
+                                'id_egreso_automatico' => $auto->id,
+                                'concepto' => $auto->concepto . ' (AUTOMÁTICO)',
+                                'monto' => $auto->monto,
+                                'fecha' => $fechaEgreso,
+                                'observaciones' => $auto->observaciones ?: 'Generado automáticamente por el sistema (Mensual).',
+                            ]);
+                        }
+                    }
+                } elseif ($auto->frecuencia === 'SEMANAL') {
+                    if ($auto->dia_semana <= $diaSemanaHoy) {
+                        // Verificar si ya se registró para esta semana
+                        $inicioSemana = Carbon::now()->startOfWeek();
+                        $finSemana = Carbon::now()->endOfWeek();
+
+                        $yaExiste = \App\Egreso::where('id_egreso_automatico', $auto->id)
+                            ->whereBetween('fecha', [$inicioSemana->toDateString(), $finSemana->toDateString()])
+                            ->exists();
+
+                        if (!$yaExiste) {
+                            $fechaEgreso = Carbon::now()->startOfWeek()->addDays($auto->dia_semana - 1)->toDateString();
+                            \App\Egreso::create([
+                                'id_usuario' => auth()->id() ?: 1,
+                                'id_egreso_automatico' => $auto->id,
+                                'concepto' => $auto->concepto . ' (AUTOMÁTICO SEMANAL)',
+                                'monto' => $auto->monto,
+                                'fecha' => $fechaEgreso,
+                                'observaciones' => $auto->observaciones ?: 'Generado automáticamente por el sistema (Semanal).',
+                            ]);
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error al procesar egresos automáticos: ' . $e->getMessage());
+        }
     }
 
     public function precio_materiales_dia()
@@ -210,6 +417,126 @@ class HomeController extends Controller
 
     public function inicio()
     {
-        return view('about');
+        $settings = \App\HomepageSetting::pluck('value', 'key')->toArray();
+        return view('about', compact('settings'));
+    }
+
+    public function obtenerNotificaciones()
+    {
+        try {
+            $notifications = [];
+
+            // Obtener notificaciones ya leídas/descartadas por el usuario actual
+            $readNotifications = \DB::table('notificaciones_leidas')
+                ->where('user_id', \Auth::id())
+                ->get()
+                ->groupBy('notification_type')
+                ->map(function ($items) {
+                    return $items->pluck('notification_id')->toArray();
+                })
+                ->toArray();
+
+            $readApartados = $readNotifications['apartado_inactivo'] ?? [];
+            $readProducts = $readNotifications['stock_bajo'] ?? [];
+
+            // 1. Apartados Inactivos (Reminders)
+            $diasInactividad = (int) \App\HomepageSetting::getValue('apartado_inactive_days', 30);
+            $limitDate = now()->subDays($diasInactividad);
+
+            $apartados = Apartado::where('estado', 'ABIERTO')
+                ->whereNotIn('id', $readApartados)
+                ->where('updated_at', '<', $limitDate)
+                ->whereDoesntHave('abonos', function ($query) use ($limitDate) {
+                    $query->where('fecha_abono', '>=', $limitDate)
+                          ->orWhere('created_at', '>=', $limitDate);
+                })
+                ->with(['cliente'])
+                ->orderBy('updated_at', 'asc')
+                ->get();
+
+            foreach ($apartados as $ap) {
+                $ultimoAbono = $ap->abonos()->latest('fecha_abono')->first();
+                $fechaReferencia = $ultimoAbono ? Carbon::parse($ultimoAbono->fecha_abono) : Carbon::parse($ap->created_at);
+                $diasTranscurridos = now()->diffInDays($fechaReferencia);
+                $clienteNombre = $ap->cliente ? $ap->cliente->nombre : 'Cliente General';
+                $apNombre = $ap->nombre_apartado ?: 'Sin nombre';
+
+                $notifications[] = [
+                    'id' => $ap->id,
+                    'type' => 'apartado_inactivo',
+                    'icon' => 'fas fa-exclamation-triangle',
+                    'title' => 'Apartado sin movimiento',
+                    'description' => "El apartado <strong>\"{$apNombre}\"</strong> de <strong>{$clienteNombre}</strong> lleva <strong>{$diasTranscurridos} días</strong> sin abonos (Saldo pendiente: $" . number_format($ap->saldo, 2) . ").",
+                    'time_ago' => "Último abono: " . $fechaReferencia->format('d/m/Y'),
+                    'url' => route('apartados.index') . "?ver_abonos={$ap->id}"
+                ];
+            }
+
+            /*
+            // 2. Productos con Bajo Stock (stock_bajo)
+            $productosBajoStock = \App\Producto::where('lActivo', 1)
+                ->whereNotIn('id', $readProducts)
+                ->where('existencia', '<=', 3)
+                ->orderBy('existencia', 'asc')
+                ->take(5)
+                ->get();
+
+            foreach ($productosBajoStock as $prod) {
+                $notifications[] = [
+                    'id' => $prod->id,
+                    'type' => 'stock_bajo',
+                    'icon' => 'fas fa-box-open',
+                    'title' => 'Bajo stock de producto',
+                    'description' => "El producto <strong>\"{$prod->descripcion}\"</strong> tiene un stock muy bajo: <strong>" . (float)$prod->existencia . " unidades</strong>.",
+                    'time_ago' => "Código: {$prod->codigo_barras}",
+                    'url' => route('productos.index') . "?buscar={$prod->codigo_barras}"
+                ];
+            }
+            */
+
+            return response()->json([
+                'lSuccess' => true,
+                'notifications' => $notifications
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'Error al obtener notificaciones: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Marcar una notificación como leída (guardar en base de datos para excluirla de la lista).
+     */
+    public function marcarNotificacionLeida(Request $request)
+    {
+        try {
+            $request->validate([
+                'type' => 'required|string',
+                'id' => 'required'
+            ]);
+
+            \DB::table('notificaciones_leidas')->updateOrInsert(
+                [
+                    'user_id' => \Auth::id(),
+                    'notification_type' => $request->type,
+                    'notification_id' => $request->id,
+                ],
+                [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+
+            return response()->json([
+                'lSuccess' => true
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'lSuccess' => false,
+                'cMensaje' => 'Error al marcar como leída: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

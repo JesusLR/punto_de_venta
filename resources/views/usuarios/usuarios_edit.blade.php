@@ -47,7 +47,15 @@ ____          _____               _ _           _
                 </div>
                 <div class="form-group-modern">
                     <label for="password"><i class="fas fa-lock"></i>Contraseña</label>
-                    <input id="password" required value="{{$usuario->password}}" autocomplete="off" name="password" class="form-control form-control-modern" type="password" placeholder="Contraseña">
+                    <input id="password" autocomplete="off" name="password" class="form-control form-control-modern" type="password" placeholder="Dejar en blanco para no cambiar">
+                </div>
+                <div class="form-group-modern">
+                    <label for="role_id"><i class="fas fa-user-tag"></i>Rol del Usuario</label>
+                    <select id="role_id" required name="role_id" class="form-control form-control-modern">
+                        @foreach($roles as $role)
+                            <option value="{{ $role->id }}" {{ $usuario->role_id == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 @include("notificacion")

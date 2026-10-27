@@ -45,6 +45,10 @@
                     <i class="fas fa-file-pdf"></i>
                     Ticket (PDF)
                 </button>
+                <button type="button" id="btnEnviarPdfWhatsappVenta" class="btn-modern btn-success-modern">
+                    <i class="fab fa-whatsapp"></i>
+                    Enviar por WhatsApp
+                </button>
             </div>
         </div>
 
@@ -147,6 +151,92 @@
 <script>
     document.getElementById('btnPrintTicketVenta').addEventListener('click', function () {
         window.open("{{ route('ventas.pdf', ['id' => $venta->id]) }}", '_blank');
+    });
+
+    function normalizarTelefonoMx(valor) {
+        const soloDigitos = (valor || '').toString().replace(/\D/g, '');
+
+        if (soloDigitos.startsWith('521') && soloDigitos.length > 10) return soloDigitos.substring(3);
+        if (soloDigitos.startsWith('52') && soloDigitos.length > 10) return soloDigitos.substring(2);
+        if (soloDigitos.startsWith('1') && soloDigitos.length === 11) return soloDigitos.substring(1);
+
+        return soloDigitos;
+    }
+
+    document.getElementById('btnEnviarPdfWhatsappVenta').addEventListener('click', function () {
+        const telefonoInicial = normalizarTelefonoMx("{{ $venta->cliente->telefono ?? '' }}");
+
+        swal.fire({
+            title: 'Enviar PDF por WhatsApp',
+            html: '\n                <div style="text-align:left; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">\n                    <div style="font-size:13px; color:#475569; margin-bottom:6px;">Número de WhatsApp</div>\n                    <input id="telefonoWhatsappVenta" class="swal2-input" style="margin:0; width:100%;" maxlength="10" value="' + telefonoInicial + '" placeholder="10 dígitos" />\n                    <small style="display:block; margin-top:8px; color:#64748b;">Puedes editar el número antes de enviar.</small>\n                </div>\n            ',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, enviar',
+            cancelButtonText: 'Cancelar',
+            focusConfirm: false,
+            preConfirm: () => {
+                const telefono = normalizarTelefonoMx(document.getElementById('telefonoWhatsappVenta').value || '');
+
+                if (!telefono || telefono.length !== 10) {
+                    swal.showValidationMessage('Ingresa un número válido de 10 dígitos.');
+                    return false;
+                }
+
+                return telefono;
+            }
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            $.ajax({
+                url: "{{ route('ventas.enviarPdfWhatsapp') }}",
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    id_venta: {{ $venta->id }},
+                    telefono: result.value,
+                },
+                beforeSend: function () {
+                    swal.fire({
+                        title: 'Enviando...',
+                        text: 'Por favor espera mientras se envía el PDF.',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            swal.showLoading();
+                        }
+                    });
+                },
+                success: function (data) {
+                    if (data.lSuccess) {
+                        swal.fire({
+                            title: 'Ventas',
+                            text: data.cMensaje,
+                            icon: 'success',
+                            showConfirmButton: true,
+                            confirmButtonText: 'Aceptar',
+                        });
+                    } else {
+                        swal.fire({
+                            title: 'Error',
+                            text: data.cMensaje,
+                            icon: 'error',
+                            showConfirmButton: true,
+                            confirmButtonText: 'Aceptar',
+                        });
+                    }
+                },
+                error: function () {
+                    swal.fire({
+                        title: 'Error',
+                        text: 'Ocurrió un error al enviar el PDF por WhatsApp.',
+                        icon: 'error',
+                        showConfirmButton: true,
+                        confirmButtonText: 'Aceptar',
+                    });
+                }
+            });
+        });
     });
 </script>
 

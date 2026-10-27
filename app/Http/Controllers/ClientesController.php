@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 
 class ClientesController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:ver_clientes')->only(['index']);
+        $this->middleware('permission:manage_clients')->only(['create', 'store', 'edit', 'update']);
+        $this->middleware('permission:delete_clients')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      *
