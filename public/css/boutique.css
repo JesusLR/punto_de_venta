@@ -100,8 +100,8 @@
 .boutique-site .products-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:24px; align-items:stretch; }
 .boutique-site .jewel-card { background:#fffdf9; border:0; border-radius:22px; box-shadow:0 7px 25px rgba(62,49,29,.045); display:flex; flex-direction:column; min-width:0; padding:12px; transition:box-shadow .25s ease, transform .25s ease; }
 .boutique-site .jewel-media { position:relative; width:100%; aspect-ratio:4/5; background:#f1eee7; overflow:hidden; border-radius:15px; }
-.boutique-site .jewel-media img { width:100%; height:100%; object-fit:contain; padding:12px; transition:transform .4s; }
-.boutique-site .jewel-card:hover .jewel-media img { transform:scale(1.04); }
+.boutique-site .jewel-media img { position:absolute; inset:0; display:block; width:100%; height:100%; object-fit:contain; object-position:center; padding:12px; }
+.boutique-site .jewel-card:hover .jewel-media img { transform:none; }
 .boutique-site .jewel-badge { position:absolute; top:12px; left:12px; background:var(--paper); padding:6px 10px; font-size:8px; letter-spacing:1px; text-transform:uppercase; border-radius:999px; }
 .boutique-site .jewel-body { display:flex; flex-direction:column; flex:1; padding:18px 6px 6px; gap:10px; }
 .boutique-site .jewel-material { font-size:8px; letter-spacing:1.5px; color:var(--gold); text-transform:uppercase; }
@@ -124,13 +124,17 @@
 .boutique-site #catalogImageModal .modal-content { background:var(--paper); border:0; border-radius:26px; overflow:hidden; }
 .boutique-site #catalogImageModal .modal-body { padding:30px; }
 .boutique-site .modal-layout { display:grid; grid-template-columns:1.1fr 1fr; gap:40px; align-items:center; }
-.boutique-site .modal-img { width:100%; max-height:65vh; object-fit:contain; background:#eeeae0; border-radius:20px; }
+.boutique-site .modal-img { display:block; width:100%; height:auto; max-height:65vh; object-fit:contain; object-position:center; background:#eeeae0; border-radius:20px; }
 .boutique-site #modalTitle { font-family:var(--serif); font-size:38px; font-weight:400; text-transform:lowercase; overflow-wrap:anywhere; }
 .boutique-site #modalTitle::first-letter { text-transform:uppercase; }
 .boutique-site #modalPrice { font-family:var(--serif); font-size:30px; margin:25px 0; }
 .boutique-site #modalMaterial, .boutique-site #modalCategoria { font-size:11px!important; font-weight:400!important; }
 .boutique-site .modal-actions { display:flex; gap:12px; flex-wrap:wrap; }
-.boutique-site .modal-actions .btn { border-radius:999px; font-size:11px; padding:12px 17px; }
+.boutique-site .catalog-modal-button { display:inline-flex; align-items:center; justify-content:center; gap:9px; min-height:46px; border:1px solid transparent; border-radius:999px; font-family:inherit; font-size:11px; font-weight:500; padding:13px 23px; cursor:pointer; transition:background .2s, border-color .2s; }
+.boutique-site .catalog-modal-close { color:var(--ink); background:#f2eee5; border-color:var(--line); }
+.boutique-site .catalog-modal-close:hover { background:#e9e1d2; border-color:#cbbda4; }
+.boutique-site .catalog-modal-whatsapp { color:#36694c; background:#eaf0e8; border-color:#d7e3d4; }
+.boutique-site .catalog-modal-whatsapp:hover:not(:disabled) { background:#dce9d8; border-color:#b9cdb2; }
 @media(min-width:1600px) { .boutique-site .about-hero { padding-top:85px; padding-bottom:70px; } }
 @media(max-width:1100px) { .boutique-site .products-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .boutique-site .about-hero { padding:50px 36px; gap:35px; } .boutique-site .navbar-brand { font-size:22px; } }
 .boutique-site .jewel-card:hover { box-shadow:0 12px 34px rgba(62,49,29,.09); transform:translateY(-3px); }

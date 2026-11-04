@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 440" fill="none">
+  <defs>
+    <linearGradient id="wing" x1="112" y1="86" x2="255" y2="266" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F2E3C3"/>
+      <stop offset=".5" stop-color="#C6A16A"/>
+      <stop offset="1" stop-color="#94703F"/>
+    </linearGradient>
+    <linearGradient id="body" x1="264" y1="167" x2="186" y2="312" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#DCC49A"/>
+      <stop offset=".5" stop-color="#B18A50"/>
+      <stop offset="1" stop-color="#7D5B30"/>
+    </linearGradient>
+    <linearGradient id="tail" x1="219" y1="260" x2="126" y2="359" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B99258"/>
+      <stop offset="1" stop-color="#E2CEAA"/>
+    </linearGradient>
+    <radialGradient id="halo">
+      <stop stop-color="#E4CFA6" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#E4CFA6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="220" cy="214" r="184" fill="url(#halo)"/>
+  <circle cx="220" cy="214" r="162" stroke="#B99862" stroke-width=".8" stroke-opacity=".22"/>
+  <circle cx="220" cy="214" r="149" stroke="#B99862" stroke-opacity=".14" stroke-dasharray="2 9"/>
+  <!-- The far wing opens behind the raised wing. -->
+  <path d="M238 231C197 224 124 191 74 185c35 37 104 67 150 66Z" fill="#DCC49A" stroke="#A58452" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M229 241c-47-11-92-30-133-46m116 49c-27-3-66-14-94-26" stroke="#A58452" stroke-opacity=".45" stroke-linecap="round"/>
+  <!-- Long, tapering feathers give the hummingbird its hovering silhouette. -->
+  <path d="M223 260c-21 30-64 81-98 103 11-35 42-83 73-111Z" fill="url(#tail)" stroke="#987441" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M213 270c-6 32-17 68-35 92 0-32 6-64 17-90Z" fill="#B5915B" stroke="#987441" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="m201 273-61 72" stroke="#F2E1C0" stroke-width="1.3" stroke-linecap="round"/>
+  <!-- Head, slender neck and rounded breast. -->
+  <path d="M197 261c27-8 33-26 36-48 2-20 5-39 21-49 12-8 29-4 36 7 7 12 4 25-7 33-9 7-15 17-18 29-5 25-22 47-47 49-9 0-17-8-21-21Z" fill="url(#body)" stroke="#927040" stroke-width="1.3" stroke-linejoin="round"/>
+  <path d="M275 199c-13 14-17 36-25 48-8 14-19 22-33 25" stroke="#F3E3C5" stroke-width="2" stroke-linecap="round" stroke-opacity=".8"/>
+  <path d="M287 177 363 155l-71 30Z" fill="#8A683A"/>
+  <circle cx="278" cy="176" r="2.6" fill="#584126"/>
+  <circle cx="279" cy="175" r=".8" fill="#FFF4DC"/>
+  <!-- The near wing curves upward, with fine individual feather lines. -->
+  <path d="M239 236C195 211 148 141 139 78c49 33 87 95 100 158Z" fill="url(#wing)" stroke="#987441" stroke-width="1.3" stroke-linejoin="round"/>
+  <path d="M233 224c-25-39-52-83-80-126m73 118c-24-26-48-62-63-92m56 84c-25-21-43-47-51-64m44 56c-21-15-35-31-42-43" stroke="#95713E" stroke-width="1.1" stroke-opacity=".5" stroke-linecap="round"/>
+  <path d="M146 94c8 36 27 75 49 103" stroke="#FAECD1" stroke-width="1.5" stroke-linecap="round" stroke-opacity=".7"/>
+  <path d="m326 113 3-12 3 12 12 3-12 3-3 12-3-12-12-3Zm-222 161 2-8 2 8 8 2-8 2-2 8-2-8-8-2Z" fill="#B08C53"/>
+  <circle cx="307" cy="293" r="2" fill="#BA9A65"/>
+  <circle cx="123" cy="148" r="1.5" fill="#BA9A65"/>
+</svg>

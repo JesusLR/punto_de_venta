@@ -29,15 +29,6 @@
     $pills = is_array($pills) ? $pills : [];
     $gallery = is_array($gallery) ? $gallery : [];
     $team = is_array($team) ? $team : [];
-    $heroImage = asset('img/logo.jpg');
-    foreach ($gallery as $galleryImage) {
-        if (!$galleryImage) continue;
-        $relativeImage = strpos($galleryImage, 'producto_') === 0 ? 'img/productos/'.$galleryImage : 'storage/about_gallery/'.$galleryImage;
-        if (file_exists(public_path($relativeImage))) {
-            $heroImage = asset($relativeImage);
-            break;
-        }
-    }
 @endphp
 
 <div class="about-container">
@@ -59,7 +50,7 @@
             </div>
         </div>
         <figure class="hero-jewel">
-            <img src="{{ $heroImage }}" alt="Una pieza de nuestra vitrina de joyería" fetchpriority="high">
+            <img src="{{ asset('img/colibri-dorado.svg') }}" alt="Colibrí de alas desplegadas en tonos dorados" fetchpriority="high">
             <figcaption><span>La belleza de lo especial</span><span>Colibrí</span></figcaption>
         </figure>
     </section>

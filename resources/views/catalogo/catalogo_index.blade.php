@@ -126,10 +126,10 @@
                             </p>
                             <p id="modalPrice"></p>
                             <div class="modal-actions">
-                                <button type="button" class="btn btn-dark" data-dismiss="modal">
+                                <button type="button" class="catalog-modal-button catalog-modal-close" data-dismiss="modal">
                                     <i class="fas fa-times"></i> Cerrar
                                 </button>
-                                <button id="modalWhatsapp" type="button" class="btn btn-success" @if(!$telefonoWhatsapp) disabled title="Contacto de WhatsApp no disponible" @endif>
+                                <button id="modalWhatsapp" type="button" class="catalog-modal-button catalog-modal-whatsapp" @if(!$telefonoWhatsapp) disabled title="Contacto de WhatsApp no disponible" @endif>
                                     <i class="fab fa-whatsapp"></i> Enviar WhatsApp
                                 </button>
                             </div>
