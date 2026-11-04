@@ -407,9 +407,14 @@
 <body class="@auth authenticated @endauth workspace-refresh @if(request()->routeIs('apartados.index')) workspace-apartados @endif">
 
 @auth
+    <script>
+        try {
+            if (localStorage.getItem('colibri.sidebar.collapsed') === '1') document.body.classList.add('sidebar-collapsed');
+        } catch (error) { /* La navegación funciona aunque el almacenamiento esté bloqueado. */ }
+    </script>
     <!-- Cabecera Móvil (solo autenticados) -->
     <div class="mobile-header">
-        <button class="btn btn-link text-white p-0 mr-3" id="botonMenuMobile" style="font-size: 1.5rem; text-decoration: none;">
+        <button class="btn btn-link text-white p-0 mr-3" id="botonMenuMobile" type="button" aria-controls="appSidebar" aria-expanded="false" aria-label="Abrir menú de navegación" style="font-size: 1.5rem; text-decoration: none;">
             <i class="fas fa-bars mobile-header-icon"></i>
         </button>
         <a href="{{route("home")}}" class="text-white font-weight-bold text-uppercase" style="letter-spacing: 1.5px; font-size: 1.05rem; text-decoration: none; margin-right: auto;">
@@ -423,15 +428,18 @@
     </div>
 
     <!-- Sidebar (solo autenticados) -->
-    <div class="sidebar">
+    <aside class="sidebar" id="appSidebar" aria-label="Menú de la joyería">
         <div class="sidebar-brand">
-            <a class="text-white text-decoration-none font-weight-bold d-flex align-items-center" href="{{route("home")}}" style="letter-spacing: 1px;">
-                <i class="fa fa-shopping-cart mr-2" style="color: #D4AF37; font-size: 1.25rem;"></i> <span class="text-white" style="margin-left: 12px;"> {{env("APP_NAME")}}
+            <a class="sidebar-brand-link" href="{{ route('home') }}" aria-label="{{ config('app.name') }} - Inicio">
+                <span class="sidebar-brand-emblem"><img src="{{ asset('img/colibri-dorado.svg') }}" alt="" width="46" height="46"></span>
+                <span class="sidebar-brand-copy"><strong>{{ config('app.name') }}</strong><small>ESPACIO DE GESTIÓN</small></span>
             </a>
+            <button type="button" class="sidebar-desktop-toggle" id="sidebarDesktopToggle" aria-controls="appSidebar" aria-expanded="true" aria-label="Contraer menú" title="Contraer menú"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+            <button type="button" class="sidebar-mobile-close" id="sidebarCloseMobile" aria-label="Cerrar menú"><i class="fas fa-times" aria-hidden="true"></i></button>
         </div>
 
-        <div class="sidebar-nav">
-            <div class="nav-section-title">General</div>
+        <nav class="sidebar-nav" aria-label="Navegación principal">
+            <div class="nav-section-title">Mi espacio</div>
             <a class="sidebar-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{route("home")}}">
                 <i class="fa fa-home"></i>
                 <span>Inicio</span>
@@ -450,7 +458,7 @@
                 <span>Ver Catálogo</span>
             </a>
 
-            <div class="nav-section-title">Administración</div>
+            <div class="nav-section-title">Gestión de la joyería</div>
             
             {{-- Catálogos --}}
             @if (Auth::user()->hasPermission('ver_categorias') || Auth::user()->hasPermission('ver_clientes') || Auth::user()->hasPermission('ver_materiales') || Auth::user()->hasPermission('ver_proveedores') || Auth::user()->hasPermission('ver_usuarios'))
@@ -590,18 +598,20 @@
                     @endif
                 </div>
             @endif
-        </div>
+        </nav>
 
-        <div class="sidebar-footer" style="padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08);">
-            <a class="sidebar-link p-2" href="{{route("logout")}}" style="border-radius: 8px;">
-                <i class="fa fa-sign-out-alt"></i>
-                <span>Salir ({{ Auth::user()->name }})</span>
-            </a>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <span class="sidebar-user-avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr(Auth::user()->name, 0, 1)) }}</span>
+                <div class="sidebar-user-copy"><strong>{{ Auth::user()->name }}</strong><small>{{ optional(Auth::user()->role)->name ?: 'Equipo de la joyería' }}</small></div>
+                <a class="sidebar-logout" href="{{ route('logout') }}" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="fas fa-sign-out-alt" aria-hidden="true"></i></a>
+            </div>
         </div>
-    </div>
+    </aside>
 
     <!-- Overlay para Móviles -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+    <script src="{{ asset('js/sidebar.js') }}?v={{ filemtime(public_path('js/sidebar.js')) }}" defer></script>
 @endauth
 
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
@@ -615,26 +625,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", () => {
-        const sidebar = document.querySelector(".sidebar");
-        const overlay = document.querySelector(".sidebar-overlay");
-        const btnMenu = document.querySelector("#botonMenuMobile");
-        
-        if (btnMenu) {
-            btnMenu.addEventListener("click", () => {
-                sidebar.classList.toggle("active");
-                overlay.classList.toggle("active");
-            });
-        }
-        
-        if (overlay) {
-            overlay.addEventListener("click", () => {
-                sidebar.classList.remove("active");
-                overlay.classList.remove("active");
-            });
-        }
-    });
-
     $(function(){
         // Función para cargar notificaciones del sistema
         function cargarNotificaciones() {
