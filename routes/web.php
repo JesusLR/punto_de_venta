@@ -73,6 +73,7 @@ Auth::routes([
                 Route::post("/api/notificaciones/marcar-leida", "HomeController@marcarNotificacionLeida")->name("notificaciones.marcarLeida");
 
                 //Productos
+                Route::post('/productos/{producto}/edicion-rapida', 'ProductosController@actualizarRapido')->name('productos.actualizarRapido');
                 Route::post("/gridProductos", "ProductosController@gridProductos")->name("gridProductos");
                 Route::get("/editarProducto/{id}", "ProductosController@editarProducto")->name("productos.editarProducto");
                 Route::post("/deleteProducto", "ProductosController@deleteProducto")->name("deleteProducto");

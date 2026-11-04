@@ -1,0 +1,259 @@
+{
+  "2026_03_25_000001_create_categorias_table": {
+    "categorias": [
+      "id",
+      "cNombreCategoria",
+      "cNotasCategoria",
+      "lActivo",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "2026_03_25_000002_create_materiales_table": {
+    "materiales": [
+      "id",
+      "cNombreMaterial",
+      "cNotasMaterial",
+      "lActivo",
+      "lActivoConsulta",
+      "cSimbolo",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "2026_03_25_000003_create_proveedores_table": {
+    "proveedores": [
+      "id",
+      "cNombreProveedor",
+      "cNotasProveedor",
+      "lActivo",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "2026_03_25_000004_create_precios_materiales_table": {
+    "precios_materiales": [
+      "id",
+      "id_material",
+      "json",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "2026_03_26_000001_create_apartados_tables": {
+    "apartados": [
+      "id",
+      "id_cliente",
+      "id_usuario",
+      "total",
+      "total_abonado",
+      "saldo",
+      "estado",
+      "id_venta",
+      "created_at",
+      "updated_at"
+    ],
+    "apartado_productos": [
+      "id",
+      "id_apartado",
+      "id_producto",
+      "descripcion",
+      "codigo_barras",
+      "precio",
+      "cantidad",
+      "created_at",
+      "updated_at"
+    ],
+    "apartado_abonos": [
+      "id",
+      "id_apartado",
+      "id_usuario",
+      "monto",
+      "observaciones",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "2026_03_27_000001_add_missing_legacy_columns": {
+    "productos": [
+      "img",
+      "lActivo",
+      "id_proveedor",
+      "id_categoria",
+      "id_material"
+    ],
+    "productos_vendidos": [
+      "img",
+      "lActivo",
+      "id_proveedor",
+      "id_categoria",
+      "id_material"
+    ],
+    "ventas": [
+      "cNombreVenta",
+      "id_usuario"
+    ],
+    "clientes": [
+      "nombre_apartado"
+    ],
+    "apartados": [
+      "nombre_apartado"
+    ]
+  },
+  "2026_03_30_000001_add_tipo_pago_to_apartado_abonos_table": {
+    "apartado_abonos": [
+      "tipo_pago"
+    ]
+  },
+  "2026_04_07_000001_add_fecha_abono_to_apartado_abonos_table": {
+    "apartado_abonos": [
+      "fecha_abono"
+    ]
+  },
+  "2026_04_07_000003_add_observaciones_to_clientes_table": {
+    "clientes": [
+      "observaciones"
+    ]
+  },
+  "2026_04_08_000001_add_tipo_pago_to_ventas_table": {
+    "ventas": [
+      "tipo_pago"
+    ]
+  },
+  "2026_04_09_000001_create_egresos_table": {
+    "egresos": [
+      "id",
+      "id_usuario",
+      "concepto",
+      "monto",
+      "fecha",
+      "observaciones",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "2026_06_22_000001_create_permissions_system_tables": {
+    "roles": [
+      "id",
+      "name",
+      "slug",
+      "created_at",
+      "updated_at"
+    ],
+    "permissions": [
+      "id",
+      "name",
+      "slug",
+      "description",
+      "created_at",
+      "updated_at"
+    ],
+    "permission_role": [
+      "role_id",
+      "permission_id"
+    ],
+    "users": [
+      "role_id"
+    ]
+  },
+  "2026_06_22_000002_create_homepage_settings_table": {
+    "homepage_settings": [
+      "id",
+      "key",
+      "value",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "2026_06_26_000001_add_manage_general_settings_permission": {},
+  "2026_06_26_000002_create_notificaciones_leidas_table": {
+    "notificaciones_leidas": [
+      "id",
+      "user_id",
+      "notification_type",
+      "notification_id",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "2026_06_30_143853_create_ingresos_table": {
+    "ingresos": [
+      "id",
+      "id_usuario",
+      "concepto",
+      "monto",
+      "fecha",
+      "observaciones",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "2026_06_30_152000_create_egresos_automaticos_table": {
+    "egresos_automaticos": [
+      "id",
+      "concepto",
+      "monto",
+      "dia_mes",
+      "observaciones",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "2026_06_30_152001_add_id_egreso_automatico_to_egresos_table": {
+    "egresos": [
+      "id_egreso_automatico"
+    ]
+  },
+  "2026_06_30_152500_update_egresos_automaticos_table": {
+    "egresos": [],
+    "egresos_automaticos": [
+      "id",
+      "concepto",
+      "monto",
+      "frecuencia",
+      "dia_mes",
+      "dia_semana",
+      "observaciones",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "2026_09_09_000001_create_whatsapp_conversations_table": {
+    "whatsapp_conversations": [
+      "id",
+      "chat_id",
+      "phone",
+      "cliente_id",
+      "step",
+      "last_keyword",
+      "context_data",
+      "last_interaction_at",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "2026_09_09_000002_create_whatsapp_messages_table": {
+    "whatsapp_messages": [
+      "id",
+      "conversation_id",
+      "chat_id",
+      "direction",
+      "sender_name",
+      "body",
+      "type",
+      "status",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "2026_09_09_000003_add_media_url_to_whatsapp_messages_table": {
+    "whatsapp_messages": [
+      "media_url"
+    ]
+  },
+  "2026_11_04_000001_add_legacy_column_to_whatsapp_messages": {
+    "whatsapp_messages": [
+      "whatsapp_messagescol"
+    ]
+  }
+}

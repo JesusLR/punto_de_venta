@@ -38,7 +38,7 @@ class ProductosController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('permission:ver_productos')->only(['index', 'gridProductos', 'getProductos']);
-        $this->middleware('permission:manage_products')->only(['create', 'store', 'editarProducto', 'update', 'cargarProductosExcell']);
+        $this->middleware('permission:manage_products')->only(['create', 'store', 'editarProducto', 'update', 'actualizarRapido', 'cargarProductosExcell']);
         $this->middleware('permission:delete_products')->only(['deleteProducto', 'destroy']);
     }
 
@@ -172,11 +172,43 @@ class ProductosController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update product fields from the quick edit modal.
      *
      * @param \App\Producto $producto
      * @return \Illuminate\Http\Response
      */
+    public function actualizarRapido(Request $request, Producto $producto)
+    {
+        $data = $request->validate([
+            'codigo_barras' => 'required|string|max:255',
+            'precio_compra' => 'required|numeric|min:0|max:9999999.99|regex:/^\d+(\.\d{1,2})?$/',
+            'precio_venta' => 'required|numeric|min:0|max:9999999.99|regex:/^\d+(\.\d{1,2})?$/',
+            'existencia' => 'required|numeric|min:0|max:9999999.99|regex:/^\d+(\.\d{1,2})?$/',
+            'img' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+        ]);
+
+        $producto->fill(collect($data)->except('img')->all());
+        $newImage = null;
+        if ($request->hasFile('img')) {
+            $newImage = 'producto_'.\Illuminate\Support\Str::uuid().'.'.$request->file('img')->extension();
+            $request->file('img')->move(public_path('img/productos'), $newImage);
+            $producto->img = $newImage;
+        }
+
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($producto) {
+                $producto->save();
+            });
+        } catch (\Throwable $exception) {
+            if ($newImage) {
+                @unlink(public_path('img/productos/'.$newImage));
+            }
+            throw $exception;
+        }
+
+        return response()->json(['lSuccess' => true, 'cMensaje' => 'Producto actualizado']);
+    }
+
     public function destroy(Producto $producto)
     {
         $producto->delete();

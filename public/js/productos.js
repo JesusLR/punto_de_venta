@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const imgInput = document.getElementById('img');
     const previewContainer = document.getElementById('preview-container');
 
-    imgInput.addEventListener('change', function (e) {
+    if (imgInput) imgInput.addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (file) {
             if (file.size > 2 * 1024 * 1024) {
@@ -56,11 +56,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    precioCompra.addEventListener('input', calcularGanancia);
-    precioVenta.addEventListener('input', calcularGanancia);
+    if (precioCompra) precioCompra.addEventListener('input', calcularGanancia);
+    if (precioVenta) precioVenta.addEventListener('input', calcularGanancia);
 
     // Validación del formulario
-    document.getElementById('formProducto').addEventListener('submit', function (e) {
+    if (document.getElementById('formProducto')) document.getElementById('formProducto').addEventListener('submit', function (e) {
         const compra = parseFloat(precioCompra.value) || 0;
         const venta = parseFloat(precioVenta.value) || 0;
 
@@ -274,6 +274,7 @@ function accionesFormatter(value, row) {
         html += '<a href="img/productos/' + row.img + '" download="' + downloadName + '" class="btn btn-table-action btn-success" title="Descargar imagen"><i class="fa fa-download"></i></a>';
     }
     if (hasPermission('manage_products')) {
+        html += '<button type="button" class="btn btn-table-action btn-warning" onclick="abrirEdicionRapida(' + Number(row.id) + ')" title="Edición rápida" aria-label="Edición rápida"><i class="fas fa-bolt"></i></button>';
         html += '<button type="button" class="btn btn-table-action btn-light" onclick="editProducto(' + row.id + ')"><i class="fa fa-edit"></i></button>';
     }
     if (hasPermission('delete_products')) {

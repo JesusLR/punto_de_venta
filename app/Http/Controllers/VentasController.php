@@ -27,7 +27,9 @@ use App\Venta;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
+use App\Services\OpenWaService;
+use App\Exceptions\OpenWaException;
+use App\Support\DocumentoPdf;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
 use Exception;
@@ -183,10 +185,10 @@ class VentasController extends Controller
             'total' => $total,
         ])->setPaper('letter', 'portrait');
 
-        return $pdf->stream('venta_' . $venta->id . '.pdf');
+        return $pdf->stream(DocumentoPdf::nombre(DocumentoPdf::VENTA, $venta));
     }
 
-    public function enviarPdfWhatsapp(Request $request)
+    public function enviarPdfWhatsapp(Request $request, OpenWaService $openWaService)
     {
         try {
             $request->validate([
@@ -211,14 +213,11 @@ class VentasController extends Controller
                 'total' => $total,
             ])->setPaper('letter', 'portrait');
 
-            $base64 = base64_encode($pdf->output());
-
-            $response = Http::post(url('/api/openwa/send-document'), [
-                'chatId' => '521' . $telefono . '@c.us',
-                'base64' => $base64,
-                'mimetype' => 'application/pdf',
-                'filename' => 'venta_' . $venta->id . '.pdf',
-            ]);
+            $response = $openWaService->sendPdf(
+                '52'.$telefono, $pdf->output(),
+                DocumentoPdf::nombre(DocumentoPdf::VENTA, $venta),
+                DocumentoPdf::mensaje(DocumentoPdf::VENTA)
+            );
 
             if (!$response->successful()) {
                 return response()->json([
@@ -233,6 +232,8 @@ class VentasController extends Controller
                 'cMensaje' => 'PDF enviado por WhatsApp exitosamente.',
                 'response' => $response->json(),
             ]);
+        } catch (OpenWaException $e) {
+            return $e->render($request);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'lSuccess' => false,
