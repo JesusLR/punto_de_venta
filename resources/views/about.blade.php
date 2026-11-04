@@ -213,17 +213,18 @@
         <!-- CTA Agendar Cita o Contacto -->
         <section class="about-cta">
             <div class="row align-items-center">
-                <div class="col-lg-8">
+                <div class="col-lg-7">
+                    <span class="boutique-eyebrow">Una joya, tu historia</span>
                     <h3 class="font-serif-luxury">¿Deseas una pieza personalizada?</h3>
                     <p>Nuestros diseñadores y maestros joyeros pueden hacer realidad tu idea. Agenda una cita exclusiva o contáctanos por WhatsApp para una asesoría a tu medida.</p>
                 </div>
-                <div class="col-lg-4 text-lg-right">
-                    <div class="d-flex flex-column flex-sm-row justify-content-lg-end gap-2" style="gap:0.6rem; flex-wrap:wrap;">
-                        <a class="btn-gold-luxury" style="background:#25D366; border-color:#25D366; color:#fff !important;" href="https://wa.me/{{ $contactPhone }}" target="_blank" rel="noopener">
-                            <i class="fab fa-whatsapp" style="font-size:1.2rem;"></i> WhatsApp
+                <div class="col-lg-5">
+                    <div class="personalized-actions">
+                        <a class="btn-gold-luxury boutique-whatsapp" href="https://wa.me/{{ $contactPhone }}" target="_blank" rel="noopener">
+                            <i class="fab fa-whatsapp" aria-hidden="true"></i> Hablemos por WhatsApp
                         </a>
-                        <a class="btn-gold-luxury" style="background:#B38F24; border-color:#B38F24; color:#111 !important;" href="{{ route('catalogoProductos.index') }}">
-                            <i class="fas fa-gem"></i> Catálogo
+                        <a class="btn-gold-luxury" href="{{ route('catalogoProductos.index') }}">
+                            Ver colección <span aria-hidden="true">↗</span>
                         </a>
                         <a class="btn-gold-luxury" href="mailto:{{ $contactEmail }}">
                             <i class="fas fa-envelope"></i> Correo

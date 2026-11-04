@@ -75,9 +75,16 @@
 .boutique-site .info-list li { display:flex; gap:15px; font-size:11px; line-height:1.9; margin-bottom:18px; color:var(--muted); }
 .boutique-site .info-list i { color:var(--gold); margin-top:5px; }
 .boutique-site .map-wrap iframe { width:100%; min-height:420px; height:100%; border:0; display:block; }
-.boutique-site .about-cta { padding:48px; background:#272a24; color:#f8f6f0; border-radius:28px; }
-.boutique-site .about-cta h3, .boutique-site .about-cta h2 { font-family:var(--serif); font-size:38px; color:#f8f6f0; }
-.boutique-site .about-cta p { font-size:12px; line-height:1.8; color:#dbd4c6; }
+.boutique-site .about-cta { padding:48px; background:#eee8dc; color:var(--ink); border:1px solid rgba(150,115,67,.12); border-radius:28px; }
+.boutique-site .about-cta .boutique-eyebrow { margin-bottom:15px; }
+.boutique-site .about-cta h3, .boutique-site .about-cta h2 { font-family:var(--serif); font-size:38px; font-weight:400; color:var(--ink); margin-bottom:18px; }
+.boutique-site .about-cta p { font-size:12px; line-height:1.9; color:var(--muted); margin-bottom:0; }
+.boutique-site .personalized-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:10px; padding-left:20px; }
+.boutique-site .about-cta .btn-gold-luxury { background:#fffaf1; color:var(--ink); border-color:#d9ceba; box-shadow:none; gap:10px; letter-spacing:.2px; }
+.boutique-site .about-cta .btn-gold-luxury:hover { background:#e5dac6; border-color:#c4b18e; }
+.boutique-site .about-cta .boutique-whatsapp { background:#e4ecdf; color:#36694c; border-color:#cad8c3; }
+.boutique-site .about-cta .boutique-whatsapp:hover { background:#d7e4cf; border-color:#b2c5a8; }
+@media(max-width:991px) { .boutique-site .personalized-actions { justify-content:flex-start; padding:26px 0 0; } }
 .boutique-site .about-footer { padding:45px 20px 30px; text-align:center; color:var(--muted); font-size:9px; letter-spacing:1px; }
 .boutique-site .catalog-container { max-width:1360px; margin:auto; padding:0 44px 60px; background:transparent; }
 .boutique-site .catalog-header { border-bottom:0; padding:65px 0 38px; background:none; margin-bottom:30px; box-shadow:none; border-radius:0; }
