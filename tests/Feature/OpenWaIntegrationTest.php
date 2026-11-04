@@ -132,6 +132,13 @@ class OpenWaIntegrationTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_upstream_integration_configuration_error_has_diagnostic_status()
+    {
+        Http::fake(function () { return Http::response(['message' => 'System integrations are not configured correctly'], 503); });
+        $this->actingAs($this->admin)->getJson(route('whatsapp.settings.sessions.list'))
+            ->assertStatus(503)->assertJsonPath('cMensaje', 'OpenWA no está disponible o su configuración de integraciones no es válida (HTTP 503). Revisa INTEGRATION_SYSTEMS y reinicia el servicio.');
+    }
+
     public function test_cannot_select_session_from_another_system()
     {
         $this->fakeApi($this->fixtureSession(['sourceSystem' => 'de_viaje_en_viaje']));

@@ -822,6 +822,8 @@
             applyCatalogFilters(false);
         });
 
+        var busquedaInicial = new URLSearchParams(window.location.search).get('buscar') || '';
+        $('#catalogSearch').val(busquedaInicial);
         applyCatalogFilters(true);
 
         // Modal ver detalle
@@ -916,6 +918,9 @@
             if (parseFloat(price) > 0) {
                 text += 'Precio en catálogo: $' + parseFloat(price).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\n';
             }
+            var enlaceProducto = new URL(window.location.pathname, window.location.origin);
+            enlaceProducto.searchParams.set('buscar', title);
+            text += '\nVer en el catálogo:\n' + enlaceProducto.href + '\n';
             text += '\n¿Me podrían confirmar su disponibilidad y orientarme para comprarla? ¡Gracias!';
 
             var phone = @json($telefonoWhatsapp);

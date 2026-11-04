@@ -6,6 +6,7 @@ use App\Exceptions\OpenWaException;
 use App\HomepageSetting;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class OpenWaService
@@ -33,6 +34,9 @@ class OpenWaService
             throw new OpenWaException('No se pudo conectar con WhatsApp. Revisa que OpenWA esté disponible.', 503);
         }
         if (!$response->successful()) {
+            Log::warning('OpenWA rechazó una solicitud de integración.', [
+                'method' => $method, 'path' => $path ?: '/', 'status' => $response->status(),
+            ]);
             $messages = [
                 401 => 'La credencial de WhatsApp no es válida para este sistema.',
                 403 => 'La credencial de WhatsApp no tiene acceso a este sistema.',
@@ -42,8 +46,12 @@ class OpenWaService
                 409 => 'La sesión no está conectada o hay una operación en curso. Revisa Inicio de sesión.',
                 413 => 'El PDF supera el tamaño permitido de 15 MB.',
                 429 => 'Se alcanzó el límite de solicitudes. Espera un momento antes de intentar de nuevo.',
+                500 => 'OpenWA reportó un error interno (HTTP 500). Revisa los registros del servicio.',
+                502 => 'El servidor intermedio no pudo comunicarse con OpenWA (HTTP 502).',
+                503 => 'OpenWA no está disponible o su configuración de integraciones no es válida (HTTP 503). Revisa INTEGRATION_SYSTEMS y reinicia el servicio.',
+                504 => 'OpenWA tardó demasiado en responder (HTTP 504).',
             ];
-            throw new OpenWaException($messages[$response->status()] ?? 'OpenWA no pudo completar la solicitud.', in_array($response->status(), [400, 404, 409, 413, 422, 429]) ? $response->status() : 503);
+            throw new OpenWaException($messages[$response->status()] ?? 'OpenWA no pudo completar la solicitud (HTTP '.$response->status().').', in_array($response->status(), [400, 404, 409, 413, 422, 429]) ? $response->status() : 503);
         }
         if ($response->status() !== 204 && !is_array($response->json())) {
             throw new OpenWaException('OpenWA devolvió una respuesta no válida.', 502);
