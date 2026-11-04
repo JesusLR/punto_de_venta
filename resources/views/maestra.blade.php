@@ -520,6 +520,7 @@
                         </a>
                     @endif
 
+                    {{-- Módulos de mensajes y enlaces ocultos temporalmente.
                     <a class="sidebar-link {{ request()->routeIs('whatsapp.chat.index') ? 'active' : '' }}" href="{{route("whatsapp.chat.index")}}">
                         <i class="fas fa-comments" style="color: #25D366;"></i>
                         <span>Centro de Mensajes</span>
@@ -528,9 +529,10 @@
                         <i class="fab fa-whatsapp" style="color: #25D366;"></i>
                         <span>WhatsApp Enlaces / QR</span>
                     </a>
+                    --}}
                     <a class="sidebar-link {{ request()->routeIs('whatsapp.settings.index') ? 'active' : '' }}" href="{{route("whatsapp.settings.index")}}">
-                        <i class="fas fa-robot" style="color: #25D366;"></i>
-                        <span>WhatsApp Chatbot</span>
+                        <i class="fab fa-whatsapp" style="color: #25D366;"></i>
+                        <span>Inicio de sesión</span>
                     </a>
                 </div>
             @endif

@@ -4,11 +4,22 @@ namespace App\Http\Controllers;
 use App\Categorias;
 use App\Materiales;
 use App\Producto;
+use App\HomepageSetting;
 use Illuminate\Http\Request;
 
 class CatalogoController extends Controller
 {
     public function index(){
+
+        $telefonoWhatsapp = preg_replace('/\D/', '', (string) HomepageSetting::getValue('contact_phone', ''));
+        if (strlen($telefonoWhatsapp) === 13 && strpos($telefonoWhatsapp, '521') === 0) {
+            $telefonoWhatsapp = '52'.substr($telefonoWhatsapp, 3);
+        } elseif (strlen($telefonoWhatsapp) === 10) {
+            $telefonoWhatsapp = '52'.$telefonoWhatsapp;
+        }
+        if (!preg_match('/^[1-9][0-9]{7,14}$/D', $telefonoWhatsapp)) {
+            $telefonoWhatsapp = '';
+        }
 
         $lstProducto = array();
         $lstCategorias = Categorias::where('lActivo', 1)->get();
@@ -44,7 +55,8 @@ class CatalogoController extends Controller
         return view("catalogo.catalogo_index", [
             'lstCategorias' => $lstCategorias,
             'lstMateriales' => $lstMateriales,
-            'lstProducto' =>  $lstProducto
+            'lstProducto' =>  $lstProducto,
+            'telefonoWhatsapp' => $telefonoWhatsapp,
         ]);
         // return view("catalogo.catalogo_index");
     }

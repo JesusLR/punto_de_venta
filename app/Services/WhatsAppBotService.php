@@ -45,8 +45,8 @@ class WhatsAppBotService
             }
 
             // Verificar si el bot está habilitado globalmente
-            $botEnabled = HomepageSetting::getValue('wa_bot_enabled', '1');
-            if ($botEnabled !== '1') {
+            $botEnabled = HomepageSetting::getValue('wa_bot_enabled', '0');
+            if (!config('services.openwa.automatic_replies', false) || $botEnabled !== '1') {
                 Log::info("WhatsApp Bot desactivado globalmente. Omitiendo respuesta a {$chatId}");
                 return false;
             }

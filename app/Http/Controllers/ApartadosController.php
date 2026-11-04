@@ -14,7 +14,9 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
+use App\Services\OpenWaService;
+use App\Exceptions\OpenWaException;
+use App\Support\DocumentoPdf;
 use Carbon\Carbon;
 use PDF;
 
@@ -184,7 +186,7 @@ class ApartadosController extends Controller
             'saldo' => $saldo,
         ])->setPaper('letter', 'portrait');
 
-        return $pdf->stream('apartado_' . $apartado->id . '.pdf');
+        return $pdf->stream(DocumentoPdf::nombre(DocumentoPdf::ABONOS, $apartado));
     }
 
     public function verProductos($id_apartado)
@@ -549,7 +551,7 @@ class ApartadosController extends Controller
         ]);
     }
 
-    public function openWA(Request $request)
+    public function openWA(Request $request, OpenWaService $openWaService)
     {
         try {
             $request->validate([
@@ -588,15 +590,11 @@ class ApartadosController extends Controller
                 'saldo' => $saldoRestante,
             ])->setPaper('letter', 'portrait');
 
-            $base64 = base64_encode($pdf->output());
-
-            $response = Http::post(url('/api/openwa/send-document'), [
-                'chatId' => '521' . $telUsuario . '@c.us',
-                'base64' => $base64,
-                'mimetype' => 'application/pdf',
-                'filename' => 'Resumen_de_apartados_' . $apartado->id . '.pdf',
-            ]);
-            // dd( $response);
+            $response = $openWaService->sendPdf(
+                '52'.$telUsuario, $pdf->output(),
+                DocumentoPdf::nombre(DocumentoPdf::ABONOS, $apartado),
+                DocumentoPdf::mensaje(DocumentoPdf::ABONOS)
+            );
             if (!$response->successful()) {
                 return response()->json([
                     'lSuccess' => false,
@@ -611,6 +609,8 @@ class ApartadosController extends Controller
                 'response' => $response->json(),
             ]);
 
+        } catch (OpenWaException $e) {
+            return $e->render($request);
         } catch (ValidationException $e) {
             return response()->json([
                 'lSuccess' => false,

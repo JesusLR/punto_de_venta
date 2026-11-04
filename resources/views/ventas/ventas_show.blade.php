@@ -226,10 +226,10 @@
                         });
                     }
                 },
-                error: function () {
+                error: function (xhr) {
                     swal.fire({
                         title: 'Error',
-                        text: 'Ocurrió un error al enviar el PDF por WhatsApp.',
+                        text: (xhr.responseJSON && xhr.responseJSON.cMensaje) || 'Ocurrió un error al enviar el PDF por WhatsApp.',
                         icon: 'error',
                         showConfirmButton: true,
                         confirmButtonText: 'Aceptar',

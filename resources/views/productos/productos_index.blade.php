@@ -200,8 +200,15 @@
     </div>
 </div>
 
+@if(Auth::user()->hasPermission('manage_products'))
+    @include('productos.modals.edicion_rapida')
+@endif
+
 <input type="hidden" id="userID" value="{{Auth::user()->id}}">
 
-<script src="{{ asset('js/productos.js') }}"></script>
+<script src="{{ asset('js/productos.js') }}?v={{ filemtime(public_path('js/productos.js')) }}"></script>
+@if(Auth::user()->hasPermission('manage_products'))
+    <script src="{{ asset('js/productos-edicion-rapida.js') }}?v={{ filemtime(public_path('js/productos-edicion-rapida.js')) }}"></script>
+@endif
 
 @endsection

@@ -641,6 +641,7 @@
                  data-categoria="{{ $producto->id_categoria }}"
                  data-material="{{ $producto->cNombreMaterial ?? '' }}"
                  data-title="{{ strtolower($producto->descripcion ?? '') }}"
+                 data-product-name="{{ $producto->descripcion ?? '' }}"
                  data-code="{{ strtolower($producto->codigo_barras ?? '') }}"
                  data-price="{{ $producto->precio_venta ?? 0 }}">
                 <div class="jewel-media">
@@ -672,7 +673,7 @@
                                 data-price="{{ number_format($producto->precio_venta, 2) }}">
                             <i class="fas fa-eye"></i> Ver
                         </button>
-                        <button class="btn-whatsapp" data-phone="" data-title="{{ $producto->descripcion }} - {{ $producto->cNombreMaterial ?? '' }}">
+                        <button class="btn-whatsapp" @if(!$telefonoWhatsapp) disabled title="Contacto de WhatsApp no disponible" @endif data-title="{{ $producto->descripcion }}">
                             <i class="fab fa-whatsapp"></i> WhatsApp
                         </button>
                     </div>
@@ -714,7 +715,7 @@
                                 <button type="button" class="btn btn-dark" data-dismiss="modal">
                                     <i class="fas fa-times"></i> Cerrar
                                 </button>
-                                <button id="modalWhatsapp" type="button" class="btn btn-success">
+                                <button id="modalWhatsapp" type="button" class="btn btn-success" @if(!$telefonoWhatsapp) disabled title="Contacto de WhatsApp no disponible" @endif>
                                     <i class="fab fa-whatsapp"></i> Enviar WhatsApp
                                 </button>
                             </div>
@@ -867,7 +868,6 @@
         $('.btn-whatsapp, #modalWhatsapp').on('click', function(){
             var title = '';
             var material = '';
-            var imgUrl = '';
             var code = '';
             var price = '';
             var categoria = '';
@@ -876,18 +876,16 @@
             if (isModal) {
                 title = $(this).data('title') || '';
                 material = $(this).data('material') || '';
-                imgUrl = $(this).data('img') || '';
                 code = $(this).data('code') || '';
                 price = $(this).data('price') || '';
                 categoria = $(this).data('categoria') || '';
             } else {
                 var $card = $(this).closest('.jewel-card');
-                title = $card.data('title') || $card.find('.jewel-title').text().trim();
+                title = $card.attr('data-product-name') || $card.find('.jewel-title').text().trim();
                 code = $card.data('code') || '';
                 material = $card.data('material') || '';
                 price = $card.data('price') || '';
                 categoria = $card.data('categoria') || '';
-                imgUrl = $card.find('.jewel-media img').attr('src') || '';
             }
 
             // Normalización de material
@@ -907,25 +905,23 @@
                 });
             }
 
-            var text = '✨ *Nueva consulta de producto* ✨\n\n' +
-                       '👋 Hola, me gustaría obtener más información sobre el siguiente artículo:\n\n' +
-                       '📝 *Descripción:* ' + title + '\n';
+            var text = '¡Hola! Me interesa esta pieza de su catálogo:\n\n' +
+                       '*' + title + '*\n';
             if (code) {
-                text += '🏷️ *Código:* ' + code.toString().toUpperCase() + '\n';
+                text += 'Referencia: ' + code.toString().toUpperCase() + '\n';
             }
             if (material) {
-                text += '💎 *Material:* ' + material + '\n';
+                text += 'Material: ' + material + '\n';
             }
-            if (price) {
-                text += '💵 *Precio:* $' + parseFloat(price).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\n';
+            if (parseFloat(price) > 0) {
+                text += 'Precio en catálogo: $' + parseFloat(price).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\n';
             }
-            if (imgUrl) {
-                text += '\n🔗 *Imagen de referencia:* ' + imgUrl + '\n';
-            }
+            text += '\n¿Me podrían confirmar su disponibilidad y orientarme para comprarla? ¡Gracias!';
 
-            var phone = "529991629742";
+            var phone = @json($telefonoWhatsapp);
+            if (!phone) return;
             var url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(text);
-            window.open(url, '_blank');
+            window.open(url, '_blank', 'noopener,noreferrer');
         });
     });
 </script>
