@@ -53,7 +53,9 @@
             gtag('config', '{{ config('services.google.analytics_id') }}');
         </script>
     @endif
-    <link rel="icon" type="image/png" href="{{ asset('img/favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}?v=colibri">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('img/favicon.svg') }}?v=colibri">
+    <link rel="apple-touch-icon" href="{{ asset('img/apple-touch-icon.png') }}">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="{{env("APP_NAME")}}">
