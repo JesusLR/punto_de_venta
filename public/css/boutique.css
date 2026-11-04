@@ -189,3 +189,28 @@
 }
 @media(max-width:360px) { .boutique-site .navbar-brand { font-size:17px; } .boutique-site .boutique-manifesto { font-size:16px; gap:12px; } .boutique-site .catalog-title h1 { font-size:39px; } }
 @media(prefers-reduced-motion:reduce) { .boutique-site *, .boutique-site *::before, .boutique-site *::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; } }
+
+/* Sign-in shares the storefront palette and rounded controls. */
+.boutique-site .login-container { min-height:calc(100vh - 94px); display:flex; align-items:center; justify-content:center; padding:48px 24px 64px; background:radial-gradient(ellipse at 50% 35%,#efe7d8 0%,var(--paper) 65%); }
+.boutique-site .login-card { width:100%; max-width:475px; background:#fffdf9; border:1px solid rgba(150,115,67,.12); border-radius:30px; box-shadow:0 18px 60px rgba(62,49,29,.07); overflow:hidden; }
+.boutique-site .login-header { padding:26px 36px 0; text-align:center; }
+.boutique-site .login-colibri { display:block; width:130px; height:130px; object-fit:contain; margin:0 auto 10px; }
+.boutique-site .login-header .boutique-eyebrow { font-size:9px; letter-spacing:1.8px; margin-bottom:14px; }
+.boutique-site .login-header h1 { font-family:var(--serif); font-size:39px; font-weight:400; line-height:1.1; margin:0 0 12px; }
+.boutique-site .login-header p { font-size:11px; color:var(--muted); margin:0; }
+.boutique-site .login-body { padding:30px 38px 35px; }
+.boutique-site .login-body .form-group { margin-bottom:22px; }
+.boutique-site .login-body label { display:block; font-size:10px; font-weight:500; letter-spacing:.4px; margin-bottom:9px; color:var(--ink); }
+.boutique-site .login-body .form-control { height:50px; border:1px solid var(--line); border-radius:16px; padding:13px 17px; background:#faf8f2; color:var(--ink); font-family:inherit; font-size:12px; transition:border-color .2s,box-shadow .2s; }
+.boutique-site .login-body .form-control::placeholder { color:#8a8375; }
+.boutique-site .login-body .form-control:focus { background:#fffdf9; border-color:var(--gold); box-shadow:0 0 0 3px rgba(150,115,67,.12); }
+.boutique-site .login-body .form-control.is-invalid { border-color:#b35c4b; background-image:none; }
+.boutique-site .login-body .invalid-feedback { display:block; font-size:11px; line-height:1.6; color:#a44938; margin-top:7px; }
+.boutique-site .login-actions { margin-top:28px; }
+.boutique-site .btn-login { display:flex; width:100%; justify-content:center; align-items:center; gap:20px; min-height:49px; border:1px solid var(--ink); border-radius:999px; background:var(--ink); color:#fff; font-family:inherit; font-size:11px; font-weight:500; letter-spacing:.6px; padding:14px 24px; cursor:pointer; transition:background .2s; }
+.boutique-site .btn-login:hover { background:#4d4537; border-color:#4d4537; }
+.boutique-site .login-footer-info { margin-top:26px; text-align:center; }
+.boutique-site .login-footer-info p { font-size:9px; line-height:1.8; color:var(--muted); margin-bottom:13px; }
+.boutique-site .login-footer-info .boutique-text-link { display:inline-block; font-size:10px; padding:8px 0; }
+@media(max-width:767px) { .boutique-site .login-container { min-height:calc(100vh - 81px); padding:30px 18px 40px; } }
+@media(max-width:480px) { .boutique-site .login-header { padding:20px 24px 0; } .boutique-site .login-header h1 { font-size:35px; } .boutique-site .login-body { padding:26px 25px 30px; } .boutique-site .login-colibri { width:110px; height:110px; } }
