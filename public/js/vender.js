@@ -373,13 +373,14 @@ function buildTicketPdfBlob() {
                     sliceCtx.clearRect(0, 0, sliceCanvas.width, sliceCanvas.height);
                     sliceCtx.drawImage(canvas, 0, position, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
                     var pageData = sliceCanvas.toDataURL('image/png');
-                    if (pdf.getNumberOfPages() > 0) pdf.addPage();
+                    if (position > 0) pdf.addPage();
                     pdf.addImage(pageData, 'PNG', margin, margin, imgWidth, sliceHeight * scale);
                     remainingHeight -= sliceHeight;
                     position += sliceHeight;
                 }
             }
 
+            window.applyPdfPageNumbers(pdf);
             return pdf.output('blob');
         })
         .finally(function(){

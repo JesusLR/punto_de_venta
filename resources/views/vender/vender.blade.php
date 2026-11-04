@@ -22,7 +22,6 @@
 @section("titulo", "Realizar venta")
 @section("contenido")
 
-<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
 
 <div class="row">
     <div class="col-12">

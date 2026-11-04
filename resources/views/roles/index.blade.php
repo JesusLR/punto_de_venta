@@ -1,7 +1,6 @@
 @extends("maestra")
 @section("titulo", "Roles y Permisos")
 @section("contenido")
-<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
 
 <div class="row">
     <div class="col-md-8">
@@ -46,8 +45,8 @@
                                         </span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-warning btn-table-action" title="Editar Permisos">
-                                            <i class="fa fa-key"></i> Configurar Permisos
+                                        <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-warning btn-table-action" title="Editar permisos" aria-label="Editar permisos">
+                                            <i class="fa fa-key" aria-hidden="true"></i>
                                         </a>
                                         @if($role->slug !== 'admin' && $role->id != 1)
                                             <form action="{{ route('roles.destroy', $role->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Está seguro de que desea eliminar este rol? Esta acción no se puede deshacer.');">

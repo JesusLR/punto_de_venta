@@ -22,7 +22,6 @@
 @section("titulo", "Ventas")
 @section("contenido")
 
-<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
 
 <input type="text" id="userID" value="{{Auth::user()->id}}" hidden>
 <input type="text" id="iIDVenta" hidden>
@@ -66,6 +65,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<script src="{{asset('js/ventas.js')}}"></script>
+<script src="{{ asset('js/ventas.js') }}?v={{ filemtime(public_path('js/ventas.js')) }}"></script>
 
 @endsection

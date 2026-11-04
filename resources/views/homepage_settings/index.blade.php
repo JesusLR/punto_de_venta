@@ -1,7 +1,6 @@
 @extends("maestra")
 @section("titulo", "Configuración de Portada")
 @section("contenido")
-<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
 
 <style>
     .nav-tabs {

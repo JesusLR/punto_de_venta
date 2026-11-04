@@ -21,7 +21,6 @@ ____          _____               _ _           _
 @extends("maestra")
 @section("titulo", "Editar usuario")
 @section("contenido")
-<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
 
     <div class="row">
         <div class="col-12">

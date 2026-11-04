@@ -21,7 +21,6 @@
 @extends("maestra")
 @section("titulo", "Materiales")
 @section("contenido")
-<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
 
 <input type="text" id="userID" value={{Auth::user()->id}} hidden>
 <input type="text" id="iIDMaterial" hidden>

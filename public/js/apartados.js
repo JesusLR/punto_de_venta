@@ -203,7 +203,7 @@ function accionesApartadoFormatter(value, row) {
         html += '<button type="button" style="margin-right: 2px;" class="btn btn-success" title="Ejecutar venta" onclick="ejecutarApartado(' + row.id + ')"><i class="fas fa-check"></i></button>';
     }
 
-    return html;
+    return '<div class="workspace-row-actions">' + html + '</div>';
 }
 
 function escaparTexto(texto) {

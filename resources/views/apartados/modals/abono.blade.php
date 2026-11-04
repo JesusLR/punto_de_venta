@@ -19,14 +19,20 @@
                 <div class="modal-body">
                     <input type="hidden" id="id_apartado_abono" name="id_apartado">
 
-                    <div class="apartado-modal-helper">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>Captura el monto exacto y el tipo de pago para mantener el control del apartado.</span>
+                    <div class="workspace-payment-client">
+                        <span class="workspace-eyebrow">Apartado <span id="folio-abono"></span></span>
+                        <strong id="cliente-abono"></strong>
+                    </div>
+                    <div class="workspace-payment-summary">
+                        <div><span>Total</span><strong id="total-abono">—</strong></div>
+                        <div><span>Abonado</span><strong id="abonado-abono">—</strong></div>
+                        <div class="is-pending"><span>Saldo pendiente</span><strong id="saldo-abono">—</strong></div>
                     </div>
 
                     <div class="form-group-modern">
                         <label for="monto_abono"><i class="fas fa-dollar-sign"></i>Monto</label>
                         <input type="text" id="monto_abono" class="form-control form-control-modern apartado-modal-input" name="monto_abono" inputmode="decimal" autocomplete="off" placeholder="0.00" required>
+                        <small class="form-text" id="max-abono"></small>
                     </div>
 
                     <div class="form-group-modern">

@@ -401,8 +401,10 @@
             line-height: 1;
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}?v={{ filemtime(public_path('css/productos-styles.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/workspace.css') }}?v={{ filemtime(public_path('css/workspace.css')) }}">
 </head>
-<body class="@auth authenticated @endauth">
+<body class="@auth authenticated @endauth workspace-refresh @if(request()->routeIs('apartados.index')) workspace-apartados @endif">
 
 @auth
     <!-- Cabecera Móvil (solo autenticados) -->
@@ -728,6 +730,7 @@
     });
 </script>
 
+<script src="{{ asset('js/pdf-layout.js') }}?v={{ filemtime(public_path('js/pdf-layout.js')) }}"></script>
 <div class="main-wrapper">
     <main class="container-fluid py-4">
         @yield("contenido")

@@ -1,3 +1,14 @@
+@if(request()->routeIs('apartados.verAbonos'))
+    <div class="workspace-history-context" hidden>
+        <span class="workspace-eyebrow">Historial del apartado #{{ $apartado->id }}</span>
+        <strong>{{ $apartado->nombre_apartado ?: 'Detalle de pagos' }}</strong>
+    </div>
+    <div class="workspace-payment-summary" hidden>
+        <div><span>Total del apartado</span><strong>${{ number_format((float) $apartado->total, 2) }}</strong></div>
+        <div><span>Abonado · {{ $abonos->count() }} movimientos</span><strong>${{ number_format((float) $abonos->sum('monto'), 2) }}</strong></div>
+        <div class="is-pending"><span>Saldo pendiente</span><strong>${{ number_format((float) $apartado->total - (float) $abonos->sum('monto'), 2) }}</strong></div>
+    </div>
+@endif
 @if($abonos && count($abonos) > 0)
     <div class="table-responsive apartado-table-wrapper" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
     <table class="table table-sm table-bordered apartado-table">
@@ -27,7 +38,7 @@
                                         onclick="editarFechaAbono({{ $abono->id }}, {{ $apartado->id }}, '{{ optional($abono->fecha_registro)->format('Y-m-d') }}')">
                                     <i class="fas fa-calendar-alt"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-danger apartado-action-btn" onclick="eliminarAbono({{ $abono->id }}, {{ $apartado->id }})">
+                                <button type="button" class="btn btn-sm btn-danger apartado-action-btn" title="Eliminar abono" aria-label="Eliminar abono" onclick="eliminarAbono({{ $abono->id }}, {{ $apartado->id }})">
                                     <i class="fas fa-trash"></i>
                                 </button>
                         </td>

@@ -1,7 +1,6 @@
 @extends("maestra")
 @section("titulo", "Configuración General")
 @section("contenido")
-<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
 
 <style>
     .setting-card {
@@ -157,7 +156,7 @@
                                     <form method="POST" action="{{ route('general.egresos_automaticos.destroy', $egresoAuto->id) }}" class="form-eliminar-egreso-auto">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar programación">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger btn-table-action" title="Eliminar programación" aria-label="Eliminar programación de egreso automático">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
