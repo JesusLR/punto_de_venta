@@ -31,7 +31,8 @@ class AgregarIdClienteVentas extends Migration
     public function down()
     {
         Schema::table('ventas', function (Blueprint $table) {
-            //
+            $table->dropForeign(['id_cliente']);
+            $table->dropColumn('id_cliente');
         });
     }
 }
