@@ -501,7 +501,7 @@
                 </div>
             @endif
                         {{-- Configuracion --}}
-            @if (Auth::user()->hasPermission('manage_roles') || Auth::user()->hasPermission('manage_homepage') || Auth::user()->hasPermission('manage_general_settings'))
+            @if (Auth::user()->hasPermission('manage_roles') || Auth::user()->hasPermission('manage_homepage') || Auth::user()->hasPermission('manage_general_settings') || Auth::user()->hasPermission('manage_whatsapp'))
                 <a class="sidebar-link {{ request()->routeIs(['roles.*', 'homepage.settings.*', 'general.settings.*', 'whatsapp.*']) ? '' : 'collapsed' }}" 
                    data-toggle="collapse" href="#configuracionesCollapse" role="button" 
                    aria-expanded="{{ request()->routeIs(['roles.*', 'homepage.settings.*', 'general.settings.*', 'whatsapp.*']) ? 'true' : 'false' }}" 
@@ -542,10 +542,12 @@
                         <span>WhatsApp Enlaces / QR</span>
                     </a>
                     --}}
+                    @if(Auth::user()->hasPermission('manage_whatsapp'))
                     <a class="sidebar-link {{ request()->routeIs('whatsapp.settings.index') ? 'active' : '' }}" href="{{route("whatsapp.settings.index")}}">
                         <i class="fab fa-whatsapp" style="color: #25D366;"></i>
                         <span>Inicio de sesión</span>
                     </a>
+                    @endif
                 </div>
             @endif
 

@@ -109,6 +109,6 @@ Route::resource("catalogoProductos", "CatalogoController");
 Route::get("/verCategoria/{id_categoria}/{id_material}", "CatalogoController@verCategoria")->name("verCategoria");
 
 //OpenWA
-Route::post('/openwa/send-text', [OpenWaController::class, 'sendText'])->middleware(['auth:api', 'permission:manage_general_settings']);
-Route::post('/openwa/send-document', [OpenWaController::class, 'sendDocument'])->middleware(['auth:api', 'permission:manage_general_settings']);
+Route::post('/openwa/send-text', [OpenWaController::class, 'sendText'])->middleware(['auth:api', 'permission:manage_whatsapp']);
+Route::post('/openwa/send-document', [OpenWaController::class, 'sendDocument'])->middleware(['auth:api', 'permission:manage_whatsapp']);
 Route::post('/whatsapp/webhook', 'WhatsAppWebhookController@handle');
