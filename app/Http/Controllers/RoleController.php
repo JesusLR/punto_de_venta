@@ -113,6 +113,9 @@ class RoleController extends Controller
                     case 'homepage':
                         $groupName = 'Página de Inicio';
                         break;
+                    case 'whatsapp':
+                        $groupName = 'WhatsApp';
+                        break;
                 }
             } else {
                 if ($p->slug === 'make_sales') {

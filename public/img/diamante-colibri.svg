@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 440" fill="none">
+  <defs>
+    <linearGradient id="gold" x1="110" y1="90" x2="322" y2="318" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E9D7AF"/>
+      <stop offset=".48" stop-color="#BB9659"/>
+      <stop offset="1" stop-color="#8F6B36"/>
+    </linearGradient>
+    <linearGradient id="light" x1="165" y1="154" x2="253" y2="310" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF9E9"/>
+      <stop offset="1" stop-color="#C7A66D"/>
+    </linearGradient>
+    <radialGradient id="halo">
+      <stop stop-color="#E5D0A6" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#E5D0A6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="220" cy="211" r="183" fill="url(#halo)"/>
+  <circle cx="220" cy="211" r="164" stroke="#B99862" stroke-opacity=".22" stroke-width=".8"/>
+  <circle cx="220" cy="211" r="151" stroke="#B99862" stroke-opacity=".16" stroke-dasharray="2 9"/>
+  <ellipse cx="220" cy="353" rx="69" ry="5" fill="#A0814F" opacity=".09"/>
+  <path d="m80 163 70-73h140l70 73-140 168Z" fill="url(#gold)"/>
+  <path d="m80 163 70-73 21 73Z" fill="#E8D4AD"/>
+  <path d="m150 90 70 0-49 73Z" fill="#FAEDD0"/>
+  <path d="m220 90 70 0-21 73Z" fill="#D3B57F"/>
+  <path d="m220 90-49 73h98Z" fill="#F6E7C6"/>
+  <path d="m290 90 70 73h-91Z" fill="#E8D5AF"/>
+  <path d="m80 163 140 168-49-168Z" fill="#BA965D"/>
+  <path d="m171 163 49 168 49-168Z" fill="url(#light)"/>
+  <path d="m269 163-49 168 140-168Z" fill="#C6A36B"/>
+  <path d="m80 163 70-73h140l70 73-140 168Zm0 0h280M150 90l21 73 49 168 49-168 21-73m-119 73 49-73 49 73" stroke="#91703E" stroke-width="1.2" stroke-linejoin="round" stroke-opacity=".65"/>
+  <path d="m94 116 3-14 3 14 14 3-14 3-3 14-3-14-14-3Zm249 124 3-11 3 11 11 3-11 3-3 11-3-11-11-3Z" fill="#AD8A51"/>
+  <path d="m316 64 2-8 2 8 8 2-8 2-2 8-2-8-8-2Z" fill="#C4A570"/>
+  <circle cx="127" cy="293" r="2" fill="#B18E56"/>
+  <circle cx="320" cy="304" r="1.5" fill="#B18E56"/>
+</svg>

@@ -1,7 +1,6 @@
 @extends("maestra")
 @section("titulo", "Editar Permisos de Rol")
 @section("contenido")
-<link rel="stylesheet" href="{{ asset('css/productos-styles.css') }}">
 <style>
     .permission-group-card {
         background: white;

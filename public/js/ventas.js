@@ -47,8 +47,8 @@ $(document).ready(function () {
             title: "Vendio",
         },{
             field: "acciones",
-            title: "",
-            width: 200,
+            title: "Acciones y documentos",
+            width: 310,
             formatter: "accionesFormatter",
         },],
         onLoadSuccess: function (data) {
@@ -106,21 +106,44 @@ function tipoPagoFormatter(value, row) {
 
 
 function accionesFormatter(value, row) {
-    html = ''
-
-    html += ' <button type="button" style="margin-right: 2px;" class="btn btn-success" title="Visualizar venta" onclick="verVenta('+row.id+')"><i class="far fa-list-alt"></i></button>'
-    // if(user == 1){
-    //    html += ' <button type="button" style="margin-right: 2px;" class="btn btn-info" title="Imprimir ticket" onclick="imprimirTicket('+row.id+')"><i class="fa fa-print"></i></button>'
-       html += ' <button type="button" style="margin-right: 2px;" class="btn btn-light" title="Editar nombre de venta" onclick="editNombreVenta('+row.id+', \''+row.cNombreVenta+'\')"><i class="fa fa-edit"></i></button>';
-    // }
-    // console.log(row.apartado_id_venta > 0)
-    if(row.apartado_id_venta > 0){
-        html += '<button type="button" style="margin-right: 2px;" class="btn btn-secondary" title="Ver historial de abonos" onclick="verHistorialAbonos(' + row.apartado_id + ')"><i class="fas fa-history"></i></button>';
-        html += '<button type="button" style="margin-right: 2px;" class="btn btn-danger" title="Descargar PDF Historial de abonos" onclick="descargarPdfApartado(' + row.apartado_id + ')"><i class="fas fa-file-pdf"></i></button>';
-        html += '<button type="button" style="margin-right: 2px;" class="btn btn-success" title="Enviar PDF Historial de abonos por WhatsApp" onclick="enviarPdfWhatsApp(' + row.apartado_id + ', \'' + escaparTexto(row.telefono) + '\')"><i class="fab fa-whatsapp"></i></button>';
-
+    var id = Number(row.id);
+    var html = '<div class="sales-actions"><div class="sales-record-actions">';
+    html += '<button type="button" class="btn btn-secondary btn-table-action" title="Ver detalle de venta" aria-label="Ver detalle de venta" onclick="verVenta(' + id + ')"><i class="far fa-list-alt"></i></button>';
+    html += '<button type="button" class="btn btn-light btn-table-action" title="Editar nombre de venta" aria-label="Editar nombre de venta" onclick="editarNombreDesdeListado(' + id + ')"><i class="fa fa-edit"></i></button></div>';
+    html += '<div class="sales-document-group sales-document-payment"><span class="sales-document-label"><i class="fas fa-receipt"></i> Comprobante de pago</span>';
+    html += '<button type="button" class="sales-document-pdf" title="Ver PDF del comprobante de pago" aria-label="Ver PDF del comprobante de pago" onclick="verComprobantePago(' + id + ')"><i class="fas fa-file-pdf"></i></button>';
+    html += '<button type="button" class="sales-document-send" title="Enviar comprobante de pago por WhatsApp" onclick="enviarComprobantePagoWhatsApp(' + id + ')"><i class="fab fa-whatsapp"></i> Enviar pago</button></div>';
+    if (Number(row.apartado_id_venta) > 0 && Number(row.apartado_id) > 0) {
+        var apartadoId = Number(row.apartado_id);
+        html += '<div class="sales-document-group sales-document-payments"><span class="sales-document-label"><i class="fas fa-history"></i> Historial de abonos</span>';
+        html += '<button type="button" class="sales-document-pdf" title="Ver PDF del historial de abonos" aria-label="Ver PDF del historial de abonos" onclick="descargarPdfApartado(' + apartadoId + ')"><i class="fas fa-file-pdf"></i></button>';
+        html += '<button type="button" class="sales-document-send" title="Enviar historial de abonos por WhatsApp" onclick="enviarHistorialDesdeListado(' + id + ')"><i class="fab fa-whatsapp"></i> Enviar abonos</button></div>';
+        html += '<button type="button" class="sales-history-link" onclick="verHistorialAbonos(' + apartadoId + ')">Ver movimientos de abonos <i class="fas fa-arrow-right" aria-hidden="true"></i></button>';
     }
-    return html;
+    return html + '</div>';
+}
+
+function ventaDesdeListado(id) {
+    return $('#gridVentas').bootstrapTable('getData').find(function (row) { return Number(row.id) === Number(id); });
+}
+
+function editarNombreDesdeListado(id) {
+    var venta = ventaDesdeListado(id);
+    if (venta) editNombreVenta(venta.id, venta.cNombreVenta || '');
+}
+
+function verComprobantePago(id) {
+    window.open('/ventas/pdf/' + Number(id), '_blank', 'noopener,noreferrer');
+}
+
+function enviarComprobantePagoWhatsApp(id) {
+    var venta = ventaDesdeListado(id);
+    if (venta) enviarDocumentoVentaWhatsApp('pago', venta.id, venta.telefono);
+}
+
+function enviarHistorialDesdeListado(id) {
+    var venta = ventaDesdeListado(id);
+    if (venta) enviarPdfWhatsApp(venta.apartado_id, venta.telefono);
 }
 
 function imprimirTicket(id){
@@ -186,7 +209,7 @@ function imprimirTicket(id){
                     sliceCtx.clearRect(0, 0, sliceCanvas.width, sliceCanvas.height);
                     sliceCtx.drawImage(canvas, 0, position, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
                     var pageData = sliceCanvas.toDataURL('image/png');
-                    if (pdf.getNumberOfPages() > 0) pdf.addPage();
+                    if (position > 0) pdf.addPage();
                     pdf.addImage(pageData, 'PNG', margin, margin, imgWidth, sliceHeight * scale);
                     remainingHeight -= sliceHeight;
                     position += sliceHeight;
@@ -194,6 +217,7 @@ function imprimirTicket(id){
             }
 
             // show PDF in new tab
+            window.applyPdfPageNumbers(pdf);
             var blob = pdf.output('blob');
             var url = URL.createObjectURL(blob);
             window.open(url, '_blank');
@@ -423,7 +447,7 @@ function printTicketVenta(items, total, fecha, usuario) {
                     sliceCtx.clearRect(0, 0, sliceCanvas.width, sliceCanvas.height);
                     sliceCtx.drawImage(canvas, 0, position, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
                     var pageData = sliceCanvas.toDataURL('image/png');
-                    if (pdf.getNumberOfPages() > 0) pdf.addPage();
+                    if (position > 0) pdf.addPage();
                     pdf.addImage(pageData, 'PNG', margin, margin, imgWidth, sliceHeight * scale);
                     remainingHeight -= sliceHeight;
                     position += sliceHeight;
@@ -431,6 +455,7 @@ function printTicketVenta(items, total, fecha, usuario) {
             }
 
             // abrir PDF en nueva pestaña (no imprimir)
+            window.applyPdfPageNumbers(pdf);
             var blob = pdf.output('blob');
             var url = URL.createObjectURL(blob);
             var win = window.open(url, '_blank');
@@ -592,14 +617,20 @@ function normalizarTelefonoMx(valor) {
 }
 
 function enviarPdfWhatsApp(id, telefonoCliente) {
+    return enviarDocumentoVentaWhatsApp('abonos', id, telefonoCliente);
+}
+
+function enviarDocumentoVentaWhatsApp(tipo, id, telefonoCliente) {
+    const esComprobante = tipo === 'pago';
+    const documento = esComprobante ? 'comprobante de pago' : 'historial de abonos';
     const telefonoInicial = normalizarTelefonoMx(telefonoCliente || '');
 
     swal.fire({
-        title: "Confirmar envío de historial de abonos a WhatsApp",
+        title: 'Enviar ' + documento + ' por WhatsApp',
         html: '\n            <div style="text-align:left; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">\n                <div style="font-size:13px; color:#475569; margin-bottom:6px;">Número de WhatsApp</div>\n                <div>\n                    <input id="telefonoWhatsapp" class="swal2-input" style="margin:0; width:100%; height:40px; border:1px solid #cbd5e1; border-radius:8px;" maxlength="10" value="' + telefonoInicial + '" placeholder="999 999 9999" />\n                </div>\n                <small style="display:block; margin-top:8px; color:#64748b;">Ingresa 10 dígitos.</small>\n            </div>\n        ',
         icon: "question",
         showCancelButton: true,
-        confirmButtonText: "Sí, enviar",
+        confirmButtonText: esComprobante ? 'Enviar comprobante' : 'Enviar historial',
         cancelButtonText: "Cancelar",
         focusConfirm: false,
         preConfirm: () => {
@@ -617,17 +648,20 @@ function enviarPdfWhatsApp(id, telefonoCliente) {
         if (!result.isConfirmed) return;
 
         $.ajax({
-            url: "/apartados/openWA",
+            url: esComprobante ? '/ventas/enviar-pdf-whatsapp' : '/apartados/openWA',
             type: "post",
             dataType: "json",
-            data: {
+            data: esComprobante ? {
+                id_venta: id,
+                telefono: result.value,
+            } : {
                 id_apartado: id,
                 telefono: result.value,
             },
             beforeSend: function () {
                 swal.fire({
                     title: "Enviando...",
-                    text: "Por favor espera mientras se envía el PDF",
+                    text: 'Por favor espera mientras se envía el ' + documento + '.',
                     icon: "info",
                     allowOutsideClick: false,
                     showConfirmButton: false,
@@ -639,7 +673,7 @@ function enviarPdfWhatsApp(id, telefonoCliente) {
             success: function (data) {
                 if (data.lSuccess) {
                     swal.fire({
-                        title: "Apartados",
+                        title: esComprobante ? 'Comprobante enviado' : 'Historial enviado',
                         text: data.cMensaje,
                         icon: "success",
                         showConfirmButton: true,
@@ -655,10 +689,10 @@ function enviarPdfWhatsApp(id, telefonoCliente) {
                     });
                 }
             },
-            error: function () {
+            error: function (xhr) {
                 swal.fire({
                     title: "Error",
-                    text: "Ocurrió un error al enviar el mensaje de WhatsApp.",
+                    text: (xhr.responseJSON && xhr.responseJSON.cMensaje) || 'No se pudo enviar el ' + documento + ' por WhatsApp.',
                     icon: "error",
                     showConfirmButton: true,
                     confirmButtonText: "Aceptar",
