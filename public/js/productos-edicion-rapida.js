@@ -18,7 +18,10 @@
 
     window.abrirEdicionRapida = function (id) {
         if (guardando) return;
-        var producto = $('#gridProductos').bootstrapTable('getData').find(function (row) {
+        var grid = $('#gridProductos');
+        var datos = document.getElementById('productosDashboardEdicionRapida');
+        var productos = grid.length ? grid.bootstrapTable('getData') : (datos ? JSON.parse(datos.textContent) : []);
+        var producto = productos.find(function (row) {
             return Number(row.id) === Number(id);
         });
         if (!producto) return;
@@ -87,8 +90,13 @@
             }).done(function () {
                 guardando = false;
                 $('#edicionRapidaModal').modal('hide');
-                $('#gridProductos').bootstrapTable('refresh', { silent: true });
-                Swal.fire({ icon: 'success', title: 'Producto actualizado', timer: 1600, showConfirmButton: false });
+                if ($('#gridProductos').length) {
+                    $('#gridProductos').bootstrapTable('refresh', { silent: true });
+                    Swal.fire({ icon: 'success', title: 'Producto actualizado', timer: 1600, showConfirmButton: false });
+                } else {
+                    Swal.fire({ icon: 'success', title: 'Producto actualizado', timer: 1600, showConfirmButton: false })
+                        .then(function () { window.location.reload(); });
+                }
             }).fail(function (xhr) {
                 var respuesta = xhr.responseJSON || {};
                 var mensajes = [];

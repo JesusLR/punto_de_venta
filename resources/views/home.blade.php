@@ -307,9 +307,11 @@
                                                 </span>
                                             </td>
                                             <td class="text-end py-3 px-3 border-0" style="border-radius: 0 12px 12px 0;">
-                                                <a href="{{ route('productos.editarProducto', $prod->id) }}" class="btn btn-sm btn-outline-secondary" style="border-radius: 8px; font-weight: 700; font-size: 0.75rem; border-color: #cbd5e1; color: #475569;">
+                                                @if(Auth::user()->hasPermission('manage_products'))
+                                                <button type="button" onclick="abrirEdicionRapida({{ (int) $prod->id }})" class="btn btn-sm btn-outline-secondary" style="border-radius: 8px; font-weight: 700; font-size: 0.75rem; border-color: #cbd5e1; color: #475569;">
                                                     <i class="fas fa-edit"></i> Surtir
-                                                </a>
+                                                </button>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -409,7 +411,7 @@
 
     <div class="modules-grid mb-5">
         @foreach($modulos as $modulo)
-            <div class="module-card">
+            <a class="module-card" href="{{ route($modulo['nombre'] . '.index') }}">
                 <div class="module-icon-container" style="background: {{ $modulo['color'] }};">
                     <i class="fa {{ $modulo['icono'] }}"></i>
                 </div>
@@ -438,15 +440,26 @@
                                 {{ str_replace('_', ' ', ucfirst($modulo['nombre'])) }}
                         @endswitch
                     </h5>
-                    <a href="{{ route($modulo['nombre'] . ".index") }}" class="btn btn-module-access">
+                    <span class="btn btn-module-access">
                         <i class="fas fa-arrow-right"></i>
                         Acceder
-                    </a>
+                    </span>
                 </div>
-            </div>
+            </a>
         @endforeach
     </div>
 </div>
+
+@if(Auth::user()->hasPermission('manage_products'))
+    @include('productos.modals.edicion_rapida')
+    @php
+        $productosDashboardEdicionRapida = $productosBajoStock->map(function ($producto) {
+            return $producto->only(['id', 'descripcion', 'codigo_barras', 'precio_compra', 'precio_venta', 'existencia', 'img']);
+        })->values();
+    @endphp
+    <script type="application/json" id="productosDashboardEdicionRapida">@json($productosDashboardEdicionRapida)</script>
+    <script src="{{ asset('js/productos-edicion-rapida.js') }}?v={{ filemtime(public_path('js/productos-edicion-rapida.js')) }}"></script>
+@endif
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

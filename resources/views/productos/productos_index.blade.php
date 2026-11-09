@@ -14,10 +14,11 @@
             </h1>
             <div class="header-actions">
                 @if(Auth::user()->hasPermission('manage_products'))
-                    <a href="{{route("productos.create")}}" class="btn-modern btn-success-modern">
+                    {{-- <a href="{{route("productos.create")}}" class="btn-modern btn-success-modern">
                         <i class="fas fa-plus-circle"></i>
                         Nuevo Producto
-                    </a>
+                    </a> --}}
+                    <button type="button" class="btn-modern btn-success-modern" id="btnNuevoProductoModal"><i class="fas fa-plus-circle"></i> Nuevo Producto</button>
                 @endif
                 <button type="button" class="btn-modern btn-excel" id="btnExportExcel">
                     <i class="fas fa-file-excel"></i>
@@ -201,6 +202,7 @@
 
 @if(Auth::user()->hasPermission('manage_products'))
     @include('productos.modals.edicion_rapida')
+    @include('productos.modals.formulario')
 @endif
 
 <input type="hidden" id="userID" value="{{Auth::user()->id}}">
@@ -208,6 +210,7 @@
 <script src="{{ asset('js/productos.js') }}?v={{ filemtime(public_path('js/productos.js')) }}"></script>
 @if(Auth::user()->hasPermission('manage_products'))
     <script src="{{ asset('js/productos-edicion-rapida.js') }}?v={{ filemtime(public_path('js/productos-edicion-rapida.js')) }}"></script>
+    <script src="{{ asset('js/productos-modal.js') }}?v={{ filemtime(public_path('js/productos-modal.js')) }}"></script>
 @endif
 
 @endsection
