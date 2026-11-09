@@ -58,7 +58,7 @@
                  data-product-name="{{ $producto->descripcion ?? '' }}"
                  data-code="{{ strtolower($producto->codigo_barras ?? '') }}"
                  data-price="{{ $producto->precio_venta ?? 0 }}">
-                <div class="jewel-media">
+                <button type="button" class="jewel-media" aria-label="Ver pieza: {{ $producto->descripcion }}" aria-haspopup="dialog" aria-controls="catalogImageModal">
                     @if($producto->img)
                         <img src="{{ asset('img/productos/'.$producto->img) }}" alt="{{ $producto->descripcion }}" loading="lazy">
                     @else
@@ -67,7 +67,7 @@
                     @if($producto->es_nuevo ?? false)
                         <div class="jewel-badge">Nuevo</div>
                     @endif
-                </div>
+                </button>
                 <div class="jewel-body">
                     <div class="jewel-material">
                         <i class="fas fa-certificate"></i>
@@ -241,6 +241,9 @@
         applyCatalogFilters(true);
 
         // Modal ver detalle
+        $('.jewel-media').on('click', function(){
+            $(this).closest('.jewel-card').find('.btn-view').trigger('click');
+        });
         $('.btn-view').on('click', function(){
             var img = $(this).data('img');
             var title = $(this).data('title');

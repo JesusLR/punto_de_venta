@@ -274,8 +274,10 @@ function accionesFormatter(value, row) {
         html += '<a href="img/productos/' + row.img + '" download="' + downloadName + '" class="btn btn-table-action btn-success" title="Descargar imagen"><i class="fa fa-download"></i></a>';
     }
     if (hasPermission('manage_products')) {
-        html += '<button type="button" class="btn btn-table-action btn-warning" onclick="abrirEdicionRapida(' + Number(row.id) + ')" title="Edición rápida" aria-label="Edición rápida"><i class="fas fa-bolt"></i></button>';
-        html += '<button type="button" class="btn btn-table-action btn-light" onclick="editProducto(' + row.id + ')"><i class="fa fa-edit"></i></button>';
+        // html += '<button type="button" class="btn btn-table-action btn-warning" onclick="abrirEdicionRapida(' + Number(row.id) + ')" title="Edición rápida" aria-label="Edición rápida"><i class="fas fa-bolt"></i></button>';
+        // Pantalla de edición original conservada:
+        // html += '<button type="button" class="btn btn-table-action btn-light" onclick="editProducto(' + row.id + ')"><i class="fa fa-edit"></i></button>';
+        html += '<button type="button" class="btn btn-table-action btn-light" onclick="abrirProductoModal(' + Number(row.id) + ')" title="Editar producto" aria-label="Editar producto"><i class="fa fa-edit"></i></button>';
     }
     if (hasPermission('delete_products')) {
         html += '<button type="button" class="btn btn-table-action btn-danger" onclick="confirmDeleteProducto(' + row.id + ', \'' + row.codigo_barras + '\')"><i class="fa fa-trash"></i></button>';
