@@ -135,7 +135,8 @@
                             <label><i class="fas fa-file-image"></i>Seleccionar Imagen</label>
                             <input type="file" class="form-control-file" id="productoModalArchivo" name="img" 
                                    accept="image/jpeg,image/png,image/gif,image/webp">
-                            <small class="form-text"><i class="fas fa-info-circle"></i>JPG, PNG, GIF o WebP. Máximo 2 MB. Al editar, deja este campo vacío para conservar la imagen.</small>
+                            <small class="form-text"><i class="fas fa-info-circle"></i>JPG, PNG, GIF o WebP. Máximo 2 MB. Puedes conservarla, reemplazarla o marcarla para quitar.</small>
+                            <button type="button" class="btn btn-outline-danger btn-sm mt-2" id="productoQuitarPrincipal" hidden>Quitar imagen guardada</button>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -150,3 +151,13 @@
                 </div>
             </div>
 
+
+            <div class="form-container">
+                <div class="section-title"><i class="fas fa-images"></i> Imágenes adicionales (opcionales)</div>
+                <div id="productoGaleriaActual" class="producto-galeria mb-3"></div>
+                <small class="form-text mb-3">Marca las imágenes que quieras quitar. Solo se eliminarán al guardar los cambios.</small>
+                <label for="productoGaleriaArchivos">Agregar fotografías de la pieza</label>
+                <input type="file" id="productoGaleriaArchivos" name="imagenes_adicionales[]" class="form-control-file" accept="image/jpeg,image/png,image/gif,image/webp" multiple>
+                <small class="form-text">Hasta 10 adicionales por producto. JPG, PNG, GIF o WebP, máximo 2 MB y 4000 × 4000 px cada una.</small>
+                <div id="productoGaleriaPrevia" class="producto-galeria mt-3"></div>
+            </div>

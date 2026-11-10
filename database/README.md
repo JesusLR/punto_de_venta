@@ -1,5 +1,32 @@
 # Migraciones y administrador
 
+## Imágenes de Configuración Portada
+
+La galería y las fotos del equipo se guardan explícitamente en el disco `public`,
+en `storage/app/public/about_gallery`. La escritura se verifica antes de guardar
+la referencia y la configuración se actualiza en una transacción; un fallo
+conserva los datos e imágenes anteriores. Los archivos se validan con los nombres
+reales del formulario y admiten JPG, PNG, GIF, WebP o BMP de hasta 5 MB por imagen.
+También se aplican los límites de PHP y del servidor web.
+
+La portada y la configuración utilizan `/portada/imagenes/{archivo}` para mostrar
+estas fotos, sin depender del enlace `public/storage`. El usuario del servidor web
+necesita lectura y escritura sobre el almacenamiento. Después de desplegar este
+cambio, limpiar las cachés de rutas, configuración y vistas. No requiere migración.
+
+## Galería de productos
+
+La migración `2026_11_10_000005_create_producto_imagenes_table` agrega las imágenes
+adicionales sin modificar la imagen principal ni los productos existentes. Desde
+el modal de alta o edición en Productos se pueden añadir hasta 10 imágenes extra
+por pieza (JPG, PNG, GIF o WebP, máximo 2 MB y 4000 × 4000 px por imagen), con el
+permiso `manage_products`. Las fotografías se guardan con nombres aleatorios en
+`public/img/productos`, que debe ser escribible por el servidor web.
+
+El catálogo muestra la cantidad de fotografías y permite seleccionarlas mediante
+miniaturas en Ver pieza. Si no hay imagen principal, usa la primera adicional como
+portada. Al editar sin cargar fotos nuevas se conservan las existentes.
+
 ## Reparaciones internas
 
 La migración `2026_11_09_000001_create_reparaciones_internas` agrega las tablas

@@ -24,6 +24,7 @@ Auth::routes([
 
         Route::get('/home', 'HomeController@index')->name('home');
         Route::get('/inicio', 'HomeController@inicio')->name('inicio');
+        Route::get('/portada/imagenes/{archivo}', 'HomepageImageController@show')->where('archivo', '[A-Za-z0-9._-]+')->name('homepage.image');
         // Permitir logout con petición get
         Route::get("/logout", function () {
             Auth::logout();

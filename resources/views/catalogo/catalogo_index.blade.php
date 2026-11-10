@@ -50,6 +50,11 @@
     <!-- Grid de productos -->
     <div class="products-grid" id="productsGrid">
         @foreach($lstProducto as $index => $producto)
+            @php
+                $galeriaPieza = collect($producto->imagenes_adicionales ?? [])->map(function ($archivo) { return asset('img/productos/'.$archivo); })->values()->all();
+                $imagenPieza = $producto->img ? asset('img/productos/'.$producto->img) : ($galeriaPieza[0] ?? asset('img/logo.jpg'));
+                $cantidadFotos = count($galeriaPieza) + ($producto->img ? 1 : 0);
+            @endphp
             <div class="jewel-card"
                  data-index="{{ $index }}"
                  data-categoria="{{ $producto->id_categoria }}"
@@ -59,11 +64,8 @@
                  data-code="{{ strtolower($producto->codigo_barras ?? '') }}"
                  data-price="{{ $producto->precio_venta ?? 0 }}">
                 <button type="button" class="jewel-media" aria-label="Ver pieza: {{ $producto->descripcion }}" aria-haspopup="dialog" aria-controls="catalogImageModal">
-                    @if($producto->img)
-                        <img src="{{ asset('img/productos/'.$producto->img) }}" alt="{{ $producto->descripcion }}" loading="lazy">
-                    @else
-                        <img src="{{ asset('img/logo.jpg') }}" alt="imagen" loading="lazy">
-                    @endif
+                    <img src="{{ $imagenPieza }}" alt="{{ $producto->descripcion }}" loading="lazy">
+                    @if($cantidadFotos > 1)<span class="jewel-gallery-count"><i class="fas fa-images" aria-hidden="true"></i> {{ $cantidadFotos }} fotos</span>@endif
                     @if($producto->es_nuevo ?? false)
                         <div class="jewel-badge">Nuevo</div>
                     @endif
@@ -80,7 +82,8 @@
                     </div>
                     <div class="jewel-actions">
                         <button class="btn-view" 
-                                data-img="@if($producto->img){{ asset('img/productos/'.$producto->img) }}@else{{ asset('img/logo.jpg') }}@endif" 
+                                data-img="{{ $imagenPieza }}"
+                                data-galeria="{{ json_encode($galeriaPieza) }}"
                                 data-title="{{ $producto->descripcion }}"
                                 data-material="{{ $producto->cNombreMaterial ?? 'N/A' }}"
                                 data-categoria="{{ $producto->cNombreCategoria ?? 'N/A' }}"
@@ -115,7 +118,7 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="modal-layout">
-                        <img id="modalImage" class="modal-img" src="" alt="producto">
+                        <div class="catalog-modal-gallery"><img id="modalImage" class="modal-img" src="" alt="producto"><p id="catalogGalleryCounter" class="catalog-gallery-counter" hidden></p><div id="catalogGalleryThumbs" class="catalog-gallery-thumbs" aria-label="Fotografías de la pieza"></div></div>
                         <div class="modal-info">
                             <h4 id="modalTitle"></h4>
                             <p id="modalMaterial" style="color: var(--gold); font-weight: 700; font-size: 1.1rem;">
@@ -143,6 +146,7 @@
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ asset('js/catalogo-galeria.js') }}?v={{ filemtime(public_path('js/catalogo-galeria.js')) }}"></script>
 <script>
     $(function(){
         var visibleLimit = 12;
@@ -253,6 +257,7 @@
             var code = $(this).closest('.jewel-card').data('code') || '';
             
             $('#modalImage').attr('src', img);
+            mostrarGaleriaCatalogo(img, $(this).data('galeria'), title);
             $('#modalTitle').text(title);
             $('#modalMaterial span').text(material);
             $('#modalCategoria span').text(categoria);

@@ -24,6 +24,7 @@ class ReparacionesTest extends TestCase
         foreach ([
             '2014_10_12_000000_create_users_table.php' => 'CreateUsersTable',
             '2020_03_04_190205_create_productos_table.php' => 'CreateProductosTable',
+            '2026_11_10_000005_create_producto_imagenes_table.php' => 'CreateProductoImagenesTable',
             '2020_03_10_014423_create_clientes_table.php' => 'CreateClientesTable',
             '2026_06_26_000002_create_notificaciones_leidas_table.php' => 'CreateNotificacionesLeidasTable',
             '2026_04_09_000001_create_egresos_table.php' => 'CreateEgresosTable',

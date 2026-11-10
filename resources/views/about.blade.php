@@ -93,7 +93,7 @@
                         } elseif (strpos($img, 'producto_') === 0) {
                             $imgUrl = asset('img/productos/' . $img);
                         } else {
-                            $imgUrl = asset('storage/about_gallery/' . $img);
+                            $imgUrl = route('homepage.image', ['archivo' => $img]);
                         }
                     @endphp
                     <div class="gallery-item">
@@ -143,7 +143,7 @@
                             if (empty($img)) {
                                 $imgUrl = asset('img/logo.jpg');
                             } elseif (strpos($img, 'team_') === 0) {
-                                $imgUrl = asset('storage/about_gallery/' . $img);
+                                $imgUrl = route('homepage.image', ['archivo' => $img]);
                             } else {
                                 $imgUrl = asset($img);
                             }

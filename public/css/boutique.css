@@ -1,4 +1,12 @@
 /* Public storefront: Colibri. Separate from the point-of-sale interface. */
+.boutique-site .jewel-gallery-count { position:absolute; right:10px; bottom:10px; padding:5px 9px; border-radius:999px; background:#fffdf8ed; color:#706b60; font-size:12px; }
+.boutique-site .catalog-modal-gallery { min-width:0; }
+.boutique-site .catalog-gallery-thumbs { display:flex; gap:9px; overflow-x:auto; padding:8px 3px; }
+.boutique-site .catalog-gallery-thumbs button { flex:0 0 64px; height:64px; border:1px solid var(--line); border-radius:12px; background:#f8f6f0; padding:4px; cursor:pointer; }
+.boutique-site .catalog-gallery-thumbs button.active { border:2px solid var(--gold); }
+.boutique-site .catalog-gallery-thumbs img { width:100%; height:100%; object-fit:contain; }
+.boutique-site .catalog-gallery-counter { margin:12px 0 0; text-align:center; font-size:13px; color:var(--muted); }
+.boutique-site .catalog-gallery-counter[hidden] { display:none; }
 /* Readable body copy; display headings retain their original proportions. */
 .boutique-site { font-size:16px; line-height:1.6; }
 .boutique-site { --ink:#292720; --muted:#706b60; --gold:#967343; --line:#dfd8cb; --paper:#f8f6f0; --serif:'Cormorant Garamond',Georgia,serif; background:var(--paper); color:var(--ink); font-family:Montserrat,Arial,sans-serif; padding-top:94px; }

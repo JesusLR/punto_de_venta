@@ -7,6 +7,7 @@ Desarrollado sobre Laravel 7 y PHP 7.4. El proyecto adapta y amplía el punto de
 ## Funcionalidades
 
 - Página de inicio y catálogo público con búsqueda, imágenes de las piezas y contacto por WhatsApp.
+- Galería de hasta 10 imágenes adicionales por producto, con miniaturas en el detalle del catálogo.
 - Inventario con códigos, categorías, materiales, proveedores, precios y existencias; edición rápida e importación desde Excel.
 - Ventas, clientes y tickets para impresora térmica.
 - Apartados con historial de abonos, fechas de pago y saldo pendiente.

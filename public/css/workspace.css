@@ -352,6 +352,10 @@ body.workspace-refresh { --ws-ink:#263247; --ws-muted:#728095; --ws-accent:#a17d
 .workspace-refresh a.module-card:focus-visible { outline:2px solid var(--ws-accent); outline-offset:4px; }
 
 /* Internal repairs */
+.workspace-refresh .producto-galeria { display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:12px; }
+.workspace-refresh .producto-galeria img { width:100%; height:120px; object-fit:contain; border:1px solid var(--ws-line); border-radius:12px; background:#fafbfc; }
+.workspace-refresh .producto-imagen-card { display:flex; flex-direction:column; gap:8px; }
+.workspace-refresh .producto-imagen-quitar img { opacity:.3; }
 .workspace-refresh #reparacionesResultados.reparaciones-cargando { opacity:.55; pointer-events:none; }
 .workspace-refresh #filtrosReparaciones .form-group-modern { margin-bottom:12px!important; }
 .workspace-refresh #reparacionImagenModal .modal-dialog { width:calc(100% - 32px); max-width:1440px; margin:16px auto; }
