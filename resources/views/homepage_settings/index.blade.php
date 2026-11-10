@@ -94,6 +94,7 @@
             </div>
         </div>
 
+        @include('notificacion')
         @if(session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <i class="fas fa-exclamation-triangle mr-2"></i> {{ session('error') }}
@@ -101,6 +102,9 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+        @endif
+        @if($errors->any())
+            <div class="alert alert-danger" role="alert"><strong>No se pudo guardar:</strong><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
         @endif
 
         <form id="formSettings" action="{{ route('homepage.settings.update') }}" method="POST" enctype="multipart/form-data">
@@ -246,7 +250,7 @@
                                     } elseif (strpos($img, 'producto_') === 0) {
                                         $imgUrl = asset('img/productos/' . $img);
                                     } else {
-                                        $imgUrl = asset('storage/about_gallery/' . $img);
+                                        $imgUrl = route('homepage.image', ['archivo' => $img]);
                                     }
                                 @endphp
                                 <div class="col-md-4 mb-4" id="gallery_item_container_{{ $i }}">
@@ -259,7 +263,7 @@
                                                     <i class="fas fa-camera mr-2"></i> Cambiar Imagen
                                                 </div>
                                             </div>
-                                            <input type="file" name="gallery_image_{{ $i }}" id="gallery_image_{{ $i }}" class="hidden-file-input" accept="image/*" onchange="previewImage(this, 'preview_gallery_image_{{ $i }}')">
+                                            <input type="file" name="gallery_image_{{ $i }}" id="gallery_image_{{ $i }}" class="hidden-file-input" accept="image/jpeg,image/png,image/gif,image/webp,image/bmp" onchange="previewImage(this, 'preview_gallery_image_{{ $i }}')">
                                             <small class="text-muted"><i class="fas fa-hand-pointer mr-1"></i> Haz clic para seleccionar archivo</small>
                                         </div>
                                     </div>
@@ -294,7 +298,7 @@
                                     if (empty($img)) {
                                         $imgUrl = asset('img/logo.jpg');
                                     } elseif (strpos($img, 'team_') === 0) {
-                                        $imgUrl = asset('storage/about_gallery/' . $img);
+                                        $imgUrl = route('homepage.image', ['archivo' => $img]);
                                     } else {
                                         $imgUrl = asset($img);
                                     }
@@ -311,7 +315,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <input type="file" name="team_image_{{ $i }}" id="team_image_{{ $i }}" class="hidden-file-input" accept="image/*" onchange="previewImage(this, 'preview_team_image_{{ $i }}')">
+                                            <input type="file" name="team_image_{{ $i }}" id="team_image_{{ $i }}" class="hidden-file-input" accept="image/jpeg,image/png,image/gif,image/webp,image/bmp" onchange="previewImage(this, 'preview_team_image_{{ $i }}')">
                                             
                                             <div class="form-group-modern mb-2">
                                                 <label for="team_name_{{ $i }}"><i class="fas fa-user"></i> Nombre Completo</label>

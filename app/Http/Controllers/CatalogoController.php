@@ -25,6 +25,7 @@ class CatalogoController extends Controller
         $lstCategorias = Categorias::where('lActivo', 1)->get();
         $lstMateriales = Materiales::where('lActivo', 1)->get();
         $productos = Producto::leftJoin('materiales', 'productos.id_material', '=', 'materiales.id')
+                    ->with('imagenesAdicionales')
                     ->leftJoin('categorias', 'productos.id_categoria', '=', 'categorias.id')
                     // ->where('productos.id_categoria', $categoria->id)
                     // ->where('productos.id_material', $material->id)
@@ -41,6 +42,7 @@ class CatalogoController extends Controller
                     'id_categoria' => $producto->id_categoria,
                     'id_material' => $producto->id_material,
                     'img' => $producto->img,
+                    'imagenes_adicionales' => $producto->imagenesAdicionales->pluck('archivo')->all(),
                     'descripcion' => $producto->descripcion,
                     'precio_venta' => ($producto->cNombreMaterial == 'ORO' && $producto->cNombreCategoria != 'BROQUEL') ? '0.00' : $producto->precio_venta,
                     'cNombreMaterial' => $producto->cNombreMaterial,
@@ -64,6 +66,7 @@ class CatalogoController extends Controller
     public function verCategoria($id_categoria, $id_material){
         try{
             $lstProducto = Producto::where('id_categoria', $id_categoria)
+            ->with('imagenesAdicionales')
             ->where('id_material', $id_material)
             ->where('lActivo', 1)
             ->where('existencia', '>', 0)

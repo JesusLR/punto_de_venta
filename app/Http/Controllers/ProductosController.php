@@ -219,7 +219,11 @@ class ProductosController extends Controller
         try{
             $lstProductos = [];
 
-            $productos = Producto::query()->with(['Proveedores', 'Materiales', 'Categorias']);
+            $productos = Producto::query()->with(['Proveedores', 'Materiales', 'Categorias', 'imagenesAdicionales'])->select('productos.*')
+                ->selectSub(\Illuminate\Support\Facades\DB::table('reparacion_productos as rp')
+                    ->join('reparaciones as r', 'r.id', '=', 'rp.reparacion_id')
+                    ->whereColumn('rp.producto_id', 'productos.id')->where('r.estado', 'EN_REPARACION')
+                    ->selectRaw('COALESCE(SUM(rp.cantidad), 0)'), 'unidades_reparacion');
 
             $offset = (int) $request->input('offset', 0);
             $limit = (int) $request->input('limit', 10);
@@ -302,6 +306,8 @@ class ProductosController extends Controller
                     "precio_compra" => $producto->precio_compra,
                     "precio_venta" => $producto->precio_venta,
                     "existencia" => $producto->existencia,
+                    "unidades_reparacion" => (int) $producto->unidades_reparacion,
+                    "imagenes_adicionales" => $producto->imagenesAdicionales->pluck('archivo')->all(),
                     "img" => $producto->img,
                     "lActivo" => $producto->lActivo,
                     "proveedor" => ($producto->id_proveedor == 0 || !$producto->Proveedores) ? "N/A" : $producto->Proveedores->cNombreProveedor,

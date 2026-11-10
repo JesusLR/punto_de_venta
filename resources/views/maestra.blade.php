@@ -461,7 +461,7 @@
             </a>
 
             <div class="nav-section-title">Gestión de la joyería</div>
-            
+
             {{-- Catálogos --}}
             @if (Auth::user()->hasPermission('ver_categorias') || Auth::user()->hasPermission('ver_clientes') || Auth::user()->hasPermission('ver_materiales') || Auth::user()->hasPermission('ver_proveedores') || Auth::user()->hasPermission('ver_usuarios'))
                 <a class="sidebar-link {{ request()->routeIs(['categorias.*', 'clientes.*', 'materiales.*', 'proveedores.*', 'usuarios.*']) ? '' : 'collapsed' }}" 
@@ -511,7 +511,7 @@
                     <i class="fas fa-chevron-down ml-auto submenu-arrow"></i>
                 </a>
                 <div class="collapse sidebar-submenu {{ request()->routeIs(['roles.*', 'homepage.settings.*', 'general.settings.*', 'whatsapp.*']) ? 'show' : '' }}" id="configuracionesCollapse">
- 
+
                     @if(Auth::user()->hasPermission('manage_roles'))
                         <a class="sidebar-link {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{route("roles.index")}}">
                             <i class="fa fa-key" style="color: #D4AF37;"></i>Roles y Permisos
@@ -570,16 +570,16 @@
             @endif
 
             {{-- Tienda --}}
-            @if (Auth::user()->hasPermission('make_sales') || Auth::user()->hasPermission('ver_apartados') || Auth::user()->hasPermission('view_sales') || Auth::user()->hasPermission('manage_finances'))
-                <a class="sidebar-link {{ request()->routeIs(['vender.*', 'apartados.*', 'ventas.*', 'finanzas.*']) ? '' : 'collapsed' }}" 
+            @if (Auth::user()->hasPermission('make_sales') || Auth::user()->hasPermission('ver_apartados') || Auth::user()->hasPermission('view_sales') || Auth::user()->hasPermission('manage_finances') || Auth::user()->hasPermission('ver_reparaciones'))
+                <a class="sidebar-link {{ request()->routeIs(['vender.*', 'apartados.*', 'ventas.*', 'finanzas.*', 'reparaciones.*']) ? '' : 'collapsed' }}"
                    data-toggle="collapse" href="#ventasCollapse" role="button" 
-                   aria-expanded="{{ request()->routeIs(['vender.*', 'apartados.*', 'ventas.*', 'finanzas.*']) ? 'true' : 'false' }}" 
+                   aria-expanded="{{ request()->routeIs(['vender.*', 'apartados.*', 'ventas.*', 'finanzas.*', 'reparaciones.*']) ? 'true' : 'false' }}"
                    aria-controls="ventasCollapse">
                     <i class="fas fa-store"></i>
                     <span>Tienda</span>
                     <i class="fas fa-chevron-down ml-auto submenu-arrow"></i>
                 </a>
-                <div class="collapse sidebar-submenu {{ request()->routeIs(['vender.*', 'apartados.*', 'ventas.*', 'finanzas.*']) ? 'show' : '' }}" id="ventasCollapse">
+                <div class="collapse sidebar-submenu {{ request()->routeIs(['vender.*', 'apartados.*', 'ventas.*', 'finanzas.*', 'reparaciones.*']) ? 'show' : '' }}" id="ventasCollapse">
                     @if(Auth::user()->hasPermission('make_sales'))
                         <a class="sidebar-link {{ request()->routeIs('vender.*') ? 'active' : '' }}" href="{{route("vender.index")}}">
                             <i class="fa fa-cart-plus" style="color: #95E1D3;"></i>Vender
@@ -593,6 +593,11 @@
                     @if(Auth::user()->hasPermission('view_sales'))
                         <a class="sidebar-link {{ request()->routeIs('ventas.*') ? 'active' : '' }}" href="{{route("ventas.index")}}">
                             <i class="fa fa-list" style="color: #45B7D1;"></i>Ventas
+                        </a>
+                    @endif
+                    @if(Auth::user()->hasPermission('ver_reparaciones'))
+                        <a class="sidebar-link {{ request()->routeIs('reparaciones.*') ? 'active' : '' }}" href="{{ route('reparaciones.index') }}">
+                            <i class="fas fa-tools"></i>Reparaciones
                         </a>
                     @endif
                     @if(Auth::user()->hasPermission('manage_finances'))

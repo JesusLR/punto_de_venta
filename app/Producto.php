@@ -54,6 +54,7 @@ class Producto extends Model
     public function Proveedores() {
         return $this->belongsTo(Proveedores::class, 'id_proveedor', 'id');
     }
+    public function imagenesAdicionales() { return $this->hasMany(ProductoImagen::class)->orderBy('id'); }
     public function Materiales() {
         return $this->belongsTo(Materiales::class, 'id_material', 'id');
     }

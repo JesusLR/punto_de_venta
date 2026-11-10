@@ -4,6 +4,31 @@
     var temporal = null;
     var original = '';
     var editando = false;
+    var temporalesGaleria = [];
+    var cantidadGaleria = 0;
+    var quitarGaleria = [];
+    var galeriaGuardada = [];
+    var quitarPrincipal = false;
+    function dibujarGaleriaGuardada() {
+        var modal = $('#productoFormularioModal');
+        $('#productoGaleriaActual').empty();
+        cantidadGaleria = galeriaGuardada.length - quitarGaleria.length;
+        galeriaGuardada.forEach(function (archivo) {
+            var quitar = quitarGaleria.indexOf(archivo) !== -1;
+            var card = $('<div>', { 'class': 'producto-imagen-card' + (quitar ? ' producto-imagen-quitar' : '') });
+            $('<img>', { src: modal.attr('data-imagenes') + '/' + encodeURIComponent(archivo), alt: 'Imagen adicional guardada' }).appendTo(card);
+            $('<button>', { type: 'button', 'class': 'btn btn-outline-danger btn-sm' }).text(quitar ? 'Conservar' : 'Quitar').on('click', function () {
+                if (guardando) return;
+                quitarGaleria = quitar ? quitarGaleria.filter(function (nombre) { return nombre !== archivo; }) : quitarGaleria.concat(archivo);
+                dibujarGaleriaGuardada();
+            }).appendTo(card);
+            $('#productoGaleriaActual').append(card);
+        });
+    }
+    function liberarGaleria() {
+        temporalesGaleria.forEach(function (src) { URL.revokeObjectURL(src); });
+        temporalesGaleria = []; $('#productoGaleriaPrevia').empty();
+    }
 
     function liberarImagen() {
         if (temporal) URL.revokeObjectURL(temporal);
@@ -41,6 +66,10 @@
         editando = !!producto;
         form.reset();
         liberarImagen();
+        liberarGaleria();
+        galeriaGuardada = producto && Array.isArray(producto.imagenes_adicionales) ? producto.imagenes_adicionales : [];
+        quitarGaleria = []; quitarPrincipal = false;
+        dibujarGaleriaGuardada();
         modal.find('option[data-historico]').remove();
         $('#productoFormularioErrores').addClass('d-none').text('');
         form.action = editando ? modal.attr('data-base-url') + '/' + Number(id) + '/modal' : modal.attr('data-create-url');
@@ -60,6 +89,7 @@
             input.value = value == null ? '' : value;
         });
         original = producto && producto.img ? modal.attr('data-imagenes') + '/' + encodeURIComponent(producto.img) : '';
+        $('#productoQuitarPrincipal').prop('hidden', !original).text('Quitar imagen guardada');
         mostrarImagen(original);
         calcularGanancia();
         modal.modal('show');
@@ -67,22 +97,38 @@
 
     $(function () {
         $('#btnNuevoProductoModal').on('click', function () { window.abrirProductoModal(); });
+        $('#productoQuitarPrincipal').on('click', function () {
+            if (guardando) return;
+            quitarPrincipal = !quitarPrincipal;
+            $(this).text(quitarPrincipal ? 'Conservar imagen guardada' : 'Quitar imagen guardada');
+            mostrarImagen(temporal || (quitarPrincipal ? '' : original));
+        });
         $('#productoModal_precio_compra, #productoModal_precio_venta').on('input', calcularGanancia);
         $('#productoFormularioModal').on('shown.bs.modal', function () {
             $('#productoModalCodigo').trigger('focus');
         }).on('hide.bs.modal', function (event) {
             if (guardando) event.preventDefault();
-        }).on('hidden.bs.modal', liberarImagen);
+        }).on('hidden.bs.modal', function () { liberarImagen(); liberarGaleria(); });
+        $('#productoGaleriaArchivos').on('change', function () {
+            liberarGaleria();
+            var archivos = Array.from(this.files);
+            if (archivos.length + cantidadGaleria > 10 || archivos.some(function (archivo) { return archivo.size > 2 * 1024 * 1024 || !/^image\/(jpeg|png|gif|webp)$/.test(archivo.type); })) {
+                this.value = '';
+                $('#productoFormularioErrores').removeClass('d-none').text('El producto admite hasta 10 imágenes adicionales JPG, PNG, GIF o WebP de hasta 2 MB cada una.');
+                return;
+            }
+            archivos.forEach(function (archivo) { var src = URL.createObjectURL(archivo); temporalesGaleria.push(src); $('<img>', { src: src, alt: 'Vista previa de imagen adicional' }).appendTo('#productoGaleriaPrevia'); });
+        });
 
         $('#productoModalArchivo').on('change', function () {
             liberarImagen();
             var archivo = this.files[0];
             $('#productoFormularioErrores').addClass('d-none').text('');
-            if (!archivo) return mostrarImagen(original);
+            if (!archivo) return mostrarImagen(quitarPrincipal ? '' : original);
             if (archivo.size > 2 * 1024 * 1024 || !/^image\/(jpeg|png|gif|webp)$/.test(archivo.type)) {
                 this.value = '';
                 $('#productoFormularioErrores').removeClass('d-none').text('Selecciona una imagen JPG, PNG, GIF o WebP de hasta 2 MB.');
-                return mostrarImagen(original);
+                return mostrarImagen(quitarPrincipal ? '' : original);
             }
             temporal = URL.createObjectURL(archivo);
             mostrarImagen(temporal);
@@ -91,6 +137,10 @@
         $('#formProductoModal').on('submit', async function (event) {
             event.preventDefault();
             if (guardando || !this.reportValidity()) return;
+            if (document.getElementById('productoGaleriaArchivos').files.length + cantidadGaleria > 10) {
+                $('#productoFormularioErrores').removeClass('d-none').text('El producto admite hasta 10 imágenes adicionales.');
+                return;
+            }
             if (Number(this.elements.precio_venta.value) < Number(this.elements.precio_compra.value)) {
                 guardando = true;
                 var confirmacion = await Swal.fire({
@@ -101,6 +151,9 @@
                 if (!confirmacion.isConfirmed) return;
             }
             var datos = new FormData(this);
+            if (!document.getElementById('productoGaleriaArchivos').files.length) datos.delete('imagenes_adicionales[]');
+            quitarGaleria.forEach(function (archivo) { datos.append('eliminar_imagenes[]', archivo); });
+            if (quitarPrincipal) datos.append('quitar_imagen_principal', '1');
             var botones = $('#productoFormularioModal button');
             var guardar = $('#guardarProductoModal');
             var texto = guardar.html();
