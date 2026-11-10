@@ -47,6 +47,20 @@ Auth::routes([
                 Route::post("/terminarOCancelarVenta", "VenderController@terminarOCancelarVenta")->name("terminarOCancelarVenta");
 
                 // Finanzas
+                // Reparaciones internas
+                Route::get('/reparaciones/clientes', 'ReparacionesExternasController@clientes')->name('reparaciones.clientes');
+                Route::post('/reparaciones/externas', 'ReparacionesExternasController@store')->name('reparaciones.externas.store');
+                Route::get('/reparaciones/{reparacion}/externa/editar', 'ReparacionesExternasController@edit')->name('reparaciones.externas.edit');
+                Route::post('/reparaciones/{reparacion}/externa', 'ReparacionesExternasController@update')->name('reparaciones.externas.update');
+                Route::get('/reparaciones/{reparacion}/imagenes/{imagen}', 'ReparacionesExternasController@imagen')->name('reparaciones.imagen');
+                Route::get('/reparaciones/{reparacion}/pdf', 'ReparacionesExternasController@pdf')->name('reparaciones.pdf');
+                Route::get('/reparaciones', 'ReparacionesController@index')->name('reparaciones.index');
+                Route::get('/reparaciones/productos', 'ReparacionesController@productos')->name('reparaciones.productos');
+                Route::post('/reparaciones', 'ReparacionesController@store')->name('reparaciones.store');
+                Route::post('/reparaciones/{reparacion}/entregar', 'ReparacionesController@entregar')->name('reparaciones.entregar');
+                Route::post('/reparaciones/{reparacion}/nombre', 'ReparacionesController@cambiarNombre')->name('reparaciones.nombre');
+                Route::post('/reparaciones/{reparacion}/cancelar', 'ReparacionesController@cancelar')->name('reparaciones.cancelar');
+
                 Route::get('/finanzas', 'FinanzasController@index')->name('finanzas.index');
                 Route::get('/finanzas/excel', 'FinanzasController@exportExcel')->name('finanzas.excel');
                 Route::post('/finanzas/egresos', 'FinanzasController@store')->name('finanzas.store');

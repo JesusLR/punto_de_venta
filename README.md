@@ -10,6 +10,8 @@ Desarrollado sobre Laravel 7 y PHP 7.4. El proyecto adapta y amplía el punto de
 - Inventario con códigos, categorías, materiales, proveedores, precios y existencias; edición rápida e importación desde Excel.
 - Ventas, clientes y tickets para impresora térmica.
 - Apartados con historial de abonos, fechas de pago y saldo pendiente.
+- Reparaciones internas de varias piezas, retiro temporal de existencias y recepción con egreso automático.
+- Reparaciones externas para clientes o contactos manuales, imágenes opcionales, PDF y entrega con ingreso y egreso.
 - Comprobantes de pago e historiales de abonos en PDF, con numeración de páginas, descarga y envío por WhatsApp.
 - Finanzas con ingresos, egresos y egresos automáticos; estadísticas y exportación a Excel.
 - Usuarios, roles y permisos.

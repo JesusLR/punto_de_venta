@@ -224,6 +224,13 @@ class FinanzasController extends Controller
     public function destroy(Request $request, $id)
     {
         $egreso = Egreso::findOrFail($id);
+        if (\App\Reparacion::where('id_egreso', $egreso->id)->exists()) {
+            $mensaje = 'Este egreso corresponde a una reparación entregada y no se puede eliminar.';
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json(['lSuccess' => false, 'cMensaje' => $mensaje], 422);
+            }
+            return redirect()->back()->with(['mensaje' => $mensaje, 'tipo' => 'warning']);
+        }
         $egreso->delete();
 
         if ($request->ajax() || $request->expectsJson()) {
@@ -418,6 +425,11 @@ class FinanzasController extends Controller
     public function destroyIngreso(Request $request, $id)
     {
         $ingreso = Ingreso::findOrFail($id);
+        if (\App\Reparacion::where('id_ingreso', $ingreso->id)->exists()) {
+            $mensaje = 'Este ingreso corresponde a una reparación entregada y no se puede eliminar.';
+            if ($request->ajax() || $request->expectsJson()) return response()->json(['lSuccess' => false, 'cMensaje' => $mensaje], 422);
+            return redirect()->back()->with(['mensaje' => $mensaje, 'tipo' => 'warning']);
+        }
         $ingreso->delete();
 
         if ($request->ajax() || $request->expectsJson()) {

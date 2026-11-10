@@ -116,6 +116,9 @@ class RoleController extends Controller
                     case 'whatsapp':
                         $groupName = 'WhatsApp';
                         break;
+                    case 'reparaciones':
+                        $groupName = 'Reparaciones';
+                        break;
                 }
             } else {
                 if ($p->slug === 'make_sales') {
@@ -123,6 +126,7 @@ class RoleController extends Controller
                 }
             }
             
+            if ($p->slug === 'ver_todas_reparaciones') $groupName = 'Reparaciones';
             $groupedPermissions[$groupName][] = $p;
         }
 

@@ -125,7 +125,7 @@ class VenderController extends Controller
             $apartado->saveOrFail();
 
             foreach ($productos as $producto) {
-                $productoActualizado = Producto::find($producto->id);
+                $productoActualizado = Producto::lockForUpdate()->find($producto->id);
                 if (!$productoActualizado || $productoActualizado->existencia < $producto->cantidad) {
                     throw new \Exception('No hay existencia suficiente para apartar el producto ' . $producto->descripcion);
                 }
@@ -180,32 +180,53 @@ class VenderController extends Controller
             'tipo_pago.in' => 'El tipo de pago seleccionado no es válido.',
         ]);
 
-        $venta = new Venta();
-        $venta->cNombreVenta = NULL;
-        $venta->id_cliente = $request->input("id_cliente");
-        $venta->id_usuario = $request->input("userID");
-        $venta->tipo_pago = $request->input("tipo_pago");
-        $venta->saveOrFail();
-        $idVenta = $venta->id;
         $productos = $this->obtenerProductos();
-        // Recorrer carrito de compras
-        foreach ($productos as $producto) {
-            // El producto que se vende...
-            $productoVendido = new ProductoVendido();
-            $productoVendido->fill([
-                "id_venta" => $idVenta,
-                "descripcion" => $producto->descripcion,
-                "codigo_barras" => $producto->codigo_barras,
-                "precio" => $producto->precio_venta,
-                "cantidad" => $producto->cantidad,
-            ]);
-            // Lo guardamos
-            $productoVendido->saveOrFail();
-            // Y restamos la existencia del original
-            $productoActualizado = Producto::find($producto->id);
-            $productoActualizado->existencia -= $productoVendido->cantidad;
-            $productoActualizado->saveOrFail();
+        if (!count($productos)) {
+            return redirect()->route('vender.index')->with(['mensaje' => 'No hay productos para vender.', 'tipo' => 'danger']);
         }
+        try {
+            $venta = DB::transaction(function () use ($productos, $request) {
+                $inventario = Producto::whereIn('id', collect($productos)->pluck('id'))->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+                foreach ($productos as $pieza) {
+                    $actual = $inventario->get($pieza->id);
+                    if (!$actual || !$actual->lActivo || $pieza->cantidad <= 0 || $actual->existencia < $pieza->cantidad) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'productos' => 'Ya no hay existencia disponible para vender ' . $pieza->descripcion . '. Puede haberse enviado a reparación o vendido. Revisa el carrito.',
+                        ]);
+                    }
+                }
+                $venta = new Venta();
+                $venta->cNombreVenta = NULL;
+                $venta->id_cliente = $request->input("id_cliente");
+                $venta->id_usuario = $request->input("userID");
+                $venta->tipo_pago = $request->input("tipo_pago");
+                $venta->saveOrFail();
+                $idVenta = $venta->id;
+                // Recorrer carrito de compras
+                foreach ($productos as $producto) {
+                    // El producto que se vende...
+                    $productoVendido = new ProductoVendido();
+                    $productoVendido->fill([
+                        "id_venta" => $idVenta,
+                        "descripcion" => $producto->descripcion,
+                        "codigo_barras" => $producto->codigo_barras,
+                        "precio" => $producto->precio_venta,
+                        "cantidad" => $producto->cantidad,
+                    ]);
+                    // Lo guardamos
+                    $productoVendido->saveOrFail();
+                    // Y restamos la existencia del original
+                    $productoActualizado = $inventario->get($producto->id);
+                    $productoActualizado->existencia -= $productoVendido->cantidad;
+                    $productoActualizado->saveOrFail();
+                }
+                return $venta;
+            }, 3);
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            if ($request->expectsJson()) throw $exception;
+            return redirect()->route('vender.index')->with(['mensaje' => $exception->errors()['productos'][0], 'tipo' => 'danger']);
+        }
+        $idVenta = $venta->id;
 
         $mensaje = 'Venta terminada';
 

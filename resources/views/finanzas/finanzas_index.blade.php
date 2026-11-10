@@ -2,7 +2,7 @@
 @section("titulo", "Finanzas")
 @section("contenido")
 
-<div class="row">
+<div class="row workspace-finanzas">
     <div class="col-12">
         <div class="productos-header">
             <h1><i class="fas fa-wallet"></i> Ingresos y egresos</h1>
@@ -101,7 +101,7 @@
                                 <textarea class="form-control-modern" id="observaciones" name="observaciones" rows="3" placeholder="Opcional..."></textarea>
                             </div>
 
-                            <button type="submit" class="btn-modern btn-danger w-100">
+                            <button type="submit" class="btn-modern btn-success-modern w-100">
                                 <i class="fas fa-save mr-1"></i> Guardar egreso
                             </button>
                         </form>
@@ -177,7 +177,7 @@
                                                         @method('DELETE')
                                                         <input type="hidden" name="fecha_inicio" value="{{ $fechaInicio }}">
                                                         <input type="hidden" name="fecha_fin" value="{{ $fechaFin }}">
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar ingreso manual">
+                                                        <button type="submit" class="btn btn-table-action btn-danger" title="Eliminar ingreso manual">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
@@ -239,7 +239,7 @@
                                                     @method('DELETE')
                                                     <input type="hidden" name="fecha_inicio" value="{{ $fechaInicio }}">
                                                     <input type="hidden" name="fecha_fin" value="{{ $fechaFin }}">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <button type="submit" class="btn btn-table-action btn-danger">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
@@ -314,11 +314,11 @@
             if (tipo === 'egreso') {
                 $title.html('<i class="fas fa-minus-circle text-danger"></i> Capturar egreso');
                 $form.attr('action', '{{ route("finanzas.store") }}');
-                $btn.removeClass('btn-success').addClass('btn-danger').html('<i class="fas fa-save mr-1"></i> Guardar egreso');
+                $btn.removeClass('btn-success btn-danger').addClass('btn-success-modern').html('<i class="fas fa-save mr-1"></i> Guardar egreso');
             } else {
                 $title.html('<i class="fas fa-plus-circle text-success"></i> Capturar ingreso');
                 $form.attr('action', '{{ route("finanzas.storeIngreso") }}');
-                $btn.removeClass('btn-danger').addClass('btn-success').html('<i class="fas fa-save mr-1"></i> Guardar ingreso');
+                $btn.removeClass('btn-danger btn-success').addClass('btn-success-modern').html('<i class="fas fa-save mr-1"></i> Guardar ingreso');
             }
         });
 

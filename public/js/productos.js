@@ -151,7 +151,14 @@ $(document).ready(function () {
             visible: hasPermission('view_cost_and_utility'),
         }, {
             field: "existencia",
-            title: "Existencia",
+            title: "Disponible",
+        }, {
+            field: "unidades_reparacion",
+            title: "En reparación",
+            formatter: function (value) {
+                var cantidad = Math.max(0, Number(value) || 0);
+                return cantidad > 0 ? '<span class="badge badge-warning" title="Unidades fuera del inventario disponible por reparación">' + cantidad + ' uds.</span>' : '—';
+            },
         }, {
             field: "proveedor",
             title: "Proveedor",

@@ -228,7 +228,7 @@ class ApartadosController extends Controller
                 ]);
             }
 
-            $producto = Producto::findOrFail($request->id_producto);
+            $producto = Producto::lockForUpdate()->findOrFail($request->id_producto);
             $cantidad = (float) $request->cantidad;
 
             if ((float) $producto->existencia < $cantidad) {

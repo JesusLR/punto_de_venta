@@ -350,3 +350,73 @@ body.workspace-refresh { --ws-ink:#263247; --ws-muted:#728095; --ws-accent:#a17d
 .workspace-refresh #productoFormularioModal .profit-indicator { flex-wrap:wrap; }
 .workspace-refresh a.module-card { color:inherit; text-decoration:none; }
 .workspace-refresh a.module-card:focus-visible { outline:2px solid var(--ws-accent); outline-offset:4px; }
+
+/* Internal repairs */
+.workspace-refresh #reparacionesResultados.reparaciones-cargando { opacity:.55; pointer-events:none; }
+.workspace-refresh #filtrosReparaciones .form-group-modern { margin-bottom:12px!important; }
+.workspace-refresh #reparacionImagenModal .modal-dialog { width:calc(100% - 32px); max-width:1440px; margin:16px auto; }
+.workspace-refresh #reparacionImagenModal .modal-content { max-height:calc(100vh - 32px); }
+.workspace-refresh #reparacionImagenModal .modal-body { overflow:auto; background:#f6f8fb; }
+.workspace-refresh #reparacionImagenGrande { max-width:100%; max-height:65vh; object-fit:contain; }
+.workspace-refresh #reparacionImagenModal [hidden] { display:none!important; }
+.workspace-refresh .btn-ver-imagen-reparacion { display:block; width:100%; padding:0; border:0; background:transparent; border-radius:12px; cursor:zoom-in; }
+.workspace-refresh .btn-ver-imagen-reparacion:focus-visible { outline:2px solid var(--ws-accent); outline-offset:3px; }
+.workspace-refresh .reparacion-imagen-card { display:flex; flex-direction:column; gap:8px; }
+.workspace-refresh .imagen-por-quitar img { opacity:.3; }
+.workspace-refresh .reparacion-externa-modal .modal-dialog { width:calc(100% - 48px); max-width:1440px; margin:24px auto; }
+.workspace-refresh .reparacion-externa-modal .modal-content { max-height:calc(100vh - 48px); }
+.workspace-refresh .reparacion-externa-modal .modal-body { overflow-y:auto; background:#f6f8fb; padding:24px 26px; }
+.workspace-refresh .reparacion-externa-modal [hidden] { display:none!important; }
+.workspace-refresh .reparacion-imagenes { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:12px; }
+.workspace-refresh .reparacion-imagenes img { width:100%; height:150px; object-fit:contain; border:1px solid var(--ws-line); background:#fafbfc; border-radius:12px; }
+.workspace-refresh .workspace-finanzas .btn-modern { min-height:44px; border-radius:11px; font-size:14px; font-weight:600; box-shadow:none; text-transform:none; }
+.workspace-refresh .workspace-finanzas .btn-table-action { display:inline-flex; align-items:center; justify-content:center; border-radius:9px; width:32px; height:32px; border:0; box-shadow:none; }
+.workspace-refresh .workspace-finanzas .btn-table-action.btn-danger { background:#faedf0; color:#a95160; }
+.workspace-refresh .workspace-finanzas .btn-table-action.btn-danger:hover { background:#f2dce2; color:#923e4e; }
+.workspace-refresh .reparacion-detalle-modal .modal-dialog { width:calc(100% - 32px); max-width:1100px; margin:24px auto; }
+.workspace-refresh .reparacion-detalle-modal .modal-content { max-height:calc(100vh - 48px); }
+.workspace-refresh .reparacion-detalle-modal .modal-body { overflow-y:auto; }
+.workspace-refresh .reparacion-detalle-modal .table th { background:#f5f7fa; color:var(--ws-muted); font-size:13px; border:0; padding:14px; }
+.workspace-refresh .reparacion-detalle-modal .table td { font-size:14px; padding:14px; border-top:0; border-bottom:1px solid var(--ws-line); }
+.workspace-refresh #nombreReparacionModal .modal-dialog { max-width:600px; }
+.workspace-refresh #resultadosPiezasReparacion { max-height:210px; overflow-y:auto; border-radius:12px; }
+.workspace-refresh #resultadosPiezasReparacion .list-group-item { font-size:14px; padding:12px 16px; text-align:left; }
+.workspace-refresh #piezasReparacionSeleccionadas .form-control { min-width:110px; }
+.workspace-refresh #reparacionesApp .table th { font-size:13px; color:var(--ws-muted); white-space:nowrap; }
+.workspace-refresh #reparacionesApp .table td { vertical-align:middle; }
+.workspace-refresh #reparacionesApp .table td:last-child .btn { margin:3px; }
+.workspace-refresh #reparacionesApp .workspace-row-actions .btn { width:31px; height:31px; padding:0; border:0; border-radius:9px; font-size:14px; }
+.workspace-refresh #nuevaReparacionModal .modal-body { padding-top:12px; }
+.workspace-refresh #reparacionesApp .filters-container { padding-bottom:22px; }
+.workspace-refresh #reparacionesApp .reparaciones-table > tbody > tr > td { padding:18px 12px; border-bottom:1px solid var(--ws-line); }
+.workspace-refresh #reparacionesApp .table small { display:inline-block; color:var(--ws-muted); margin-top:4px; font-size:13px; }
+.workspace-refresh #reparacionesApp .table .btn { border-radius:10px; font-size:13px; padding:9px 13px; font-weight:600; box-shadow:none; }
+.workspace-refresh #reparacionesApp .btn-outline-secondary { color:#617188; background:#f0f3f7; border-color:#e1e7ee; }
+.workspace-refresh #reparacionesApp .btn-outline-secondary:hover { background:#e4eaf2; }
+.workspace-refresh #reparacionesApp tr.collapse > td { background:#f6f8fb; }
+.workspace-refresh #reparacionesApp .reparacion-detalle-table { background:#fff; margin:6px 0 16px; }
+.workspace-refresh #nuevaReparacionModal .modal-dialog { width:calc(100% - 48px); max-width:1440px; margin:24px auto; }
+.workspace-refresh #nuevaReparacionModal .modal-content { max-height:calc(100vh - 48px); display:flex; flex-direction:column; }
+.workspace-refresh #nuevaReparacionModal .modal-header,.workspace-refresh #nuevaReparacionModal .modal-footer { flex-shrink:0; }
+.workspace-refresh #nuevaReparacionModal .modal-body { min-height:0; overflow-y:auto; background:#f6f8fb; padding:24px 26px; }
+.workspace-refresh .reparacion-piezas-layout { display:grid; grid-template-columns:minmax(0, .85fr) minmax(0, 1.15fr); gap:20px; }
+.workspace-refresh .reparacion-form-panel { min-width:0; padding:22px; border:1px solid var(--ws-line); border-radius:16px; background:#fff; }
+.workspace-refresh #nuevaReparacionModal #resultadosPiezasReparacion { max-height:310px; }
+.workspace-refresh #nuevaReparacionModal .list-group-item { border-color:var(--ws-line); background:#fafbfc; color:var(--ws-ink); white-space:normal; }
+.workspace-refresh #nuevaReparacionModal .list-group-item:not(:disabled):hover { background:#f2ecdf; }
+.workspace-refresh #nuevaReparacionModal .list-group-item:disabled { color:#8793a4; background:#f3f5f8; }
+.workspace-refresh #nuevaReparacionModal .table th { font-size:12px; color:var(--ws-muted); background:#f5f7fa; border:0; padding:12px 10px; }
+.workspace-refresh #nuevaReparacionModal .table td { padding:12px 10px; font-size:14px; border-top:0; border-bottom:1px solid var(--ws-line); vertical-align:middle; }
+.workspace-refresh #nuevaReparacionModal .table .btn { border-radius:10px; font-size:12px; padding:8px 10px; }
+.workspace-refresh #reparacionSinPiezas { padding:38px 20px; text-align:center; background:#fafbfc; border:1px dashed var(--ws-line); border-radius:12px; font-size:14px; }
+@media(max-width:991px) {
+    .workspace-refresh .reparacion-piezas-layout { grid-template-columns:1fr; }
+    .workspace-refresh #nuevaReparacionModal #resultadosPiezasReparacion { max-height:200px; }
+}
+@media(max-width:575px) {
+    .workspace-refresh #nuevaReparacionModal .modal-dialog { width:calc(100% - 20px); margin:10px auto; }
+    .workspace-refresh #nuevaReparacionModal .modal-content { max-height:calc(100vh - 20px); }
+    .workspace-refresh #nuevaReparacionModal .modal-body { padding:16px; }
+    .workspace-refresh .reparacion-form-panel { padding:16px; }
+    .workspace-refresh #nuevaReparacionModal .modal-footer { flex-wrap:wrap; }
+}
